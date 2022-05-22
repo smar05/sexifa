@@ -37,7 +37,7 @@
         <!-- Add icons to the links using the .nav-icon class
              with font-awesome or any other icon font library -->
         <li class="nav-item">
-          <a class="nav-link">
+          <a class="nav-link" [routerLink]="['/']">
             <i class="nav-icon fas fa-home"></i>
             <p>Home</p>
           </a>
@@ -61,7 +61,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link btn text-left">
+          <a class="nav-link btn text-left" (click)="logout()">
             <i class="nav-icon fas fa-sign-out-alt"></i>
             <p>Log out</p>
           </a>
