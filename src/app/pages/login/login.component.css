@@ -1,0 +1,18 @@
+.login-page {
+  background-color: var(--color-grey);
+}
+
+button {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+button:hover {
+  background-color: var(--color-wine);
+  border-color: var(--color-wine);
+}
+
+button:disabled {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+}

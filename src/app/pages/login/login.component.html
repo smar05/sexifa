@@ -1,68 +1,81 @@
 <div class="hold-transition login-page">
   <div class="login-box">
     <!-- /.login-logo -->
-    <div class="card card-outline card-primary">
+    <div class="card card-outline">
       <div class="card-header text-center">
-        <img
-          width="100%"
-          src="../../../assets/img/sexifa_logo.png"
-          alt=""
-          class="img-thumbnail"
-        />
+        <img width="100%" src="../../../assets/img/sexifa_logo.png" alt="" />
       </div>
       <div class="card-body">
         <p class="login-box-msg">Bienvenido a Sexifa</p>
 
-        <!--
         <ng-container *ngIf="loading">
-          <div class="sk-cube-grid">
-            <div class="sk-cube sk-cube1"></div>
-            <div class="sk-cube sk-cube2"></div>
-            <div class="sk-cube sk-cube3"></div>
-            <div class="sk-cube sk-cube4"></div>
-            <div class="sk-cube sk-cube5"></div>
-            <div class="sk-cube sk-cube6"></div>
-            <div class="sk-cube sk-cube7"></div>
-            <div class="sk-cube sk-cube8"></div>
-            <div class="sk-cube sk-cube9"></div>
-          </div>
+          <app-sk-folding-cube></app-sk-folding-cube>
         </ng-container>
-        -->
 
-        <form autocomplete="off">
-          <div class="input-group mb-3">
-            <input type="email" class="form-control" placeholder="Correo" />
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-envelope"></span>
+        <ng-container *ngIf="!loading">
+          <form autocomplete="off" [formGroup]="f" (ngSubmit)="login()">
+            <div class="input-group mb-3">
+              <input
+                type="email"
+                class="form-control"
+                placeholder="Correo"
+                formControlName="email"
+                [ngClass]="{ 'is-invalid': invalidField('email') }"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-envelope"></span>
+                </div>
+              </div>
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  invalidField('email') && f.controls.email.errors.required
+                "
+              >
+                Por favor llene este campo
+              </div>
+              <div
+                class="invalid-feedback"
+                *ngIf="invalidField('email') && f.controls.email.errors.email"
+              >
+                Por favor ingrese un correo valido
               </div>
             </div>
-            <div class="invalid-feedback">Por favor llene este campo</div>
-          </div>
-          <div class="input-group mb-3">
-            <input
-              type="password"
-              class="form-control"
-              placeholder="Contraseña"
-            />
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-lock"></span>
+            <div class="input-group mb-3">
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Contraseña"
+                formControlName="password"
+                [ngClass]="{ 'is-invalid': invalidField('password') }"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+              <div class="invalid-feedback" *ngIf="invalidField('password')">
+                Por favor llene este campo
               </div>
             </div>
-            <div class="invalid-feedback">Por favor llene este campo</div>
-          </div>
-          <div class="row">
-            <!-- /.col -->
-            <div class="col-12">
-              <button type="submit" class="btn btn-primary btn-block">
-                Iniciar sesion
-              </button>
+            <div class="row">
+              <!-- /.col -->
+              <div class="col-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-block"
+                  [disabled]="f.invalid"
+                >
+                  Iniciar sesion
+                </button>
+              </div>
+              <!-- /.col -->
             </div>
-            <!-- /.col -->
-          </div>
-        </form>
+          </form>
+        </ng-container>
 
+        <!--
         <div class="social-auth-links text-center mt-2 mb-3">
           <a href="#" class="btn btn-block btn-primary">
             <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
@@ -80,6 +93,7 @@
             >Register a new membership</a
           >
         </p>
+        -->
       </div>
       <!-- /.card-body -->
     </div>
