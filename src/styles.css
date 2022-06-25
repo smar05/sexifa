@@ -6,3 +6,7 @@
   --color-dark-wine: #500c12;
   --color-grey: #e2e2e2;
 }
+
+.content-wrapper {
+  height: max-content !important;
+}
