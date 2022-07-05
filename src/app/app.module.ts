@@ -7,10 +7,17 @@ import { HttpClientModule } from '@angular/common/http';
 
 //Modulos personalizados
 import { PagesModule } from './pages/pages.module';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, AppRoutingModule, PagesModule, HttpClientModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    PagesModule,
+    HttpClientModule,
+    FontAwesomeModule,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

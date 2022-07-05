@@ -133,6 +133,7 @@
   height: 65px;
   position: relative;
   border-radius: 50%;
+  background-color: var(--color-red);
   box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 5px -3px,
     rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
 }
@@ -146,6 +147,12 @@
   object-fit: cover;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 5px -3px,
     rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+}
+.box1 .box .image-list .single-image-box .img fa-icon {
+  font-size: 1.5em;
+  position: relative;
+  left: 0.9em;
+  top: 0.9em;
 }
 .box1 .box .image-list .single-image-box .lable {
   font-size: 13px;

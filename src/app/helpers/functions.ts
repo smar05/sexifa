@@ -122,4 +122,26 @@ export class functions {
       reader.onerror = (error) => reject(error);
     });
   }
+
+  /**
+   * Ordenar un array de la A a la Z
+   *
+   * @static
+   * @param {any[]} array Array a ordenar
+   * @param {string} orderBy Parametro por el cual ordenar
+   * @return {*}  {any[]}
+   * @memberof functions
+   */
+  static orderArrayAZ(array: any[], orderBy: string): any[] {
+    return array.sort((a: any, b: any) => {
+      if (a[orderBy] > b[orderBy]) {
+        return 1;
+      }
+      if (a[orderBy] < b[orderBy]) {
+        return -1;
+      }
+      // a must be equal to b
+      return 0;
+    });
+  }
 }
