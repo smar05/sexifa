@@ -144,4 +144,25 @@ export class functions {
       return 0;
     });
   }
+
+  /**
+   * Convertir un json a queryparams
+   *
+   * @static
+   * @param {*} ob
+   * @return {*}  {string}
+   * @memberof functions
+   */
+  static jsonToQueryParams(ob: any): string {
+    let urlParameters: string = Object.entries(ob)
+      .map((e: any[]) => {
+        if (typeof e[1] == 'string') {
+          e[1] = '"' + e[1] + '"';
+        }
+
+        return e.join('=');
+      })
+      .join('&');
+    return urlParameters;
+  }
 }

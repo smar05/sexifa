@@ -1,50 +1,39 @@
+import { IQueryParams } from './../interface/i-query-params';
+import { functions } from 'src/app/helpers/functions';
+import { ApiService } from './api.service';
 import { Icategories } from './../interface/icategories';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoriesService {
-  private urlApi: string = environment.urlFirebase;
+  private urlCategories: string = 'categories';
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiService: ApiService) {}
 
   /**
    * Se toma la informacion de la coleccion de Categorias en Firebase
    *
+   * @param {IQueryParams} [queryParams={}]
    * @return {*}  {Observable<any>}
    * @memberof CategoriesService
    */
-  public getData(): Observable<any> {
-    return this.http.get(`${this.urlApi}categories.json`);
+  public getData(queryParams: IQueryParams = {}): Observable<any> {
+    return this.apiService.get(`${this.urlCategories}.json`, queryParams);
   }
 
   /**
-   * Data filtrada de categorias
-   *
-   * @param {string} orderBy
-   * @param {string} equalTo
-   * @return {*}  {Observable<any>}
-   * @memberof CategoriesService
-   */
-  public getFilterData(orderBy: string, equalTo: string): Observable<any> {
-    return this.http.get(
-      `${this.urlApi}categories.json?orderBy="${orderBy}"&equalTo="${equalTo}"&print=pretty`
-    );
-  }
-
-  /**
-   * TOmar un item de categorias
+   * Tomar un item de categorias
    *
    * @param {string} id
+   * @param {IQueryParams} [queryParams={}]
    * @return {*}  {Observable<any>}
    * @memberof CategoriesService
    */
-  public getItem(id: string): Observable<any> {
-    return this.http.get(`${this.urlApi}categories/${id}.json`);
+  public getItem(id: string, queryParams: IQueryParams = {}): Observable<any> {
+    return this.apiService.get(`${this.urlCategories}/${id}.json`, queryParams);
   }
 
   /**
@@ -55,7 +44,7 @@ export class CategoriesService {
    * @memberof CategoriesService
    */
   public postData(data: Icategories): Observable<any> {
-    return this.http.post(`${this.urlApi}categories.json`, data);
+    return this.apiService.post(`${this.urlCategories}.json`, data);
   }
 
   /**
@@ -67,7 +56,7 @@ export class CategoriesService {
    * @memberof CategoriesService
    */
   public patchData(id: string, data: object): Observable<any> {
-    return this.http.patch(`${this.urlApi}categories/${id}.json`, data);
+    return this.apiService.patch(`${this.urlCategories}/${id}.json`, data);
   }
 
   /**
@@ -78,6 +67,6 @@ export class CategoriesService {
    * @memberof CategoriesService
    */
   public deleteData(id: string): Observable<any> {
-    return this.http.delete(`${this.urlApi}categories/${id}.json`);
+    return this.apiService.delete(`${this.urlCategories}/${id}.json`);
   }
 }
