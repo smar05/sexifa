@@ -1,3 +1,4 @@
+import { IQueryParams } from './../../../interface/i-query-params';
 import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
 import { Icategories } from './../../../interface/icategories';
 import { CategoriesService } from './../../../services/categories.service';
@@ -25,9 +26,12 @@ export class HomeComponent implements OnInit {
   }
 
   public getAllCategories() {
-    this.categoriesService.getData().subscribe(
+    let queryParams: IQueryParams = {
+      orderBy: '"name"',
+    };
+    this.categoriesService.getData(queryParams).subscribe(
       (res: Icategories[]) => {
-        this.categories = functions.orderArrayAZ(res, 'name');
+        this.categories = res;
       },
       (error) => {
         console.error(error);
