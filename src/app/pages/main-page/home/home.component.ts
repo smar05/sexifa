@@ -3,7 +3,6 @@ import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/fo
 import { Icategories } from './../../../interface/icategories';
 import { CategoriesService } from './../../../services/categories.service';
 import { Component, OnInit } from '@angular/core';
-import { functions } from 'src/app/helpers/functions';
 
 @Component({
   selector: 'app-home',
@@ -12,21 +11,23 @@ import { functions } from 'src/app/helpers/functions';
 })
 export class HomeComponent implements OnInit {
   public categories: Icategories[] | null = [];
-  public faMars: any;
 
   constructor(
     private categoriesService: CategoriesService,
     public fontAwesomeIconsService: FontAwesomeIconsService
-  ) {
-    this.faMars = fontAwesomeIconsService.getIcon('faMars');
-  }
+  ) {}
 
   ngOnInit(): void {
     this.getAllCategories();
   }
 
-  public getAllCategories() {
-    this.categoriesService.getData().subscribe(
+  public getAllCategories(): void {
+    let queryParams: IQueryParams = {
+      orderBy: '"name"',
+      limitToFirst: 4,
+      print: 'pretty',
+    };
+    this.categoriesService.getData(queryParams).subscribe(
       (res: Icategories[]) => {
         this.categories = res;
       },
