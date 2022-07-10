@@ -5,4 +5,5 @@ export interface IQueryParams {
   equalTo?: string;
   limitToFirst?: number;
   limitToLast?: number;
+  print?: string;
 }

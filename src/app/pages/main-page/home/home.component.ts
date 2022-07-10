@@ -26,10 +26,7 @@ export class HomeComponent implements OnInit {
   }
 
   public getAllCategories() {
-    let queryParams: IQueryParams = {
-      orderBy: '"name"',
-    };
-    this.categoriesService.getData(queryParams).subscribe(
+    this.categoriesService.getData().subscribe(
       (res: Icategories[]) => {
         this.categories = res;
       },

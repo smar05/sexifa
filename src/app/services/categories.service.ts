@@ -33,11 +33,7 @@ export class CategoriesService {
    * @memberof CategoriesService
    */
   public getItem(id: string, queryParams: IQueryParams = {}): Observable<any> {
-    return this.apiService.get(
-      `${this.urlCategories}/${id}.json?${functions.jsonToQueryParams(
-        queryParams
-      )}`
-    );
+    return this.apiService.get(`${this.urlCategories}/${id}.json`, queryParams);
   }
 
   /**
