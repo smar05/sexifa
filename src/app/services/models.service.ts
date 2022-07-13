@@ -1,3 +1,4 @@
+import { StorageService } from './storage.service';
 import { Imodels } from './../interface/imodels';
 import { Observable } from 'rxjs';
 import { IQueryParams } from './../interface/i-query-params';
@@ -10,7 +11,10 @@ import { Injectable } from '@angular/core';
 export class ModelsService {
   private urlModels: string = 'models';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private storageService: StorageService
+  ) {}
 
   /**
    * Se toma la informacion de la coleccion de modelos en Firebase
@@ -67,5 +71,19 @@ export class ModelsService {
    */
   public deleteData(id: string): Observable<any> {
     return this.apiService.delete(`${this.urlModels}/${id}.json`);
+  }
+
+  //-------- Storage -----//
+
+  /**
+   *  Se obtiene la imagen principal del modelo
+   *
+   * @param {Imodels} model
+   * @return {*}  {Promise<any>}
+   * @memberof ModelsService
+   */
+  public getMainImage(model: Imodels): Promise<any> {
+    let url: string = `${this.urlModels}/${model.id}/main`;
+    return this.storageService.getStorageListAll(url);
   }
 }

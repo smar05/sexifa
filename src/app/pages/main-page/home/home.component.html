@@ -50,93 +50,19 @@
           </div>
         </div>
         <div class="gallery-section">
-          <div class="img-box">
-            <img src="../../../../assets/img/1.JPG" alt="" />
+          <!--Modelos-->
+          <div class="img-box" *ngFor="let model of models">
+            <img [src]="this.mainImages.get(model.id)" alt="" />
             <div class="description">
               <div class="headring-row">
-                <h6 class="heading">Berrylush</h6>
+                <h6 class="heading">{{ model.name }}</h6>
                 <p class="price">$120</p>
               </div>
               <div class="sub-desc">
-                <p>Casual Cottonware</p>
+                <p>{{ this.getCategorieById(model.categorie)?.name }}</p>
               </div>
               <div class="reting">
                 <i class="fas fa-star"></i> <label for="">4.5</label>
-              </div>
-            </div>
-          </div>
-          <div class="img-box">
-            <img src="../../../../assets/img/3.JPG" alt="" />
-            <div class="description">
-              <div class="headring-row">
-                <h6 class="heading">Twinkle</h6>
-                <p class="price">$150</p>
-              </div>
-              <div class="sub-desc">
-                <p>Byodycan with stripes</p>
-              </div>
-              <div class="reting">
-                <i class="fas fa-star"></i> <label for="">4.7</label>
-              </div>
-            </div>
-          </div>
-          <div class="img-box">
-            <img src="../../../../assets/img/2.jpg" alt="" />
-            <div class="description">
-              <div class="headring-row">
-                <h6 class="heading">Blazers</h6>
-                <p class="price">$110</p>
-              </div>
-              <div class="sub-desc">
-                <p>Casual Cottonware</p>
-              </div>
-              <div class="reting">
-                <i class="fas fa-star"></i> <label for="">4.8</label>
-              </div>
-            </div>
-          </div>
-          <div class="img-box">
-            <img src="../../../../assets/img/4.JPG" alt="" />
-            <div class="description">
-              <div class="headring-row">
-                <h6 class="heading">Berrylush</h6>
-                <p class="price">$180</p>
-              </div>
-              <div class="sub-desc">
-                <p>Casual Cottonware</p>
-              </div>
-              <div class="reting">
-                <i class="fas fa-star"></i> <label for="">4.6</label>
-              </div>
-            </div>
-          </div>
-          <div class="img-box">
-            <img src="../../../../assets/img/5.JPG" alt="" />
-            <div class="description">
-              <div class="headring-row">
-                <h6 class="heading">Berrylush</h6>
-                <p class="price">$100</p>
-              </div>
-              <div class="sub-desc">
-                <p>Casual Cottonware</p>
-              </div>
-              <div class="reting">
-                <i class="fas fa-star"></i> <label for="">5.0</label>
-              </div>
-            </div>
-          </div>
-          <div class="img-box">
-            <img src="../../../../assets/img/6.JPG" alt="" />
-            <div class="description">
-              <div class="headring-row">
-                <h6 class="heading">Berrylush</h6>
-                <p class="price">$145</p>
-              </div>
-              <div class="sub-desc">
-                <p>Casual Cottonware</p>
-              </div>
-              <div class="reting">
-                <i class="fas fa-star"></i> <label for="">4.8</label>
               </div>
             </div>
           </div>

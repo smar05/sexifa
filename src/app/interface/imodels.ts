@@ -1,6 +1,7 @@
 export interface Imodels {
-  categorie: string;
-  name: string;
-  page: string;
-  url: string;
+  id: string;
+  categorie?: string;
+  name?: string;
+  page?: string;
+  url?: string;
 }
