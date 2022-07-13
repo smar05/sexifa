@@ -1,3 +1,5 @@
+import { Ipages } from './../../../interface/ipages';
+import { PagesService } from './../../../services/pages.service';
 import { StorageService } from './../../../services/storage.service';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
@@ -16,11 +18,13 @@ export class HomeComponent implements OnInit {
   public categories: Icategories[] | null = [];
   public models: Imodels[] | null = [];
   public mainImages: Map<string, string> = new Map(); //Imagenes principales de los modelos
+  public modelPage: Map<string, string> = new Map(); //Pagina a la que pertenece el modelo
 
   constructor(
     private categoriesService: CategoriesService,
     private modelsService: ModelsService,
     private storageService: StorageService,
+    private pagesService: PagesService,
     public fontAwesomeIconsService: FontAwesomeIconsService
   ) {}
 
@@ -50,6 +54,7 @@ export class HomeComponent implements OnInit {
       (res: Imodels[]) => {
         this.models = res;
         this.setModelMainImages();
+        this.getModelPageName();
       },
       (error) => {
         console.error(error);
@@ -70,6 +75,20 @@ export class HomeComponent implements OnInit {
       this.models.forEach(async (model: Imodels) => {
         let urlMainImage: string = await this.getModelMainImage(model);
         this.mainImages.set(model.id, urlMainImage);
+      });
+    }
+  }
+
+  public getModelPageName(): void {
+    if (this.models && this.models.length > 0) {
+      this.models.forEach((model: Imodels) => {
+        if (model.page) {
+          this.pagesService
+            .getItem(model.page)
+            .subscribe((modelPage: Ipages) => {
+              this.modelPage.set(model.id, modelPage.name);
+            });
+        }
       });
     }
   }
