@@ -52,7 +52,11 @@
         <div class="gallery-section">
           <!--Modelos-->
           <div class="img-box" *ngFor="let model of models">
-            <img [src]="this.mainImages.get(model.id)" alt="" />
+            <img
+              [src]="this.mainImages.get(model.id)"
+              [alt]="model.name"
+              loading="lazy"
+            />
             <div class="description">
               <div class="headring-row">
                 <h6 class="heading">{{ model.name }}</h6>
