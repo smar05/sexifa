@@ -4,4 +4,5 @@ export interface Imodels {
   name?: string;
   page?: string;
   url?: string;
+  description?: string;
 }
