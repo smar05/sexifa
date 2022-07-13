@@ -1,3 +1,6 @@
+import { provideStorage, getStorage } from '@angular/fire/storage';
+import { environment } from './../environments/environment';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { ApiInterceptor } from './interceptor/api.interceptor';
 import { NgModule, ViewChild } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -18,6 +21,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     PagesModule,
     HttpClientModule,
     FontAwesomeModule,
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideStorage(() => getStorage()),
   ],
   providers: [
     {
