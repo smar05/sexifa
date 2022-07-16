@@ -1,3 +1,7 @@
+import { PagesService } from './pages.service';
+import { Icategories } from './../interface/icategories';
+import { CategoriesService } from './categories.service';
+import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
 import { Imodels } from './../interface/imodels';
 import { Observable } from 'rxjs';
@@ -13,7 +17,9 @@ export class ModelsService {
 
   constructor(
     private apiService: ApiService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private categoriesService: CategoriesService,
+    private pagesService: PagesService
   ) {}
 
   /**
@@ -85,5 +91,40 @@ export class ModelsService {
   public getMainImage(model: Imodels): Promise<any> {
     let url: string = `${this.urlModels}/${model.id}/main`;
     return this.storageService.getStorageListAll(url);
+  }
+
+  //-------- DTO functions ------------//
+
+  /**
+   * Interfaz de modelo a DTO
+   *
+   * @param {Imodels} imodel
+   * @return {*}  {Promise<ModelsDTO>}
+   * @memberof ModelsService
+   */
+  public async modelInterfaceToDTO(imodel: Imodels): Promise<ModelsDTO> {
+    let modelDTO: ModelsDTO = {};
+
+    //Parametros basicos
+    modelDTO.id = imodel.id;
+    modelDTO.description = imodel.description;
+    modelDTO.name = imodel.name;
+    modelDTO.url = imodel.url;
+
+    //Imagen principal
+    let image: any = (await this.getMainImage(imodel)).items[0];
+    modelDTO.mainImage = await this.storageService.getDownloadURL(image);
+
+    //Categoria
+    modelDTO.categorie = await this.categoriesService
+      .getItem(imodel.categorie || '')
+      .toPromise();
+
+    //Pages
+    modelDTO.page = await this.pagesService
+      .getItem(imodel.page || '')
+      .toPromise();
+
+    return modelDTO;
   }
 }
