@@ -52,11 +52,7 @@
         <div class="gallery-section">
           <!--Modelos-->
           <div class="img-box" *ngFor="let model of models">
-            <img
-              [src]="this.mainImages.get(model.id)"
-              [alt]="model.name"
-              loading="lazy"
-            />
+            <img [src]="model.mainImage" [alt]="model.name" loading="lazy" />
             <div class="description">
               <div class="headring-row">
                 <h6 class="heading font-weight-bold">{{ model.name }}</h6>
@@ -66,14 +62,14 @@
               <div class="sub-desc">
                 <p>
                   <span class="font-weight-bold">Categoria: </span
-                  >{{ this.getCategorieById(model.categorie)?.name }}
+                  >{{ model.categorie?.name }}
                 </p>
               </div>
               <!--Pagina de la modelo-->
               <div class="sub-desc">
                 <p>
                   <span class="font-weight-bold">Pagina: </span
-                  >{{ this.modelPage.get(model.id) }}
+                  >{{ model.page?.name }}
                 </p>
               </div>
               <div class="reting">
