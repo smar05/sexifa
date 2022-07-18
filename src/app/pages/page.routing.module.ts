@@ -28,7 +28,7 @@ const routes: Routes = [
           ),
       },
       {
-        path: 'model/:id',
+        path: 'model/:url',
         loadChildren: () =>
           import('./main-page/model/model.module').then((m) => m.ModelModule),
       },

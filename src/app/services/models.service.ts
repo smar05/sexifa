@@ -79,6 +79,19 @@ export class ModelsService {
     return this.apiService.delete(`${this.urlModels}/${id}.json`);
   }
 
+  //-------- Funciones comunes ---------//
+  /**
+   * Retorna la url para el router link
+   *
+   * @param {(ModelsDTO | Imodels)} model
+   * @return {*}  {string}
+   * @memberof ModelsService
+   */
+  public getRouterLinkUrl(model: ModelsDTO | Imodels): string {
+    let modelArray: string[] | undefined = model.name?.split(' ');
+    return `${modelArray?.join('-')}_${model.id}`;
+  }
+
   //-------- Storage -----//
 
   /**
