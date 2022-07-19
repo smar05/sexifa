@@ -191,7 +191,7 @@
 .box1 .box .search-box .end-icon {
   width: 30px;
   height: 30px;
-  background: linear-gradient(145deg, #c2baec, #7b71af);
+  background: linear-gradient(145deg, var(--color-wine), var(--color-red));
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -351,7 +351,7 @@
 }
 .bottom-nav i {
   font-size: 1.5rem;
-  color: #7b71af;
+  color: var(--color-red);
   cursor: pointer;
   transition: 0.3s ease;
 }
@@ -661,7 +661,7 @@
   margin-left: 1.5rem;
 }
 
-@media (max-width: 432px) {
+@media (max-width: 550px) {
   .box1 .box .gallery-section {
     max-width: 420px;
     max-height: 350px;
@@ -675,8 +675,7 @@
     margin: 0 1rem;
   }
   .box1 .box .gallery-section .img-box {
-    min-width: 120px;
-    max-width: 125px;
+    max-width: 100%;
     border-radius: 15px;
     margin: 10px;
     height: 300px;
