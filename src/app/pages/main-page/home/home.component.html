@@ -23,14 +23,16 @@
         </div>
         <div class="image-list">
           <!--Categorias-->
-          <div class="single-image-box" *ngFor="let category of categories">
-            <div class="img">
-              <fa-icon
-                [icon]="this.fontAwesomeIconsService.getIcon(category.icon)"
-              ></fa-icon>
+          <ng-container *ngFor="let category of categories">
+            <div class="single-image-box" (click)="this.getAllModels(category)">
+              <div class="img">
+                <fa-icon
+                  [icon]="this.fontAwesomeIconsService.getIcon(category.icon)"
+                ></fa-icon>
+              </div>
+              <p class="lable">{{ this.category.name }}</p>
             </div>
-            <p class="lable">{{ this.category.name }}</p>
-          </div>
+          </ng-container>
           <!--Categorias-->
         </div>
         <!--
