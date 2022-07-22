@@ -1,3 +1,4 @@
+import { functions } from './../../../helpers/functions';
 import { ModelsDTO } from './../../../dto/models-dto';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
@@ -24,7 +25,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAllCategories();
-    this.getAllModels();
   }
 
   public getAllCategories(): void {
@@ -43,13 +43,16 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  public getAllModels(): void {
+  public getAllModels(category: Icategories): void {
+    this.models = [];
     let queryParams: IQueryParams = {
-      orderBy: '"name"',
+      orderBy: '"categorie"',
+      equalTo: `"${category.id}"`,
+      print: 'pretty',
     };
     this.modelsService.getData(queryParams).subscribe(
-      async (res: Imodels[]) => {
-        let imodels: Imodels[] = res;
+      async (res: any) => {
+        let imodels: Imodels[] = functions.jsonToObject(res);
 
         //Imodel to DTO
         imodels.forEach(async (imodel: Imodels) => {
@@ -62,5 +65,9 @@ export class HomeComponent implements OnInit {
         console.error(error);
       }
     );
+  }
+
+  public getUrlModel(model: ModelsDTO) {
+    return this.modelsService.getRouterLinkUrl(model);
   }
 }

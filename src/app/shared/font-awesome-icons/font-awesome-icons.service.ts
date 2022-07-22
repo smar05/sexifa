@@ -1,8 +1,5 @@
-import {
-  faMars,
-  faVenus,
-  faTransgender,
-} from '@fortawesome/free-solid-svg-icons';
+import { faStar, faStarHalfStroke } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -10,9 +7,9 @@ import { Injectable } from '@angular/core';
 })
 export class FontAwesomeIconsService {
   private icons: any = {
-    faMars, //Simbolo masculino
-    faVenus, //Simbolo femenino
-    faTransgender, //Simbolo de transgeneros
+    faStar, //Estrella solida
+    faStarHalfStroke, //Estrella media
+    faStarRegular, //Estrella vacia
   };
 
   constructor() {}

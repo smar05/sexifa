@@ -4,7 +4,7 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>Home</h1>
+          <h1>Modelos</h1>
         </div>
       </div>
     </div>
@@ -23,16 +23,19 @@
         </div>
         <div class="image-list">
           <!--Categorias-->
-          <div class="single-image-box" *ngFor="let category of categories">
-            <div class="img">
-              <fa-icon
-                [icon]="this.fontAwesomeIconsService.getIcon(category.icon)"
-              ></fa-icon>
+          <ng-container *ngFor="let category of categories">
+            <div class="single-image-box" (click)="this.getAllModels(category)">
+              <div class="img">
+                <fa-icon
+                  [icon]="this.fontAwesomeIconsService.getIcon(category.icon)"
+                ></fa-icon>
+              </div>
+              <p class="lable">{{ this.category.name }}</p>
             </div>
-            <p class="lable">{{ this.category.name }}</p>
-          </div>
+          </ng-container>
           <!--Categorias-->
         </div>
+        <!--
         <div class="search-box">
           <div class="search-icon">
             <i class="fas fa-search"></i>
@@ -49,34 +52,46 @@
             <div></div>
           </div>
         </div>
+        -->
         <div class="gallery-section">
           <!--Modelos-->
-          <div class="img-box" *ngFor="let model of models">
-            <img [src]="model.mainImage" [alt]="model.name" loading="lazy" />
-            <div class="description">
-              <div class="headring-row">
-                <h6 class="heading font-weight-bold">{{ model.name }}</h6>
-                <p class="price">$120</p>
-              </div>
-              <!--Categoria-->
-              <div class="sub-desc">
-                <p>
-                  <span class="font-weight-bold">Categoria: </span
-                  >{{ model.categorie?.name }}
-                </p>
-              </div>
-              <!--Pagina de la modelo-->
-              <div class="sub-desc">
-                <p>
-                  <span class="font-weight-bold">Pagina: </span
-                  >{{ model.page?.name }}
-                </p>
-              </div>
-              <div class="reting">
-                <i class="fas fa-star"></i> <label for="">4.5</label>
+          <ng-container *ngFor="let model of models">
+            <div
+              class="img-box"
+              [routerLink]="['/model/' + this.getUrlModel(model)]"
+            >
+              <img [src]="model.mainImage" [alt]="model.name" loading="lazy" />
+              <div class="description">
+                <div class="headring-row">
+                  <h6 class="heading font-weight-bold">{{ model.name }}</h6>
+                  <!--<p class="price">$120</p>-->
+                </div>
+                <!--Categoria-->
+                <div class="sub-desc">
+                  <p>
+                    <span class="font-weight-bold">Categoria: </span
+                    >{{ model.categorie?.name }}
+                  </p>
+                </div>
+                <!--Pagina de la modelo-->
+                <div class="sub-desc">
+                  <p>
+                    <span class="font-weight-bold">Pagina: </span
+                    >{{ model.page?.name }}
+                  </p>
+                </div>
+                <div class="reting">
+                  <fa-icon
+                    [icon]="
+                      this.fontAwesomeIconsService.getIcon(
+                        model.categorie ? model.categorie.icon : ''
+                      )
+                    "
+                  ></fa-icon>
+                </div>
               </div>
             </div>
-          </div>
+          </ng-container>
         </div>
       </div>
     </div>
