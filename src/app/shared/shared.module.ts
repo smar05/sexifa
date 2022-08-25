@@ -4,9 +4,9 @@ import { FooterComponent } from './footer/footer.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SkFoldingCubeComponent } from './spinners/sk-folding-cube/sk-folding-cube.component';
 import { BottomNavComponent } from './bottom-nav/bottom-nav.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { SkFoldingCubeComponent } from './sk-folding-cube/sk-folding-cube.component';
 
 @NgModule({
   declarations: [
