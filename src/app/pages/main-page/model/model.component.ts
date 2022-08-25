@@ -12,6 +12,8 @@ import { ActivatedRoute } from '@angular/router';
 export class ModelComponent implements OnInit {
   public model: ModelsDTO = {};
   public modelId: string = '';
+  public galeria: string[] = [];
+  public imgPrincipal: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -23,6 +25,7 @@ export class ModelComponent implements OnInit {
     this.modelId = this.route.snapshot.paramMap.get('url')?.split('_')[1] || '';
 
     this.getModel();
+    this.getGaleria();
   }
 
   public getModel(): void {
@@ -32,6 +35,17 @@ export class ModelComponent implements OnInit {
         res.id = this.modelId;
         //Interface to DTO
         this.model = await this.modelsService.modelInterfaceToDTO(res);
+        this.imgPrincipal = this.model.mainImage || '';
       });
+  }
+
+  public async getGaleria(): Promise<void> {
+    this.galeria = await this.modelsService.getImages(
+      `${this.modelId}/gallery`
+    );
+  }
+
+  public setImgPrincipal(img: string): void {
+    this.imgPrincipal = img;
   }
 }

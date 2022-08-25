@@ -4,20 +4,48 @@
       <div class="box">
         <div class="top-image-container">
           <div class="icon-row">
-            <div class="icon"><i class="fas fa-chevron-left"></i></div>
-            <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="icon" [routerLink]="['/']">
+              <i class="fas fa-chevron-left"></i>
+            </div>
           </div>
           <div class="carousel">
             <div class="slides">
               <img
-                [src]="this.model.mainImage"
+                [src]="this.imgPrincipal"
                 [alt]="this.model.name"
                 class="slide"
               />
             </div>
           </div>
-          <div class="dots">
-            <div class="active"></div>
+        </div>
+
+        <!--Galeria del modelo-->
+        <div class="row mt-3" *ngIf="this.galeria && this.galeria.length > 0">
+          <div class="row align-items-center">
+            <figure
+              class="col-2 pb-3"
+              (click)="setImgPrincipal(this.model.mainImage || '')"
+            >
+              <img
+                [src]="this.model.mainImage"
+                alt=""
+                class="img-fluid img-rounded"
+                height="100px"
+              />
+            </figure>
+            <figure
+              class="col-2 pb-3"
+              *ngFor="let pic of galeria"
+              (click)="setImgPrincipal(pic)"
+            >
+              <img
+                [src]="pic"
+                alt=""
+                class="img-fluid img-rounded"
+                height="100px"
+              />
+            </figure>
+            <div class="col-2"></div>
           </div>
         </div>
         <div class="content-section">
