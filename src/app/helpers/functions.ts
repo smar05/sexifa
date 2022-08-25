@@ -165,4 +165,18 @@ export class functions {
       .join('&');
     return urlParameters;
   }
+
+  /**
+   * Transforma un objeto Json a un objeto iterable ej: {"abcd":{"nombre":"a"}} -> [{"nombre":"a"}]
+   *
+   * @static
+   * @param {*} data
+   * @return {*}  {any[]}
+   * @memberof functions
+   */
+  static jsonToObject(data: any): any[] {
+    return Object.keys(data).map((a: string) => {
+      return data[a];
+    });
+  }
 }

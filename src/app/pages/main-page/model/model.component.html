@@ -1,0 +1,86 @@
+<div class="content-wrapper">
+  <section class="content">
+    <div class="box2">
+      <div class="box">
+        <div class="top-image-container">
+          <div class="icon-row">
+            <div class="icon"><i class="fas fa-chevron-left"></i></div>
+            <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+          </div>
+          <div class="carousel">
+            <div class="slides">
+              <img
+                [src]="this.model.mainImage"
+                [alt]="this.model.name"
+                class="slide"
+              />
+            </div>
+          </div>
+          <div class="dots">
+            <div class="active"></div>
+          </div>
+        </div>
+        <div class="content-section">
+          <div class="main-heading">
+            <div class="left">
+              <h2 class="title">{{ this.model.name }}</h2>
+              <div class="subtitle">
+                <span class="font-weight-bold">Categoria: </span
+                >{{ this.model.categorie?.name }}
+              </div>
+              <div class="subtitle">
+                <span class="font-weight-bold">Pagina: </span>
+                <a [href]="this.model.url" target="_blank">{{
+                  this.model.page?.name
+                }}</a>
+              </div>
+            </div>
+            <div class="right">
+              <h1 class="price">$120</h1>
+            </div>
+          </div>
+          <div class="color-section">
+            <div class="left">
+              <p class="label">Choose Size</p>
+              <div class="sizes">
+                <div class="select">
+                  <input type="radio" name="size" id="S" />
+                  <label for="S">S</label>
+                </div>
+                <div class="select">
+                  <input type="radio" name="size" id="M" />
+                  <label for="M">M</label>
+                </div>
+                <div class="select">
+                  <input type="radio" name="size" id="L" checked />
+                  <label for="L">L</label>
+                </div>
+                <div class="select">
+                  <input type="radio" name="size" id="XL" />
+                  <label for="XL">XL</label>
+                </div>
+              </div>
+            </div>
+            <div class="right">
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          </div>
+          <div class="description">
+            <div class="tab">
+              <p class="font-weight-bold">Descripción</p>
+            </div>
+            <p class="text">
+              {{ this.model.description }}
+            </p>
+          </div>
+
+          <div class="add-to-catr-btn">
+            <button class="btn">Participar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
