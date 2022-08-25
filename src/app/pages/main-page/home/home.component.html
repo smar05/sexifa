@@ -27,7 +27,9 @@
             <div class="single-image-box" (click)="this.getAllModels(category)">
               <div class="img">
                 <fa-icon
-                  [icon]="this.fontAwesomeIconsService.getIcon(category.icon)"
+                  [icon]="
+                    this.fontAwesomeIconsService.getIcon(category.icon || '')
+                  "
                 ></fa-icon>
               </div>
               <p class="lable">{{ this.category.name }}</p>
@@ -84,7 +86,7 @@
                   <fa-icon
                     [icon]="
                       this.fontAwesomeIconsService.getIcon(
-                        model.categorie ? model.categorie.icon : ''
+                        model.categorie?.icon || ''
                       )
                     "
                   ></fa-icon>

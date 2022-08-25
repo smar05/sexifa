@@ -25,6 +25,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAllCategories();
+    this.getAllModels({ id: '0' });
   }
 
   public getAllCategories(): void {
@@ -35,7 +36,13 @@ export class HomeComponent implements OnInit {
     };
     this.categoriesService.getData(queryParams).subscribe(
       (res: Icategories[]) => {
-        this.categories = res;
+        this.categories = Object.keys(res).map((a: any) => {
+          return {
+            id: a,
+            icon: res[a].icon,
+            name: res[a].name,
+          };
+        });
       },
       (error) => {
         console.error(error);
@@ -51,8 +58,21 @@ export class HomeComponent implements OnInit {
       print: 'pretty',
     };
     this.modelsService.getData(queryParams).subscribe(
-      async (res: any) => {
-        let imodels: Imodels[] = functions.jsonToObject(res);
+      async (res: Imodels[]) => {
+        let imodels: Imodels[] = Object.keys(res)
+          .map((a: any) => {
+            return {
+              id: a,
+              categorie: res[a].categorie,
+              name: res[a].name,
+              page: res[a].page,
+              url: res[a].url,
+              description: res[a].description,
+            };
+          })
+          .sort((a: Imodels, b: Imodels) =>
+            a.name.toLowerCase()?.localeCompare(b.name.toLowerCase())
+          );
 
         //Imodel to DTO
         imodels.forEach(async (imodel: Imodels) => {

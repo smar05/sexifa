@@ -1,3 +1,4 @@
+import { environment } from './../../environments/environment';
 import { PagesService } from './pages.service';
 import { Icategories } from './../interface/icategories';
 import { CategoriesService } from './categories.service';
@@ -14,6 +15,7 @@ import { Injectable } from '@angular/core';
 })
 export class ModelsService {
   private urlModels: string = 'models';
+  private urlImage: string = `/models`;
 
   constructor(
     private apiService: ApiService,
@@ -106,6 +108,48 @@ export class ModelsService {
     return this.storageService.getStorageListAll(url);
   }
 
+  /**
+   *
+   *
+   * @param {string} url
+   * @return {*}  {Promise<string>}
+   * @memberof ModelsService
+   */
+  public async getImage(url: string): Promise<string> {
+    let image: any = (
+      await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
+    ).items[0];
+
+    if (image) {
+      return this.storageService.getDownloadURL(image);
+    }
+
+    return '';
+  }
+
+  /**
+   *
+   *
+   * @param {string} url
+   * @return {*}  {Promise<string[]>}
+   * @memberof ProductsService
+   */
+  public async getImages(url: string): Promise<string[]> {
+    let images: any[] = (
+      await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
+    ).items;
+
+    if (images) {
+      let imagesUrl: string[] = [];
+      for (const image of images) {
+        imagesUrl.push(await this.storageService.getDownloadURL(image));
+      }
+      return imagesUrl;
+    }
+
+    return [];
+  }
+
   //-------- DTO functions ------------//
 
   /**
@@ -125,8 +169,7 @@ export class ModelsService {
     modelDTO.url = imodel.url;
 
     //Imagen principal
-    let image: any = (await this.getMainImage(imodel)).items[0];
-    modelDTO.mainImage = await this.storageService.getDownloadURL(image);
+    modelDTO.mainImage = await this.getImage(`${imodel.id}/main`);
 
     //Categoria
     modelDTO.categorie = await this.categoriesService

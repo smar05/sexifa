@@ -11,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ModelComponent implements OnInit {
   public model: ModelsDTO = {};
-  public modelId: string | undefined = '';
+  public modelId: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -20,7 +20,7 @@ export class ModelComponent implements OnInit {
 
   ngOnInit(): void {
     //Id del modelo
-    this.modelId = this.route.snapshot.paramMap.get('url')?.split('_')[1];
+    this.modelId = this.route.snapshot.paramMap.get('url')?.split('_')[1] || '';
 
     this.getModel();
   }
@@ -29,6 +29,7 @@ export class ModelComponent implements OnInit {
     this.modelsService
       .getItem(this.modelId || '')
       .subscribe(async (res: Imodels) => {
+        res.id = this.modelId;
         //Interface to DTO
         this.model = await this.modelsService.modelInterfaceToDTO(res);
       });
