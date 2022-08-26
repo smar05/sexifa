@@ -1,1 +1,137 @@
-<p>register works!</p>
+<div class="hold-transition login-page">
+  <div class="register-box">
+    <div class="card">
+      <div class="card-body">
+        <p class="login-box-msg">Registrarte</p>
+
+        <form action="../../index.html" method="post">
+          <!--Nombre-->
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nombre completo"
+            />
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+          <!--Correo-->
+          <div class="input-group mb-3">
+            <input
+              type="email"
+              class="form-control"
+              placeholder="Correo electronico"
+            />
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-envelope"></span>
+              </div>
+            </div>
+          </div>
+          <!--Celular-->
+          <div class="input-group mb-3">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="No. Celular"
+            />
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-phone"></span>
+              </div>
+            </div>
+          </div>
+          <!--Fecha de nacimiento-->
+          <div class="form-group mb-3">
+            <label for="born-date">Fecha de nacimiento</label>
+            <input
+              id="born-date"
+              type="date"
+              class="form-control"
+              placeholder="Fecha de nacimiento"
+            />
+          </div>
+          <!--Genero-->
+          <div class="input-group mb-3">
+            <select type="text" class="form-control" placeholder="Genero">
+              <option value="" disabled selected>Genero</option>
+              <option value="">Hombre</option>
+              <option value="">Mujer</option>
+              <option value="">Otro</option>
+            </select>
+          </div>
+
+          <!--Contraseña-->
+          <div class="input-group mb-3">
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Contraseña"
+            />
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <!--Contraseña verificar-->
+          <div class="input-group mb-3">
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Ingrese su contraseña nuevamente"
+            />
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <!--Terminos y condiciones-->
+            <div class="col-8">
+              <div class="icheck-primary">
+                <label for="agreeTerms">
+                  Estoy de acuerdo con los <a href="#">terminos</a>
+                </label>
+                <input
+                  type="checkbox"
+                  id="agreeTerms"
+                  name="terms"
+                  value="agree"
+                />
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-4">
+              <button type="submit" class="btn btn-block bg-red">
+                Registrar
+              </button>
+            </div>
+            <!-- /.col -->
+          </div>
+        </form>
+
+        <!--Metodos de registro-->
+        <div class="social-auth-links text-center">
+          <a href="#" class="btn btn-block btn-primary">
+            <i class="fab fa-facebook mr-2"></i>
+            Registrarme con Facebook
+          </a>
+          <a href="#" class="btn btn-block btn-danger">
+            <i class="fab fa-google-plus mr-2"></i>
+            Registrarme con Google+
+          </a>
+        </div>
+
+        <a [routerLink]="['/login']" class="text-center">Ya tengo una cuenta</a>
+      </div>
+      <!-- /.form-box -->
+    </div>
+    <!-- /.card -->
+  </div>
+  <!-- /.register-box -->
+</div>
