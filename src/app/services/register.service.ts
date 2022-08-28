@@ -22,4 +22,15 @@ export class RegisterService {
       data.password
     );
   }
+
+  /**
+   * Enviar correo para restaurar contraseña de usuario
+   *
+   * @param {string} email
+   * @return {*}  {Promise<void>}
+   * @memberof RegisterService
+   */
+  public forgotPassword(email: string): Promise<void> {
+    return this.afAuth.sendPasswordResetEmail(email);
+  }
 }
