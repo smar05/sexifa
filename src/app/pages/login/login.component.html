@@ -6,7 +6,10 @@
         <img width="100%" src="../../../assets/img/sexifa_logo.png" alt="" />
       </div>
       <div class="card-body">
-        <p class="login-box-msg">Bienvenido a Sexifa</p>
+        <p class="login-box-msg font-weight-bold">Bienvenido a Sexifa</p>
+        <p class="login-box-msg">
+          Gana subscripciones para ver a l@s mejores modelos webcam
+        </p>
 
         <ng-container *ngIf="loading">
           <app-sk-folding-cube></app-sk-folding-cube>
@@ -84,10 +87,6 @@
             <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
           </a>
         </div>
-
-        <p class="mb-1">
-          <a href="forgot-password.html">I forgot my password</a>
-        </p>
         -->
         <p class="mb-0 mt-2 text-center">
           <a
@@ -95,6 +94,9 @@
             class="btn btn-primary btn-block bg-wine"
             >Crear cuenta nueva</a
           >
+        </p>
+        <p class="mb-1 mt-2">
+          <a [routerLink]="['/forgot-password']">Olvide mi contraseña</a>
         </p>
       </div>
       <!-- /.card-body -->
