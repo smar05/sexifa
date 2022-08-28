@@ -13,8 +13,10 @@
 
 .bg-wine {
   background-color: var(--color-wine);
+  border-color: var(--color-wine);
 }
 
 .bg-red {
   background-color: var(--color-red);
+  border-color: var(--color-red);
 }

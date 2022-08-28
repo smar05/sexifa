@@ -9,6 +9,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
+import { AngularFireModule } from '@angular/fire/compat';
+
 //Modulos personalizados
 import { PagesModule } from './pages/pages.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -21,6 +23,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     PagesModule,
     HttpClientModule,
     FontAwesomeModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideStorage(() => getStorage()),
   ],

@@ -2,21 +2,49 @@
   <div class="register-box">
     <div class="card">
       <div class="card-body">
-        <p class="login-box-msg">Registrarte</p>
+        <h2 class="login-box-msg font-weight-bold">Registrarte</h2>
 
-        <form action="../../index.html" method="post">
+        <form (ngSubmit)="onSubmit(f)" [formGroup]="f" autocomplete="on">
           <!--Nombre-->
           <div class="input-group mb-3">
             <input
               type="text"
               class="form-control"
               placeholder="Nombre completo"
+              formControlName="name"
+              required
+              maxlength="50"
+              [ngClass]="{
+                'is-invalid':
+                  invalidField('name') ||
+                  (f.controls.name.invalid &&
+                    f.controls.name.errors?.maxlength) ||
+                  (f.controls.name.invalid && f.controls.name.errors?.pattern)
+              }"
             />
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
               </div>
             </div>
+            <span
+              class="invalid-feedback"
+              *ngIf="invalidField('name') && f.controls.name.errors?.required"
+            >
+              Por favor ingrese su nombre
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.name.errors?.pattern"
+            >
+              Se encontraron caracteres invalidos
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.name.errors?.maxlength"
+            >
+              El nombre no puede tener mas de 50 caracteres
+            </span>
           </div>
           <!--Correo-->
           <div class="input-group mb-3">
@@ -24,12 +52,32 @@
               type="email"
               class="form-control"
               placeholder="Correo electronico"
+              formControlName="email"
+              required
+              [ngClass]="{
+                'is-invalid':
+                  invalidField('email') &&
+                  f.controls.email.invalid &&
+                  f.controls.email.errors?.email
+              }"
             />
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-envelope"></span>
               </div>
             </div>
+            <span
+              class="invalid-feedback"
+              *ngIf="invalidField('email') && f.controls.email.errors?.required"
+            >
+              Por favor ingrese su correo
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.email.errors?.email"
+            >
+              El correo no es valido
+            </span>
           </div>
           <!--Celular-->
           <div class="input-group mb-3">
@@ -37,45 +85,128 @@
               type="number"
               class="form-control"
               placeholder="No. Celular"
+              formControlName="celphone"
+              required
+              [ngClass]="{
+                'is-invalid':
+                  invalidField('celphone') ||
+                  (f.controls.celphone.invalid &&
+                    f.controls.celphone.errors?.max) ||
+                  (f.controls.celphone.invalid &&
+                    f.controls.celphone.errors?.pattern)
+              }"
             />
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-phone"></span>
               </div>
             </div>
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('celphone') && f.controls.celphone.errors?.required
+              "
+            >
+              Por favor ingrese su numero de celular
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.celphone.errors?.pattern"
+            >
+              Se encontraron caracteres invalidos
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.celphone.errors?.max"
+            >
+              El numero de celular no puede tener mas de 10 digitos
+            </span>
           </div>
           <!--Fecha de nacimiento-->
           <div class="form-group mb-3">
             <label for="born-date">Fecha de nacimiento</label>
             <input
               id="born-date"
+              name="born-date"
               type="date"
               class="form-control"
               placeholder="Fecha de nacimiento"
+              formControlName="bornDate"
+              required
+              [ngClass]="{
+                'is-invalid': invalidField('bornDate') || !mayor18Anios()
+              }"
             />
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('bornDate') && f.controls.bornDate.errors?.required
+              "
+            >
+              Por favor ingrese su fecha de nacimiento
+            </span>
+            <span class="invalid-feedback" *ngIf="!mayor18Anios()">
+              Debe ser mayor de 18 años para registrarse
+            </span>
           </div>
           <!--Genero-->
           <div class="input-group mb-3">
-            <select type="text" class="form-control" placeholder="Genero">
+            <select
+              type="text"
+              class="form-control"
+              placeholder="Genero"
+              formControlName="sex"
+              required
+              [ngClass]="{
+                'is-invalid': invalidField('sex')
+              }"
+            >
               <option value="" disabled selected>Genero</option>
-              <option value="">Hombre</option>
-              <option value="">Mujer</option>
-              <option value="">Otro</option>
+              <option value="Hombre">Hombre</option>
+              <option value="Mujer">Mujer</option>
+              <option value="Otro">Otro</option>
             </select>
-          </div>
 
+            <span
+              class="invalid-feedback"
+              *ngIf="invalidField('sex') && f.controls.sex.errors?.required"
+            >
+              Por favor ingrese su genero
+            </span>
+          </div>
           <!--Contraseña-->
           <div class="input-group mb-3">
             <input
               type="password"
               class="form-control"
               placeholder="Contraseña"
+              formControlName="password"
+              required
+              [ngClass]="{
+                'is-invalid':
+                  invalidField('password') ||
+                  f.controls.password.errors?.minlength
+              }"
             />
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
               </div>
             </div>
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('password') && f.controls.password.errors?.required
+              "
+            >
+              Por favor ingrese su contraseña
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.password.errors?.minlength"
+            >
+              La contraseña debe tener minimo 6 caracteres
+            </span>
           </div>
           <!--Contraseña verificar-->
           <div class="input-group mb-3">
@@ -83,12 +214,30 @@
               type="password"
               class="form-control"
               placeholder="Ingrese su contraseña nuevamente"
+              formControlName="repeatPassword"
+              required
+              [ngClass]="{
+                'is-invalid':
+                  invalidField('repeatPassword') || !passwordCoincidence()
+              }"
             />
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
               </div>
             </div>
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('repeatPassword') &&
+                f.controls.repeatPassword.errors?.required
+              "
+            >
+              Por favor ingrese su contraseña
+            </span>
+            <span class="invalid-feedback" *ngIf="!passwordCoincidence()">
+              La contraseña no coincide
+            </span>
           </div>
           <div class="row">
             <!--Terminos y condiciones-->
@@ -102,12 +251,29 @@
                   id="agreeTerms"
                   name="terms"
                   value="agree"
+                  formControlName="terms"
+                  required
+                  [ngClass]="{
+                    'is-invalid': invalidField('terms')
+                  }"
                 />
+                <span
+                  class="invalid-feedback"
+                  *ngIf="
+                    invalidField('terms') && f.controls.terms.errors?.required
+                  "
+                >
+                  Por favor acepte los terminos y condiciones
+                </span>
               </div>
             </div>
             <!-- /.col -->
             <div class="col-4">
-              <button type="submit" class="btn btn-block bg-red">
+              <button
+                type="submit"
+                class="btn btn-block bg-red"
+                [disabled]="f.invalid"
+              >
                 Registrar
               </button>
             </div>
@@ -116,6 +282,7 @@
         </form>
 
         <!--Metodos de registro-->
+        <!--
         <div class="social-auth-links text-center">
           <a href="#" class="btn btn-block btn-primary">
             <i class="fab fa-facebook mr-2"></i>
@@ -126,6 +293,7 @@
             Registrarme con Google+
           </a>
         </div>
+        -->
 
         <a [routerLink]="['/login']" class="text-center">Ya tengo una cuenta</a>
       </div>
