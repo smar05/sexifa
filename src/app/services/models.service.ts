@@ -14,7 +14,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ModelsService {
-  private urlModels: string = 'models';
+  private urlModels: string = environment.urlCollections.models;
   private urlImage: string = `/models`;
 
   constructor(

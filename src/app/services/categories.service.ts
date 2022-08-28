@@ -1,3 +1,4 @@
+import { environment } from './../../environments/environment';
 import { IQueryParams } from './../interface/i-query-params';
 import { functions } from 'src/app/helpers/functions';
 import { ApiService } from './api.service';
@@ -9,7 +10,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class CategoriesService {
-  private urlCategories: string = 'categories';
+  private urlCategories: string = environment.urlCollections.categories;
 
   constructor(private apiService: ApiService) {}
 

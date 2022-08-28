@@ -1,3 +1,4 @@
+import { UserService } from './../../services/user.service';
 import { alerts } from 'src/app/helpers/alerts';
 import { RegisterService } from './../../services/register.service';
 import { functions } from 'src/app/helpers/functions';
@@ -5,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, NgForm, Validators } from '@angular/forms';
 import { Iregister } from 'src/app/interface/iregister';
 import { Router } from '@angular/router';
+import { Iuser } from 'src/app/interface/iuser';
 
 @Component({
   selector: 'app-register',
@@ -77,7 +79,8 @@ export class RegisterComponent implements OnInit {
   constructor(
     private form: FormBuilder,
     private registerService: RegisterService,
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {}
@@ -101,7 +104,20 @@ export class RegisterComponent implements OnInit {
 
     try {
       let resp: any = await this.registerService.registerAuth(data);
-      //resp.user.uid;
+      const uid: string = resp.user.uid;
+
+      const user: Iuser = {
+        id: uid,
+        name: this.name.value,
+        email: this.email.value,
+        celphone: this.celphone.value,
+        bornDate: new Date(this.bornDate.value),
+        sex: this.sex.value,
+        active: true,
+      };
+
+      await this.userService.postData(user).toPromise();
+
       this.loading = false;
 
       alerts.basicAlert(
@@ -112,6 +128,8 @@ export class RegisterComponent implements OnInit {
 
       this.router.navigateByUrl('/login');
     } catch (error: any) {
+      console.error(error);
+
       let code: string = error.code;
       let errorText: string = '';
 
