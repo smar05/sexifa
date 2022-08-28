@@ -24,7 +24,9 @@ export class ApiInterceptor implements HttpInterceptor {
     //ni de refrescar token
     if (
       request.url == environment.urlLogin ||
-      request.url == environment.urlRefreshToken
+      request.url == environment.urlRefreshToken ||
+      (request.url.includes(environment.urlCollections.users) &&
+        request.method == 'POST') //Para registrar un nuevo usuario
     )
       return next.handle(request);
     this.token = localStorage.getItem('token');

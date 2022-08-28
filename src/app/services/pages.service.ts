@@ -1,3 +1,4 @@
+import { environment } from './../../environments/environment';
 import { Ipages } from './../interface/ipages';
 import { Observable } from 'rxjs';
 import { IQueryParams } from './../interface/i-query-params';
@@ -8,7 +9,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class PagesService {
-  private urlPages: string = 'pages';
+  private urlPages: string = environment.urlCollections.pages;
 
   constructor(private apiService: ApiService) {}
 

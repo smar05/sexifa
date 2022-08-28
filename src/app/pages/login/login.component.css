@@ -16,3 +16,8 @@ button:disabled {
   background-color: var(--color-red);
   border-color: var(--color-red);
 }
+
+.btn-register {
+  background-color: var(--color-wine);
+  border-color: var(--color-wine);
+}

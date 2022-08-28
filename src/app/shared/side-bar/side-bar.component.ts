@@ -14,6 +14,7 @@ export class SideBarComponent implements OnInit {
   //Funcion de salida del sistema
   public logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('localId');
     localStorage.removeItem('refreshToken');
     this.router.navigateByUrl('/login');
   }
