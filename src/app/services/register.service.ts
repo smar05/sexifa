@@ -33,4 +33,16 @@ export class RegisterService {
   public forgotPassword(email: string): Promise<void> {
     return this.afAuth.sendPasswordResetEmail(email);
   }
+
+  /**
+   * Verificar el email registrado
+   *
+   * @return {*}  {Promise<any>}
+   * @memberof RegisterService
+   */
+  public verificEmail(): Promise<any> {
+    return this.afAuth.currentUser.then((user: any) => {
+      user.sendEmailVerification();
+    });
+  }
 }

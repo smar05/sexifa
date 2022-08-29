@@ -106,6 +106,14 @@ export class RegisterComponent implements OnInit {
       let resp: any = await this.registerService.registerAuth(data);
       const uid: string = resp.user.uid;
 
+      this.registerService.verificEmail().then((res: any) => {
+        alerts.basicAlert(
+          'Correo enviado',
+          'Se te ha enviado un correo para verificacion',
+          'info'
+        );
+      });
+
       const user: Iuser = {
         id: uid,
         name: this.name.value,
@@ -119,12 +127,6 @@ export class RegisterComponent implements OnInit {
       await this.userService.postData(user).toPromise();
 
       this.loading = false;
-
-      alerts.basicAlert(
-        'Usuario registrado',
-        'El usuario ha sido registrado con exito',
-        'success'
-      );
 
       this.router.navigateByUrl('/login');
     } catch (error: any) {

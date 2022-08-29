@@ -1,3 +1,4 @@
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { environment } from './../../environments/environment';
 import { Ilogin } from './../interface/ilogin';
 import { HttpClient } from '@angular/common/http';
@@ -9,7 +10,7 @@ import { map } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class LoginService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private afAuth: AngularFireAuth) {}
 
   /**
    *  Autenticacion de firebase
@@ -21,6 +22,10 @@ export class LoginService {
   public login(data: Ilogin): Observable<any> {
     return this.http.post(environment.urlLogin, data).pipe(
       map((resp: any) => {
+        console.log(
+          '🚀 ~ file: login.service.ts ~ line 32 ~ LoginService ~ map ~ resp',
+          resp
+        );
         //Se captura el idToken y refreshToken
         localStorage.setItem('token', resp.idToken);
         localStorage.setItem('refreshToken', resp.refreshToken);
@@ -29,5 +34,16 @@ export class LoginService {
         localStorage.setItem('localId', resp.localId);
       })
     );
+  }
+
+  /**
+   *
+   *
+   * @param {Ilogin} data
+   * @return {*}  {Promise<any>}
+   * @memberof LoginService
+   */
+  public loginWithAuthFire(data: Ilogin): Promise<any> {
+    return this.afAuth.signInWithEmailAndPassword(data.email, data.password);
   }
 }
