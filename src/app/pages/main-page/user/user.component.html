@@ -1,1 +1,147 @@
-<p>user works!</p>
+<div class="content-wrapper">
+  <!-- Main content -->
+  <section class="content">
+    <div class="page-wrapper font-poppins mt-2">
+      <div class="wrapper wrapper--w780">
+        <div class="card card-3">
+          <div class="card-body">
+            <h2 class="title">Mi cuenta</h2>
+            <form (ngSubmit)="onSubmit(f)" [formGroup]="f" autocomplete="on">
+              <!--Nombre-->
+              <div class="input-group mb-3">
+                <label for="">Nombre completo</label>
+                <input
+                  type="text"
+                  class="input--style-3"
+                  placeholder="Nombre completo"
+                  formControlName="name"
+                  required
+                  maxlength="50"
+                  [ngClass]="{
+                    'is-invalid':
+                      invalidField('name') ||
+                      (f.controls.name.invalid &&
+                        f.controls.name.errors?.maxlength) ||
+                      (f.controls.name.invalid &&
+                        f.controls.name.errors?.pattern)
+                  }"
+                />
+                <span
+                  class="invalid-feedback"
+                  *ngIf="
+                    invalidField('name') && f.controls.name.errors?.required
+                  "
+                >
+                  Por favor ingrese su nombre
+                </span>
+                <span
+                  class="invalid-feedback"
+                  *ngIf="f.controls.name.errors?.pattern"
+                >
+                  Se encontraron caracteres invalidos
+                </span>
+                <span
+                  class="invalid-feedback"
+                  *ngIf="f.controls.name.errors?.maxlength"
+                >
+                  El nombre no puede tener mas de 50 caracteres
+                </span>
+              </div>
+              <!--Correo-->
+              <div class="input-group mb-3">
+                <div class="grid">
+                  <div class="row">
+                    <label for="">Correo electronico</label>
+                  </div>
+                  <div class="row">
+                    <p class="text-white">mantillasanchezr@gmail.com</p>
+                  </div>
+                </div>
+              </div>
+              <!--Celular-->
+              <div class="input-group mb-3">
+                <label for="">No. Celular</label>
+                <input
+                  type="number"
+                  class="input--style-3"
+                  placeholder="No. Celular"
+                  formControlName="celphone"
+                  required
+                  [ngClass]="{
+                    'is-invalid':
+                      invalidField('celphone') ||
+                      (f.controls.celphone.invalid &&
+                        f.controls.celphone.errors?.max) ||
+                      (f.controls.celphone.invalid &&
+                        f.controls.celphone.errors?.pattern)
+                  }"
+                />
+                <span
+                  class="invalid-feedback"
+                  *ngIf="
+                    invalidField('celphone') &&
+                    f.controls.celphone.errors?.required
+                  "
+                >
+                  Por favor ingrese su numero de celular
+                </span>
+                <span
+                  class="invalid-feedback"
+                  *ngIf="f.controls.celphone.errors?.pattern"
+                >
+                  Se encontraron caracteres invalidos
+                </span>
+                <span
+                  class="invalid-feedback"
+                  *ngIf="f.controls.celphone.errors?.max"
+                >
+                  El numero de celular no puede tener mas de 10 digitos
+                </span>
+              </div>
+              <!--Fecha de nacimiento-->
+              <div class="form-group mb-3">
+                <div class="grid">
+                  <div class="row">
+                    <label for="born-date">Fecha de nacimiento</label>
+                  </div>
+                  <div class="row">
+                    <p class="text-white">08/07/1998</p>
+                  </div>
+                </div>
+              </div>
+              <!--Genero-->
+              <div class="input-group mb-3">
+                <select
+                  type="text"
+                  class="form-control"
+                  placeholder="Genero"
+                  formControlName="sex"
+                  required
+                  [ngClass]="{
+                    'is-invalid': invalidField('sex')
+                  }"
+                >
+                  <option value="" disabled selected>Genero</option>
+                  <option value="Hombre">Hombre</option>
+                  <option value="Mujer">Mujer</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                <span
+                  class="invalid-feedback"
+                  *ngIf="invalidField('sex') && f.controls.sex.errors?.required"
+                >
+                  Por favor ingrese su genero
+                </span>
+              </div>
+              <div class="p-t-10">
+                <button class="btn btn--pill bg-red" type="submit">
+                  Guardar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

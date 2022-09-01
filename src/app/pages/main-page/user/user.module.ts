@@ -1,3 +1,4 @@
+import { ReactiveFormsModule } from '@angular/forms';
 import { UserComponent } from './user.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgModule } from '@angular/core';
@@ -8,6 +9,12 @@ import { UserRoutingModule } from './user-routing.module';
 
 @NgModule({
   declarations: [UserComponent],
-  imports: [CommonModule, UserRoutingModule, FontAwesomeModule, SharedModule],
+  imports: [
+    CommonModule,
+    UserRoutingModule,
+    FontAwesomeModule,
+    SharedModule,
+    ReactiveFormsModule,
+  ],
 })
 export class UserModule {}
