@@ -5,7 +5,7 @@
       <div class="wrapper wrapper--w780">
         <div class="card card-3">
           <div class="card-body">
-            <h2 class="title">Mi cuenta</h2>
+            <h2 class="title">Mis datos</h2>
             <form (ngSubmit)="onSubmit(f)" [formGroup]="f" autocomplete="on">
               <!--Nombre-->
               <div class="input-group mb-3">
@@ -54,7 +54,7 @@
                     <label for="">Correo electronico</label>
                   </div>
                   <div class="row">
-                    <p class="text-white">mantillasanchezr@gmail.com</p>
+                    <p class="text-white">{{ email.value }}</p>
                   </div>
                 </div>
               </div>
@@ -105,7 +105,7 @@
                     <label for="born-date">Fecha de nacimiento</label>
                   </div>
                   <div class="row">
-                    <p class="text-white">08/07/1998</p>
+                    <p class="text-white">{{ bornDate.value.split("T")[0] }}</p>
                   </div>
                 </div>
               </div>
