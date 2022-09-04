@@ -54,6 +54,6 @@ export class ApiService {
    * @memberof ApiService
    */
   public patch(endPoint: string, data: object): Observable<any> {
-    return this.http.patch(`${this.urlApi}${endPoint}&print=pretty`, data);
+    return this.http.patch(`${this.urlApi}${endPoint}`, data);
   }
 }

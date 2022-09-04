@@ -44,6 +44,11 @@ const routes: Routes = [
         loadChildren: () =>
           import('./main-page/model/model.module').then((m) => m.ModelModule),
       },
+      {
+        path: 'user',
+        loadChildren: () =>
+          import('./main-page/user/user.module').then((m) => m.UserModule),
+      },
       { path: '**', component: Error404Component },
     ],
   },

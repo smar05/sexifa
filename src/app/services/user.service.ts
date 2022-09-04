@@ -25,18 +25,6 @@ export class UserService {
   }
 
   /**
-   * Tomar un item de usuarios
-   *
-   * @param {string} id
-   * @param {IQueryParams} [queryParams={}]
-   * @return {*}  {Observable<any>}
-   * @memberof UsersService
-   */
-  public getItem(id: string, queryParams: IQueryParams = {}): Observable<any> {
-    return this.apiService.get(`${this.urlUsers}/${id}.json`, queryParams);
-  }
-
-  /**
    * Guardar informacion del usuario
    *
    * @param {Iuser} data
