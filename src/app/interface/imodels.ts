@@ -5,4 +5,5 @@ export interface Imodels {
   page?: string;
   url?: string;
   description?: string;
+  active?: boolean;
 }
