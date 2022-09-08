@@ -665,7 +665,7 @@
 @media (max-width: 550px) {
   .box1 .box .gallery-section {
     max-width: 420px;
-    max-height: 350px;
+    /*max-height: 350px;*/
     margin-top: 20px;
     display: flex;
     justify-content: center;
