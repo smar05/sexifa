@@ -1,3 +1,4 @@
+import { LocationService } from './../../services/location.service';
 import { UserService } from './../../services/user.service';
 import { alerts } from 'src/app/helpers/alerts';
 import { RegisterService } from './../../services/register.service';
@@ -80,10 +81,18 @@ export class RegisterComponent implements OnInit {
     private form: FormBuilder,
     private registerService: RegisterService,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private locationService: LocationService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.locationService.getAllContries().subscribe((res: any[]) => {
+      console.log(
+        '🚀 ~ file: register.component.ts ~ line 90 ~ RegisterComponent ~ this.locationService.getAllContries ~ res',
+        res
+      );
+    });
+  }
 
   public async onSubmit(f: any): Promise<void> {
     this.formSubmitted = true; //Formulario enviado

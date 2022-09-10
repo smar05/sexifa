@@ -1,4 +1,5 @@
 const apiKey: string = 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8';
+const apiKeyLocation: string = 'aa919bc469a28cd605aab17f478818ec';
 
 const firebaseConfig: any = {
   apiKey: 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8',
@@ -15,6 +16,7 @@ export const environment = {
   urlFirebase: `https://sexifa-269bf-default-rtdb.firebaseio.com/`,
   urlLogin: `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
   urlGetUser: `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
+  urlLocation: `http://battuta.medunes.net/api/`,
   urlCollections: {
     categories: 'categories',
     models: 'models',
@@ -23,4 +25,5 @@ export const environment = {
   },
   urlRefreshToken: `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
   firebaseConfig,
+  apiKeyLocation,
 };
