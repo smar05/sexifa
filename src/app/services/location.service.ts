@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 
@@ -9,24 +7,25 @@ import { Injectable } from '@angular/core';
 export class LocationService {
   private urlLocation: string = environment.urlLocation;
   private apiKeyLocation: string = environment.apiKeyLocation;
+  private headers: Headers = new Headers();
 
-  private headers: HttpHeaders = new HttpHeaders().set(
-    'Access-Control-Allow-Origin',
-    'http://battuta.medunes.net'
-  );
-
-  constructor(private http: HttpClient) {}
+  constructor() {
+    this.headers.append('X-CSCAPI-KEY', this.apiKeyLocation);
+    this.headers.append('Access-Control-Allow-Origin', '*');
+  }
 
   /**
    * Consulta de todos los paises
    *
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Promise<any>}
    * @memberof LocationService
    */
-  public getAllContries(): Observable<any> {
-    return this.http.get(`${this.urlLocation}country/all`, {
-      params: { key: this.apiKeyLocation },
+  public getAllContries(): Promise<any> {
+    let requestOptions: any = {
+      method: 'GET',
       headers: this.headers,
-    });
+      redirect: 'follow',
+    };
+    return fetch(`${this.urlLocation}/countries`, requestOptions);
   }
 }

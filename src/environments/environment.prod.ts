@@ -16,7 +16,7 @@ export const environment = {
   urlFirebase: `https://sexifa-269bf-default-rtdb.firebaseio.com/`,
   urlLogin: `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
   urlGetUser: `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
-  urlLocation: `http://battuta.medunes.net/api/`,
+  urlLocation: `https://api.countrystatecity.in/v1/`,
   urlCollections: {
     categories: 'categories',
     models: 'models',

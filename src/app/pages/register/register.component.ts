@@ -86,7 +86,7 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.locationService.getAllContries().subscribe((res: any[]) => {
+    this.locationService.getAllContries().then((res: any[]) => {
       console.log(
         '🚀 ~ file: register.component.ts ~ line 90 ~ RegisterComponent ~ this.locationService.getAllContries ~ res',
         res
