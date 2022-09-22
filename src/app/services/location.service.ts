@@ -17,15 +17,66 @@ export class LocationService {
   /**
    * Consulta de todos los paises
    *
-   * @return {*}  {Promise<any>}
+   * @return {*}  {Promise<string>}
    * @memberof LocationService
    */
-  public getAllContries(): Promise<any> {
+  public getAllContries(): Promise<string> {
     let requestOptions: any = {
       method: 'GET',
       headers: this.headers,
       redirect: 'follow',
     };
-    return fetch(`${this.urlLocation}/countries`, requestOptions);
+    return fetch(`${this.urlLocation}countries`, requestOptions)
+      .then((response: any) => response.text())
+      .catch((err: any) => {
+        console.error(err);
+      });
+  }
+
+  /**
+   * Todos los estados por pais
+   *
+   * @param {string} iso Iso del pais
+   * @return {*}  {Promise<string>}
+   * @memberof LocationService
+   */
+  public getAllStatesByCountry(iso: string): Promise<string> {
+    let requestOptions: any = {
+      method: 'GET',
+      headers: this.headers,
+      redirect: 'follow',
+    };
+    return fetch(`${this.urlLocation}countries/${iso}/states`, requestOptions)
+      .then((response: any) => response.text())
+      .catch((err: any) => {
+        console.error(err);
+      });
+  }
+
+  /**
+   * Todas las ciudades por pais y estado
+   *
+   * @param {string} isoCountry Iso del pais
+   * @param {string} isoState Iso del estado
+   * @return {*}  {Promise<string>}
+   * @memberof LocationService
+   */
+  public getAllCitiesByCountryAndState(
+    isoCountry: string,
+    isoState: string
+  ): Promise<string> {
+    let requestOptions: any = {
+      method: 'GET',
+      headers: this.headers,
+      redirect: 'follow',
+    };
+    return fetch(
+      `${this.urlLocation}countries/${isoCountry}/states/${isoState}/cities`,
+      requestOptions
+    )
+      .then((response: any) => response.text())
+      .catch((err: any) => {
+        console.error(err);
+      });
   }
 }

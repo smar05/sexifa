@@ -8,6 +8,9 @@ import { FormBuilder, NgForm, Validators } from '@angular/forms';
 import { Iregister } from 'src/app/interface/iregister';
 import { Router } from '@angular/router';
 import { Iuser } from 'src/app/interface/iuser';
+import { ICountries } from 'src/app/interface/icountries';
+import { IState } from 'src/app/interface/istate';
+import { ICities } from 'src/app/interface/icities';
 
 @Component({
   selector: 'app-register',
@@ -15,6 +18,10 @@ import { Iuser } from 'src/app/interface/iuser';
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent implements OnInit {
+  public allCountries: ICountries[] = [];
+  public allStatesByCountry: IState[] = [];
+  public allCities: ICities[] = [];
+
   //Grupo de controles
   public f: any = this.form.group({
     name: [
@@ -35,6 +42,9 @@ export class RegisterComponent implements OnInit {
       ],
     ],
     bornDate: ['', [Validators.required]],
+    country: ['', [Validators.required]],
+    state: ['', [Validators.required]],
+    city: ['', [Validators.required]],
     sex: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     repeatPassword: ['', [Validators.required]],
@@ -56,6 +66,18 @@ export class RegisterComponent implements OnInit {
 
   get bornDate() {
     return this.f.controls.bornDate;
+  }
+
+  get country() {
+    return this.f.controls.country;
+  }
+
+  get state() {
+    return this.f.controls.state;
+  }
+
+  get city() {
+    return this.f.controls.city;
   }
 
   get sex() {
@@ -86,12 +108,7 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.locationService.getAllContries().then((res: any[]) => {
-      console.log(
-        '🚀 ~ file: register.component.ts ~ line 90 ~ RegisterComponent ~ this.locationService.getAllContries ~ res',
-        res
-      );
-    });
+    this.getCountries();
   }
 
   public async onSubmit(f: any): Promise<void> {
@@ -131,6 +148,9 @@ export class RegisterComponent implements OnInit {
         bornDate: new Date(this.bornDate.value),
         sex: this.sex.value,
         active: true,
+        country: this.country.value,
+        state: this.state.value,
+        city: this.city.value,
       };
 
       await this.userService.postData(user).toPromise();
@@ -194,5 +214,45 @@ export class RegisterComponent implements OnInit {
 
   public formValid(): boolean {
     return !this.f.invalid && this.passwordCoincidence() && this.mayor18Anios();
+  }
+
+  public async getCountries(): Promise<void> {
+    try {
+      this.allCountries = JSON.parse(
+        await this.locationService.getAllContries()
+      );
+    } catch (error) {
+      this.allCountries = [];
+    }
+  }
+
+  public async countryChange(): Promise<void> {
+    try {
+      this.state.setValue(null);
+      this.city.setValue(null);
+      this.allStatesByCountry = JSON.parse(
+        await this.locationService.getAllStatesByCountry(this.country.value)
+      );
+    } catch (error) {
+      this.state.setValue(null);
+      this.city.setValue(null);
+      this.allStatesByCountry = [];
+    }
+  }
+
+  public async stateChange(): Promise<void> {
+    try {
+      this.city.setValue(null);
+      this.allCities = JSON.parse(
+        await this.locationService.getAllCitiesByCountryAndState(
+          this.country.value,
+          this.state.value
+        )
+      );
+    } catch (error) {
+      this.state.setValue(null);
+      this.city.setValue(null);
+      this.allCities = [];
+    }
   }
 }
