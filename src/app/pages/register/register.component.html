@@ -149,6 +149,102 @@
               Debe ser mayor de 18 años para registrarse
             </span>
           </div>
+          <!--Pais-->
+          <div class="input-group mb-3">
+            <select
+              type="text"
+              class="form-control"
+              placeholder="Pais"
+              formControlName="country"
+              required
+              (change)="this.countryChange()"
+              [ngClass]="{
+                'is-invalid': invalidField('country')
+              }"
+            >
+              <option value="" disabled selected>Pais</option>
+              <option
+                value="{{ country.iso2 }}"
+                *ngFor="let country of this.allCountries"
+              >
+                {{ country.name }}
+              </option>
+            </select>
+
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('country') && f.controls.country.errors?.required
+              "
+            >
+              Por favor ingrese su Pais
+            </span>
+          </div>
+          <!--Estado-->
+          <div
+            class="input-group mb-3"
+            *ngIf="this.country.value && this.allStatesByCountry"
+          >
+            <select
+              type="text"
+              class="form-control"
+              placeholder="Estado"
+              formControlName="state"
+              required
+              (change)="this.stateChange()"
+              [ngClass]="{
+                'is-invalid': invalidField('state')
+              }"
+            >
+              <option value="" disabled selected>Estado</option>
+              <option
+                value="{{ state.iso2 }}"
+                *ngFor="let state of this.allStatesByCountry"
+              >
+                {{ state.name }}
+              </option>
+            </select>
+
+            <span
+              class="invalid-feedback"
+              *ngIf="invalidField('state') && f.controls.state.errors?.required"
+            >
+              Por favor ingrese su Estado
+            </span>
+          </div>
+          <!--Ciudad-->
+          <div
+            class="input-group mb-3"
+            *ngIf="
+              this.country.value &&
+              this.allStatesByCountry &&
+              this.state.value &&
+              this.allCities
+            "
+          >
+            <select
+              type="text"
+              class="form-control"
+              placeholder="Ciudad"
+              formControlName="city"
+              required
+              [ngClass]="{
+                'is-invalid': invalidField('city')
+              }"
+            >
+              <option value="" disabled selected>Ciudad</option>
+              <option value="{{ city.id }}" *ngFor="let city of this.allCities">
+                {{ city.name }}
+              </option>
+            </select>
+
+            <span
+              class="invalid-feedback"
+              *ngIf="invalidField('city') && f.controls.city.errors?.required"
+            >
+              Por favor ingrese su Ciudad
+            </span>
+          </div>
           <!--Genero-->
           <div class="input-group mb-3">
             <select

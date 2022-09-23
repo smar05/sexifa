@@ -6,4 +6,7 @@ export interface Iuser {
   bornDate?: Date;
   sex?: string;
   active?: boolean;
+  country?: string;
+  state?: string;
+  city?: string;
 }

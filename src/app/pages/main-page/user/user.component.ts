@@ -1,3 +1,7 @@
+import { ICities } from './../../../interface/icities';
+import { IState } from './../../../interface/istate';
+import { ICountries } from './../../../interface/icountries';
+import { LocationService } from './../../../services/location.service';
 import { Iuser } from 'src/app/interface/iuser';
 import { IQueryParams } from './../../../interface/i-query-params';
 import { UserService } from './../../../services/user.service';
@@ -31,6 +35,9 @@ export class UserComponent implements OnInit {
       ],
     ],
     bornDate: ['', [Validators.required]],
+    country: ['', [Validators.required]],
+    state: ['', [Validators.required]],
+    city: ['', [Validators.required]],
     sex: ['', [Validators.required]],
   });
 
@@ -49,6 +56,18 @@ export class UserComponent implements OnInit {
 
   get bornDate() {
     return this.f.controls.bornDate;
+  }
+
+  get country() {
+    return this.f.controls.country;
+  }
+
+  get state() {
+    return this.f.controls.state;
+  }
+
+  get city() {
+    return this.f.controls.city;
   }
 
   get sex() {
@@ -71,10 +90,19 @@ export class UserComponent implements OnInit {
   public loading: boolean = false;
   private nameUserId: string = '';
 
-  constructor(private form: FormBuilder, private userService: UserService) {}
+  public allCountrys: ICountries[] = [];
+  public allStates: IState[] = [];
+  public allCities: ICities[] = [];
+
+  constructor(
+    private form: FormBuilder,
+    private userService: UserService,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit(): void {
     this.getUserData();
+    this.getLocationData();
   }
 
   public getUserData(): void {
@@ -92,6 +120,9 @@ export class UserComponent implements OnInit {
       this.celphone.setValue(user.celphone);
       this.bornDate.setValue(user.bornDate);
       this.sex.setValue(user.sex);
+      this.country.setValue(user.country);
+      this.state.setValue(user.state);
+      this.city.setValue(user.city);
     });
   }
 
@@ -108,6 +139,9 @@ export class UserComponent implements OnInit {
       name: this.name.value,
       celphone: this.celphone.value,
       sex: this.sex.value,
+      country: this.country.value,
+      state: this.state.value,
+      city: this.city.value,
     };
 
     this.userService.patchData(this.nameUserId, data).subscribe(
@@ -148,5 +182,55 @@ export class UserComponent implements OnInit {
     mayor18.setFullYear(hoy.getFullYear() - 18);
 
     return mayor18 >= date;
+  }
+
+  public async getLocationData(): Promise<void> {
+    try {
+      this.allCountrys = JSON.parse(
+        await this.locationService.getAllContries()
+      );
+      this.allStates = JSON.parse(
+        await this.locationService.getAllStatesByCountry(this.country.value)
+      );
+      this.allCities = JSON.parse(
+        await this.locationService.getAllCitiesByCountryAndState(
+          this.country.value,
+          this.state.value
+        )
+      );
+    } catch (error) {
+      this.allCountrys = [];
+      this.allStates = [];
+      this.allCities = [];
+    }
+  }
+
+  public async countryChange(): Promise<void> {
+    try {
+      this.state.setValue(null);
+      this.city.setValue(null);
+      this.allStates = JSON.parse(
+        await this.locationService.getAllStatesByCountry(this.country.value)
+      );
+    } catch (error) {
+      this.allStates = [];
+      this.state.setValue(null);
+      this.city.setValue(null);
+    }
+  }
+
+  public async stateChange(): Promise<void> {
+    try {
+      this.city.setValue(null);
+      this.allCities = JSON.parse(
+        await this.locationService.getAllCitiesByCountryAndState(
+          this.country.value,
+          this.state.value
+        )
+      );
+    } catch (error) {
+      this.allCities = [];
+      this.city.setValue(null);
+    }
   }
 }
