@@ -1,5 +1,6 @@
 const apiKey: string = 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8';
-const apiKeyLocation: string = 'aa919bc469a28cd605aab17f478818ec';
+const apiKeyLocation: string =
+  'dU1Pc1lYSnBVZDVqcVpSYjhVSkswTGhWTWlRWVZaUHpIdFBuemhINA==';
 
 const firebaseConfig: any = {
   apiKey: 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8',
