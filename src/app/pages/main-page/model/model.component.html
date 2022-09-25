@@ -101,7 +101,7 @@
           </div>
 
           <div class="add-to-catr-btn" *ngIf="this.price">
-            <button class="btn" [routerLink]="['/list-cupos']">
+            <button class="btn" (click)="this.clickParticipar()">
               Participar
             </button>
           </div>

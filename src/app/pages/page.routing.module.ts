@@ -50,7 +50,7 @@ const routes: Routes = [
           import('./main-page/user/user.module').then((m) => m.UserModule),
       },
       {
-        path: 'list-cupos',
+        path: 'rifa/:id',
         loadChildren: () =>
           import('./main-page/list-cupos/list-cupos.module').then(
             (m) => m.ListCuposModule

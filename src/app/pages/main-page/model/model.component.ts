@@ -1,9 +1,12 @@
+import { StateRifas, Irifas } from './../../../interface/irifas';
+import { RifasService } from './../../../services/rifas.service';
 import { IpriceModel } from './../../../interface/iprice-model';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
 import { ModelsDTO } from './../../../dto/models-dto';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IQueryParams } from 'src/app/interface/i-query-params';
 
 @Component({
   selector: 'app-model',
@@ -20,7 +23,9 @@ export class ModelComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private rifasService: RifasService,
+    private router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -86,5 +91,22 @@ export class ModelComponent implements OnInit {
     }
 
     return undefined;
+  }
+
+  public async clickParticipar(): Promise<void> {
+    let params: IQueryParams = {
+      orderBy: '"state"',
+      equalTo: `"${StateRifas.ACTIVE}"`,
+    };
+
+    try {
+      let rifa: Irifas = await this.rifasService.getData(params).toPromise();
+
+      let idRifa: string = Object.keys(rifa)[0];
+
+      this.router.navigateByUrl(`/rifa/${idRifa}`);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
