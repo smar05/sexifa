@@ -571,7 +571,7 @@
   .select
   input[type="radio"]:checked
   + label {
-  background: linear-gradient(135deg, #ada5d5, #8676b5);
+  background: var(--color-red);
   color: #fff;
 }
 .box2 .box .content-section .color-section .right {

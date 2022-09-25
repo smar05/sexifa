@@ -1,3 +1,5 @@
+import { IpriceModel } from './iprice-model';
+
 export interface Imodels {
   id: string;
   categorie?: string;
@@ -6,4 +8,5 @@ export interface Imodels {
   url?: string;
   description?: string;
   active?: boolean;
+  price?: IpriceModel[];
 }

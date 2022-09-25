@@ -167,6 +167,7 @@ export class ModelsService {
     modelDTO.description = imodel.description;
     modelDTO.name = imodel.name;
     modelDTO.url = imodel.url;
+    modelDTO.price = imodel.price;
 
     //Imagen principal
     modelDTO.mainImage = await this.getImage(`${imodel.id}/main`);

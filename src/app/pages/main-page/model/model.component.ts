@@ -1,3 +1,4 @@
+import { IpriceModel } from './../../../interface/iprice-model';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
 import { ModelsDTO } from './../../../dto/models-dto';
@@ -14,29 +15,31 @@ export class ModelComponent implements OnInit {
   public modelId: string = '';
   public galeria: string[] = [];
   public imgPrincipal: string = '';
+  public timeSubscriptionInput: any[] = [];
+  public price!: IpriceModel | undefined;
 
   constructor(
     private route: ActivatedRoute,
     private modelsService: ModelsService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     //Id del modelo
     this.modelId = this.route.snapshot.paramMap.get('url')?.split('_')[1] || '';
 
-    this.getModel();
+    await this.getModel();
     this.getGaleria();
+    this.setModelSubscripctionModelValues();
   }
 
-  public getModel(): void {
-    this.modelsService
+  public async getModel(): Promise<void> {
+    let res: Imodels = await this.modelsService
       .getItem(this.modelId || '')
-      .subscribe(async (res: Imodels) => {
-        res.id = this.modelId;
-        //Interface to DTO
-        this.model = await this.modelsService.modelInterfaceToDTO(res);
-        this.imgPrincipal = this.model.mainImage || '';
-      });
+      .toPromise();
+    res.id = this.modelId;
+    //Interface to DTO
+    this.model = await this.modelsService.modelInterfaceToDTO(res);
+    this.imgPrincipal = this.model.mainImage || '';
   }
 
   public async getGaleria(): Promise<void> {
@@ -47,5 +50,41 @@ export class ModelComponent implements OnInit {
 
   public setImgPrincipal(img: string): void {
     this.imgPrincipal = img;
+  }
+
+  public setModelSubscripctionModelValues(): void {
+    this.model.price?.forEach((price: IpriceModel) => {
+      this.timeSubscriptionInput.push({ time: price.time, checked: false });
+    });
+  }
+
+  public subscriptionModelInputChange(i: number): void {
+    let valueChecked: boolean = this.timeSubscriptionInput[i].checked;
+
+    this.timeSubscriptionInput.forEach((input: any) => {
+      input.checked = false;
+    });
+
+    this.timeSubscriptionInput[i].checked = !valueChecked;
+
+    if (this.timeSubscriptionInput[i].checked) {
+      let price: IpriceModel | undefined = this.model.price?.find(
+        (price: IpriceModel) => price.time == this.timeSubscriptionInput[i].time
+      );
+
+      this.price = price ? price : undefined;
+    } else {
+      this.price = undefined;
+    }
+  }
+
+  public calculoPrecioSubscripcion(): number | undefined {
+    if (this.price?.price && this.price?.percentage) {
+      return (
+        Math.floor(this.price.price * (this.price.percentage / 100) * 100) / 100
+      );
+    }
+
+    return undefined;
   }
 }
