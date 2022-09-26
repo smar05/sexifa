@@ -1,6 +1,5 @@
 import { environment } from './../../environments/environment';
 import { PagesService } from './pages.service';
-import { Icategories } from './../interface/icategories';
 import { CategoriesService } from './categories.service';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';

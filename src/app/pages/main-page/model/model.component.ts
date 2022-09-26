@@ -101,8 +101,17 @@ export class ModelComponent implements OnInit {
 
     try {
       let rifa: Irifas = await this.rifasService.getData(params).toPromise();
-
       let idRifa: string = Object.keys(rifa)[0];
+
+      localStorage.setItem(
+        'infoModelSubscription',
+        JSON.stringify({
+          idModel: this.model.id,
+          timeSubscription: this.timeSubscriptionInput.find(
+            (timeSubscription: any) => timeSubscription.checked
+          ).time,
+        })
+      );
 
       this.router.navigateByUrl(`/rifa/${idRifa}`);
     } catch (error) {
