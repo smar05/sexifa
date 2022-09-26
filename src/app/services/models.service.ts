@@ -1,6 +1,5 @@
 import { environment } from './../../environments/environment';
 import { PagesService } from './pages.service';
-import { Icategories } from './../interface/icategories';
 import { CategoriesService } from './categories.service';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
@@ -167,6 +166,7 @@ export class ModelsService {
     modelDTO.description = imodel.description;
     modelDTO.name = imodel.name;
     modelDTO.url = imodel.url;
+    modelDTO.price = imodel.price;
 
     //Imagen principal
     modelDTO.mainImage = await this.getImage(`${imodel.id}/main`);

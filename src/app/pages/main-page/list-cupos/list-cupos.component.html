@@ -1,0 +1,93 @@
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Cupos</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+            <li class="breadcrumb-item active">Cupos</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+  <section class="content m-2">
+    <div class="grid">
+      <!--Tipos de cupos-->
+      <div class="row">
+        <p class="font-weight-bold">Tipos de cupos</p>
+      </div>
+      <div class="row mb-3">
+        <div class="col-3">
+          <button
+            type="button"
+            class="btn btn-block btn-outline-success"
+            disabled
+          >
+            <small>Disponible</small>
+          </button>
+        </div>
+        <div class="col-3">
+          <button type="button" class="btn btn-block btn-danger" disabled>
+            <small>Vendido</small>
+          </button>
+        </div>
+        <div class="col-3">
+          <button type="button" class="btn btn-block btn-success" disabled>
+            <small>Seleccionado</small>
+          </button>
+        </div>
+      </div>
+      <!--Listado de cupos-->
+      <div class="row">
+        <h3 class="font-weight-bold">Listado de cupos</h3>
+      </div>
+      <div class="row align-items-center">
+        <div class="col-3 mb-3" *ngFor="let cupo of this.rifa?.listCupos">
+          <!--Disponible-->
+          <button
+            type="button"
+            class="btn btn-block btn-lg btn-outline-success"
+            *ngIf="cupo.state == 'AVAILABLE'"
+            (click)="this.changeCupoState(cupo)"
+          >
+            {{ cupo.id }}
+          </button>
+          <!--Seleccionado-->
+          <button
+            type="button"
+            class="btn btn-block btn-lg btn-success"
+            *ngIf="cupo.state == 'SELECT'"
+            (click)="this.changeCupoState(cupo)"
+          >
+            {{ cupo.id }}
+          </button>
+          <!--Vendido-->
+          <button
+            type="button"
+            class="btn btn-block btn-lg btn-danger"
+            *ngIf="cupo.state == 'SOLD'"
+            disabled
+          >
+            {{ cupo.id }}
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <h2 class="font-weight-bold">
+          Total: {{ this.totalPrice | currency: "USD" }}
+        </h2>
+      </div>
+      <div class="row" *ngIf="this.totalPrice && this.totalPrice > 0">
+        <button type="button" class="btn btn-block btn-lg bg-red mb-3">
+          Comprar
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

@@ -23,6 +23,7 @@ export const environment = {
     models: 'models',
     pages: 'pages',
     users: 'users',
+    rifas: 'rifas',
   },
   urlRefreshToken: `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
   firebaseConfig,

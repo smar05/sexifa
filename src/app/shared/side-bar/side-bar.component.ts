@@ -16,6 +16,7 @@ export class SideBarComponent implements OnInit {
     localStorage.removeItem('token');
     localStorage.removeItem('localId');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('infoModelSubscription');
     this.router.navigateByUrl('/login');
   }
 }
