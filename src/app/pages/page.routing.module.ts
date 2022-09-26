@@ -56,6 +56,13 @@ const routes: Routes = [
             (m) => m.ListCuposModule
           ),
       },
+      {
+        path: 'checkout',
+        loadChildren: () =>
+          import('./main-page/checkout/checkout.module').then(
+            (m) => m.CheckoutModule
+          ),
+      },
       { path: '**', component: Error404Component },
     ],
   },
