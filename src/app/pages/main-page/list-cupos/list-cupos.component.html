@@ -64,6 +64,7 @@
             class="btn btn-block btn-lg btn-success"
             *ngIf="cupo.state == 'SELECT'"
             (click)="this.changeCupoState(cupo)"
+            [disabled]="this.disabledPorSerDeOtroModelo(cupo)"
           >
             {{ cupo.id }}
           </button>
@@ -78,16 +79,17 @@
           </button>
         </div>
       </div>
-      <div class="row">
-        <h2 class="font-weight-bold">
-          Total: {{ this.totalPrice | currency: "USD" }}
-        </h2>
-      </div>
-      <div class="row" *ngIf="this.totalPrice && this.totalPrice > 0">
+      <div
+        class="row"
+        *ngIf="
+          this.cuposSeleccionadosEnPagina &&
+          this.cuposSeleccionadosEnPagina.length > 0
+        "
+      >
         <button
           type="button"
           class="btn btn-block btn-lg bg-red mb-3"
-          [routerLink]="['/checkout']"
+          (click)="this.comprar()"
         >
           Comprar
         </button>

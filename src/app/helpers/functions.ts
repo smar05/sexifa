@@ -179,4 +179,18 @@ export class functions {
       return data[a];
     });
   }
+
+  /**
+   * Elimina los valores repetidos del array
+   *
+   * @static
+   * @param {*} array
+   * @return {*}  {*}
+   * @memberof functions
+   */
+  static eliminarDatosRepetidos(array: any): any {
+    const dataArr = new Set(array);
+
+    return [...dataArr];
+  }
 }

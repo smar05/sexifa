@@ -7,6 +7,7 @@ import { ModelsDTO } from './../../../dto/models-dto';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IQueryParams } from 'src/app/interface/i-query-params';
+import { IInfoModelSubscription } from 'src/app/interface/i-info-model-subscription';
 
 @Component({
   selector: 'app-model',
@@ -102,15 +103,22 @@ export class ModelComponent implements OnInit {
     try {
       let rifa: Irifas = await this.rifasService.getData(params).toPromise();
       let idRifa: string = Object.keys(rifa)[0];
+      let infoModelSubscription: IInfoModelSubscription = localStorage.getItem(
+        'infoModelSubscription'
+      )
+        ? JSON.parse(localStorage.getItem('infoModelSubscription') || '')
+        : {};
+
+      infoModelSubscription = {
+        idModel: this.model.id,
+        timeSubscription: this.timeSubscriptionInput.find(
+          (timeSubscription: any) => timeSubscription.checked
+        ).time,
+      };
 
       localStorage.setItem(
         'infoModelSubscription',
-        JSON.stringify({
-          idModel: this.model.id,
-          timeSubscription: this.timeSubscriptionInput.find(
-            (timeSubscription: any) => timeSubscription.checked
-          ).time,
-        })
+        JSON.stringify(infoModelSubscription)
       );
 
       this.router.navigateByUrl(`/rifa/${idRifa}`);
