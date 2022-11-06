@@ -15,7 +15,6 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #a896e0, #8474b5);
 }
 .container .box1 {
   max-width: 420px;
