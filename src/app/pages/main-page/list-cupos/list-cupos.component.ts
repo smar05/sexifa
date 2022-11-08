@@ -1,8 +1,6 @@
 import { IInfoModelSubscription } from './../../../interface/i-info-model-subscription';
-import { IpriceModel } from './../../../interface/iprice-model';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
-import { alerts } from 'src/app/helpers/alerts';
 import { Irifas, StateRifas } from './../../../interface/irifas';
 import { RifasService } from './../../../services/rifas.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,8 +23,7 @@ export class ListCuposComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private rifaService: RifasService,
-    private router: Router,
-    private modelsService: ModelsService
+    private router: Router
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -154,43 +151,10 @@ export class ListCuposComponent implements OnInit {
       let { idModel, timeSubscription } = JSON.parse(
         localStorage.getItem('infoModelSubscription') || ''
       );
-
-      if (idModel && timeSubscription) {
-        try {
-          this.modelForRifa = await this.modelsService
-            .getItem(idModel)
-            .toPromise();
-
-          let priceModel: IpriceModel =
-            this.modelForRifa.price?.find(
-              (price: IpriceModel) => price.time == timeSubscription
-            ) || {};
-
-          this.modelSubscriptionPrice =
-            this.calculoPrecioSubscripcion(priceModel) || 0;
-
-          if (this.modelSubscriptionPrice <= 0) {
-            alerts.basicAlert(
-              'Error',
-              'Ha ocurrido un error, por favor seleccione un model@',
-              'error'
-            );
-            this.router.navigateByUrl('/');
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      } else {
-        alerts.basicAlert(
-          'Error',
-          'Primero debe seleccionar al model@ y el tiempo de subscripcion por el cual quieres participar',
-          'error'
-        );
-        this.router.navigateByUrl('/');
-      }
     }
   }
 
+  /*
   public calculoPrecioSubscripcion(price: IpriceModel): number | undefined {
     if (price?.price && price?.percentage) {
       return Math.floor(price.price * (price.percentage / 100) * 100) / 100;
@@ -198,6 +162,7 @@ export class ListCuposComponent implements OnInit {
 
     return undefined;
   }
+  */
 
   public comprar(): void {
     let cart: IInfoModelSubscription[] = localStorage.getItem('cart')
