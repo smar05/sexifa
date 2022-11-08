@@ -39,6 +39,12 @@ export class ListCuposComponent implements OnInit {
   public async getRifa(): Promise<void> {
     this.rifa = await this.rifaService.getItem(this.rifaId).toPromise();
 
+    // Se asigna el id de los cupos de la rifa
+    this.rifa.listCupos = Object.keys(this.rifa.listCupos).map((a: any) => {
+      this.rifa.listCupos[a].id = a;
+      return this.rifa.listCupos[a];
+    });
+
     // Si existe carrito
     if (localStorage.getItem('cart')) {
       let cart: IInfoModelSubscription[] = JSON.parse(
