@@ -47,6 +47,7 @@ export class CheckoutComponent implements OnInit {
       localStorage.getItem(LocalStorageEnum.CART) || ''
     );
     this.cart = [];
+    this.total = 0;
 
     if (!this.cartLocal) return;
 
@@ -107,10 +108,19 @@ export class CheckoutComponent implements OnInit {
     return this.modelsService.getRouterLinkUrl(model);
   }
 
-  public eliminarCartItem(index: number): void {
+  public eliminarCartItem(cartItem: ICart): void {
     this.cartLocal = JSON.parse(
       localStorage.getItem(LocalStorageEnum.CART) || ''
     );
+
+    let index: number = this.cartLocal.findIndex(
+      (cartLocaItem: IInfoModelSubscription) =>
+        cartLocaItem.idModel == cartItem.model?.id &&
+        cartLocaItem.timeSubscription ==
+          cartItem.infoModelSubscription?.timeSubscription
+    );
+
+    if (index == -1) return;
 
     this.cartLocal.splice(index, 1);
 
