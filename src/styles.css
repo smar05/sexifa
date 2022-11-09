@@ -20,3 +20,7 @@
   background-color: var(--color-red);
   border-color: var(--color-red);
 }
+
+.color-red {
+  color: var(--color-red);
+}
