@@ -22,7 +22,7 @@ export class alerts {
    * @param {string} text
    * @param {SweetAlertIcon} icon
    * @param {string} confirmButtonText
-   * @return {*}  {*}
+   * @return {*}  {Promise<any>}
    * @memberof alerts
    */
   static confirmAlert(
@@ -30,7 +30,7 @@ export class alerts {
     text: string,
     icon: SweetAlertIcon,
     confirmButtonText: string
-  ): any {
+  ): Promise<any> {
     return Swal.fire({
       title: title,
       text: text,

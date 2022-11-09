@@ -8,6 +8,7 @@ import { UserService } from './../../../services/user.service';
 import { Component, OnInit } from '@angular/core';
 import { ICart } from 'src/app/interface/i-cart';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { alerts } from 'src/app/helpers/alerts';
 
 @Component({
   selector: 'app-checkout',
@@ -108,10 +109,15 @@ export class CheckoutComponent implements OnInit {
     return this.modelsService.getRouterLinkUrl(model);
   }
 
-  public eliminarCartItem(cartItem: ICart): void {
-    this.cartLocal = JSON.parse(
-      localStorage.getItem(LocalStorageEnum.CART) || ''
+  public async eliminarCartItem(cartItem: ICart): Promise<void> {
+    let result: any = await alerts.confirmAlert(
+      'Eliminar item del carrito',
+      '¿Esta seguro de eliminar este elemento de su carrito?',
+      'warning',
+      'Si'
     );
+
+    if (!result.isConfirmed) return;
 
     let index: number = this.cartLocal.findIndex(
       (cartLocaItem: IInfoModelSubscription) =>
