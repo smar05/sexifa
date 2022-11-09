@@ -18,6 +18,13 @@
   </section>
   <section class="content m-2">
     <div class="grid">
+      <div class="row">
+        <h4><strong> Modelo: </strong>{{ this.modelForRifa.name }}</h4>
+        <h4>
+          <strong>Precio por cupo: </strong>
+          {{ this.modelSubscriptionPrice | currency: "USD" }}
+        </h4>
+      </div>
       <!--Tipos de cupos-->
       <div class="row">
         <p class="font-weight-bold">Tipos de cupos</p>
@@ -79,6 +86,16 @@
           </button>
         </div>
       </div>
+      <div class="row">
+        <h2 class="font-weight-bold">
+          Total:
+          {{
+            this.modelSubscriptionPrice * this.cuposSeleccionadosEnPagina.length
+              | currency: "USD"
+          }}
+        </h2>
+      </div>
+
       <div
         class="row"
         *ngIf="

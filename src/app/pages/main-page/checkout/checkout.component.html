@@ -47,18 +47,35 @@
           <div class="ps-block__content">
             <table class="table ps-block__products">
               <tbody>
-                <tr>
+                <tr *ngFor="let cartItem of this.cart">
                   <td>
-                    <a href="#">Ela Jamaica</a>
-                    <p><strong>Cupos: </strong>1, 2, 3, 4</p>
+                    <a
+                      [routerLink]="[
+                        '/model/' + this.getUrlModel(cartItem.model!)
+                      ]"
+                      >{{ cartItem.model?.name }}</a
+                    >
+                    <p>
+                      <strong>Numeros para rifa: </strong
+                      >{{ cartItem.infoModelSubscription?.cupos }}
+                    </p>
+                    <p>
+                      <strong>Detalle: </strong> <br />
+                      {{ cartItem.detalle }}
+                    </p>
                   </td>
 
-                  <td class="text-right">$57.99</td>
+                  <td class="text-right">
+                    {{ cartItem.price | currency: "USD" }}
+                  </td>
                 </tr>
               </tbody>
             </table>
 
-            <h3 class="text-right">Total <span>$683.49</span></h3>
+            <h3 class="text-right">
+              <strong>Total: </strong>
+              <span>{{ this.total | currency: "USD" }}</span>
+            </h3>
           </div>
         </div>
       </div>

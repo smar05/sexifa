@@ -1,3 +1,4 @@
+import { IpriceModel } from './../interface/iprice-model';
 import { environment } from './../../environments/environment';
 import { PagesService } from './pages.service';
 import { CategoriesService } from './categories.service';
@@ -91,6 +92,21 @@ export class ModelsService {
   public getRouterLinkUrl(model: ModelsDTO | Imodels): string {
     let modelArray: string[] | undefined = model.name?.split(' ');
     return `${modelArray?.join('-')}_${model.id}`;
+  }
+
+  /**
+   * Obtener el precio del cupo de la modelo
+   *
+   * @param {IpriceModel} price
+   * @return {*}  {(number | undefined)}
+   * @memberof ModelsService
+   */
+  public calculoPrecioSubscripcion(price: IpriceModel): number | undefined {
+    if (price?.price && price?.percentage) {
+      return Math.floor(price.price * (price.percentage / 100) * 100) / 100;
+    }
+
+    return undefined;
   }
 
   //-------- Storage -----//
