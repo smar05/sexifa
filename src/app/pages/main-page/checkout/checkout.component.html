@@ -39,15 +39,15 @@
             <strong>Detalles de la compra</strong>
           </h2>
           <div class="ps-block__header d-flex justify-content-between">
-            <p>Producto</p>
+            <p><strong>Producto</strong></p>
 
-            <p>Total</p>
+            <p><strong>Total</strong></p>
           </div>
 
           <div class="ps-block__content">
             <table class="table ps-block__products">
               <tbody>
-                <tr *ngFor="let cartItem of this.cart">
+                <tr *ngFor="let cartItem of this.cart; let i = index">
                   <td>
                     <a
                       [routerLink]="[
@@ -63,6 +63,10 @@
                       <strong>Detalle: </strong> <br />
                       {{ cartItem.detalle }}
                     </p>
+                  </td>
+
+                  <td (click)="this.eliminarCartItem(i)">
+                    <i class="far fa-trash-alt text-danger"></i>
                   </td>
 
                   <td class="text-right">

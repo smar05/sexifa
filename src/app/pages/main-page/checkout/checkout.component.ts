@@ -43,6 +43,7 @@ export class CheckoutComponent implements OnInit {
 
   public getCartData(): void {
     this.cartLocal = JSON.parse(localStorage.getItem('cart') || '');
+    this.cart = [];
 
     if (!this.cartLocal) return;
 
@@ -101,5 +102,15 @@ export class CheckoutComponent implements OnInit {
 
   public getUrlModel(model: Imodels): string {
     return this.modelsService.getRouterLinkUrl(model);
+  }
+
+  public eliminarCartItem(index: number): void {
+    this.cartLocal = JSON.parse(localStorage.getItem('cart') || '');
+
+    this.cartLocal.splice(index, 1);
+
+    localStorage.setItem('cart', JSON.stringify(this.cartLocal));
+
+    this.getCartData();
   }
 }
