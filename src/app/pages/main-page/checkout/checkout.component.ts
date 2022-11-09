@@ -1,3 +1,5 @@
+import { StateRifas, Irifas } from './../../../interface/irifas';
+import { Router } from '@angular/router';
 import { IpriceModel } from './../../../interface/iprice-model';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
@@ -9,6 +11,7 @@ import { Component, OnInit } from '@angular/core';
 import { ICart } from 'src/app/interface/i-cart';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { alerts } from 'src/app/helpers/alerts';
+import { RifasService } from 'src/app/services/rifas.service';
 
 @Component({
   selector: 'app-checkout',
@@ -23,7 +26,9 @@ export class CheckoutComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private rifasService: RifasService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -133,5 +138,26 @@ export class CheckoutComponent implements OnInit {
     localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(this.cartLocal));
 
     this.getCartData();
+  }
+
+  public async editarCartItem(cartItem: ICart): Promise<void> {
+    localStorage.setItem(
+      LocalStorageEnum.INFO_MODEL_SUBSCRIPTION,
+      JSON.stringify(cartItem.infoModelSubscription)
+    );
+
+    let params: IQueryParams = {
+      orderBy: '"state"',
+      equalTo: `"${StateRifas.ACTIVE}"`,
+    };
+
+    try {
+      let rifa: Irifas = await this.rifasService.getData(params).toPromise();
+      let idRifa: string = Object.keys(rifa)[0];
+
+      this.router.navigateByUrl(`/rifa/${idRifa}`);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

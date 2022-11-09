@@ -67,7 +67,9 @@
                   </td>
 
                   <!--Editar-->
-                  <td><i class="far fa-edit text-info"></i></td>
+                  <td (click)="this.editarCartItem(cartItem)">
+                    <i class="far fa-edit text-info"></i>
+                  </td>
 
                   <!--Eliminar-->
                   <td (click)="this.eliminarCartItem(cartItem)">
