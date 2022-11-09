@@ -8,6 +8,7 @@ import { RifasService } from './../../../services/rifas.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Icupo, StateCupo } from './../../../interface/icupo';
 import { Component, OnInit } from '@angular/core';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-list-cupos',
@@ -46,12 +47,12 @@ export class ListCuposComponent implements OnInit {
     });
 
     // Si existe carrito
-    if (localStorage.getItem('cart')) {
+    if (localStorage.getItem(LocalStorageEnum.CART)) {
       let cart: IInfoModelSubscription[] = JSON.parse(
-        localStorage.getItem('cart') || ''
+        localStorage.getItem(LocalStorageEnum.CART) || ''
       );
       let infoModelSubscription: IInfoModelSubscription = JSON.parse(
-        localStorage.getItem('infoModelSubscription') || ''
+        localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION) || ''
       );
       let cuposSeleccionadosEnCarrito: number[] = [];
       this.cuposSeleccionadosModeloActual = [];
@@ -117,7 +118,7 @@ export class ListCuposComponent implements OnInit {
           });
         });
 
-        localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(cart));
       }
     }
   }
@@ -152,7 +153,7 @@ export class ListCuposComponent implements OnInit {
     if (this.rifa.state == StateRifas.ACTIVE) {
       //Para las rifas activas
       let { idModel, timeSubscription } = JSON.parse(
-        localStorage.getItem('infoModelSubscription') || ''
+        localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION) || ''
       );
 
       if (idModel && timeSubscription) {
@@ -192,12 +193,16 @@ export class ListCuposComponent implements OnInit {
   }
 
   public comprar(): void {
-    let cart: IInfoModelSubscription[] = localStorage.getItem('cart')
-      ? JSON.parse(localStorage.getItem('cart') || '')
+    let cart: IInfoModelSubscription[] = localStorage.getItem(
+      LocalStorageEnum.CART
+    )
+      ? JSON.parse(localStorage.getItem(LocalStorageEnum.CART) || '')
       : [];
     let infoModelSubscriptionLocal: IInfoModelSubscription =
-      localStorage.getItem('infoModelSubscription')
-        ? JSON.parse(localStorage.getItem('infoModelSubscription') || '')
+      localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION)
+        ? JSON.parse(
+            localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION) || ''
+          )
         : {};
 
     let cuposSeleccionadosIds: number[] = [];
@@ -223,7 +228,7 @@ export class ListCuposComponent implements OnInit {
       cart.push(infoModelSubscriptionLocal);
     }
 
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(cart));
 
     this.router.navigateByUrl('/checkout');
   }

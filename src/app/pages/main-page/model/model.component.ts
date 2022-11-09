@@ -8,6 +8,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IQueryParams } from 'src/app/interface/i-query-params';
 import { IInfoModelSubscription } from 'src/app/interface/i-info-model-subscription';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-model',
@@ -104,9 +105,11 @@ export class ModelComponent implements OnInit {
       let rifa: Irifas = await this.rifasService.getData(params).toPromise();
       let idRifa: string = Object.keys(rifa)[0];
       let infoModelSubscription: IInfoModelSubscription = localStorage.getItem(
-        'infoModelSubscription'
+        LocalStorageEnum.INFO_MODEL_SUBSCRIPTION
       )
-        ? JSON.parse(localStorage.getItem('infoModelSubscription') || '')
+        ? JSON.parse(
+            localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION) || ''
+          )
         : {};
 
       infoModelSubscription = {
@@ -117,7 +120,7 @@ export class ModelComponent implements OnInit {
       };
 
       localStorage.setItem(
-        'infoModelSubscription',
+        LocalStorageEnum.INFO_MODEL_SUBSCRIPTION,
         JSON.stringify(infoModelSubscription)
       );
 

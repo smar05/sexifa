@@ -1,14 +1,8 @@
 import { environment } from './../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  ActivatedRouteSnapshot,
-  CanActivate,
-  Router,
-  RouterStateSnapshot,
-  UrlTree,
-} from '@angular/router';
-import { Observable } from 'rxjs';
+import { CanActivate, Router } from '@angular/router';
+import { LocalStorageEnum } from '../enum/localStorageEnum';
 
 @Injectable({
   providedIn: 'root',
@@ -19,18 +13,18 @@ export class AuthGuard implements CanActivate {
   canActivate(): Promise<boolean> {
     return new Promise((resolve) => {
       //Validamos que exista el token
-      if (localStorage.getItem('token') != null) {
+      if (localStorage.getItem(LocalStorageEnum.TOKEN) != null) {
         //Validamos que el token sea real
         let body: any = {
-          idToken: localStorage.getItem('token'),
+          idToken: localStorage.getItem(LocalStorageEnum.TOKEN),
         };
         this.http.post(environment.urlGetUser, body).subscribe(
           (resp: any): any => {
             resolve(true);
           },
           (err: any): any => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('refreshToken');
+            localStorage.removeItem(LocalStorageEnum.TOKEN);
+            localStorage.removeItem(LocalStorageEnum.REFRESH_TOKEN);
             this.router.navigateByUrl('/login');
             resolve(false);
           }

@@ -9,6 +9,7 @@ import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-user',
@@ -108,7 +109,7 @@ export class UserComponent implements OnInit {
   public getUserData(): void {
     let params: IQueryParams = {
       orderBy: '"id"',
-      equalTo: `"${localStorage.getItem('localId')}"`,
+      equalTo: `"${localStorage.getItem(LocalStorageEnum.LOCAL_ID)}"`,
     };
     this.userService.getData(params).subscribe((data: any) => {
       let user: Iuser = Object.keys(data).map((a: any) => {

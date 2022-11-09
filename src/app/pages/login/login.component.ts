@@ -6,6 +6,7 @@ import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Router } from '@angular/router';
 import '../../shared/spinkit/sk-folding-cube.css';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-login',
@@ -62,16 +63,19 @@ export class LoginComponent implements OnInit {
 
         //Se captura el idToken y refreshToken
         localStorage.setItem(
-          'token',
+          LocalStorageEnum.TOKEN,
           res.user.multiFactor.user.stsTokenManager.accessToken
         );
         localStorage.setItem(
-          'refreshToken',
+          LocalStorageEnum.REFRESH_TOKEN,
           res.user.multiFactor.user.stsTokenManager.refreshToken
         );
 
         //Se captura el localId
-        localStorage.setItem('localId', res.user.multiFactor.user.uid);
+        localStorage.setItem(
+          LocalStorageEnum.LOCAL_ID,
+          res.user.multiFactor.user.uid
+        );
 
         //Entramos al sistema
         this.router.navigateByUrl('/');

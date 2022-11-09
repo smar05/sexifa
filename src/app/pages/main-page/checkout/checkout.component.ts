@@ -7,6 +7,7 @@ import { IQueryParams } from './../../../interface/i-query-params';
 import { UserService } from './../../../services/user.service';
 import { Component, OnInit } from '@angular/core';
 import { ICart } from 'src/app/interface/i-cart';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-checkout',
@@ -32,7 +33,7 @@ export class CheckoutComponent implements OnInit {
   public getUserData(): void {
     let params: IQueryParams = {
       orderBy: '"id"',
-      equalTo: `"${localStorage.getItem('localId')}"`,
+      equalTo: `"${localStorage.getItem(LocalStorageEnum.LOCAL_ID)}"`,
     };
     this.userService.getData(params).subscribe((data: any) => {
       this.user = Object.keys(data).map((a: any) => {
@@ -42,7 +43,9 @@ export class CheckoutComponent implements OnInit {
   }
 
   public getCartData(): void {
-    this.cartLocal = JSON.parse(localStorage.getItem('cart') || '');
+    this.cartLocal = JSON.parse(
+      localStorage.getItem(LocalStorageEnum.CART) || ''
+    );
     this.cart = [];
 
     if (!this.cartLocal) return;
@@ -105,11 +108,13 @@ export class CheckoutComponent implements OnInit {
   }
 
   public eliminarCartItem(index: number): void {
-    this.cartLocal = JSON.parse(localStorage.getItem('cart') || '');
+    this.cartLocal = JSON.parse(
+      localStorage.getItem(LocalStorageEnum.CART) || ''
+    );
 
     this.cartLocal.splice(index, 1);
 
-    localStorage.setItem('cart', JSON.stringify(this.cartLocal));
+    localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(this.cartLocal));
 
     this.getCartData();
   }
