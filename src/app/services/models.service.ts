@@ -1,6 +1,6 @@
+import { IpriceModel } from './../interface/iprice-model';
 import { environment } from './../../environments/environment';
 import { PagesService } from './pages.service';
-import { Icategories } from './../interface/icategories';
 import { CategoriesService } from './categories.service';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
@@ -14,7 +14,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ModelsService {
-  private urlModels: string = 'models';
+  private urlModels: string = environment.urlCollections.models;
   private urlImage: string = `/models`;
 
   constructor(
@@ -94,6 +94,21 @@ export class ModelsService {
     return `${modelArray?.join('-')}_${model.id}`;
   }
 
+  /**
+   * Obtener el precio del cupo de la modelo
+   *
+   * @param {IpriceModel} price
+   * @return {*}  {(number | undefined)}
+   * @memberof ModelsService
+   */
+  public calculoPrecioSubscripcion(price: IpriceModel): number | undefined {
+    if (price?.price && price?.percentage) {
+      return Math.floor(price.price * (price.percentage / 100) * 100) / 100;
+    }
+
+    return undefined;
+  }
+
   //-------- Storage -----//
 
   /**
@@ -167,6 +182,7 @@ export class ModelsService {
     modelDTO.description = imodel.description;
     modelDTO.name = imodel.name;
     modelDTO.url = imodel.url;
+    modelDTO.price = imodel.price;
 
     //Imagen principal
     modelDTO.mainImage = await this.getImage(`${imodel.id}/main`);

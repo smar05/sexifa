@@ -10,3 +10,17 @@
 .content-wrapper {
   height: max-content !important;
 }
+
+.bg-wine {
+  background-color: var(--color-wine);
+  border-color: var(--color-wine);
+}
+
+.bg-red {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+.color-red {
+  color: var(--color-red);
+}

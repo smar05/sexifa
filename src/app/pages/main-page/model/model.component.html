@@ -4,20 +4,49 @@
       <div class="box">
         <div class="top-image-container">
           <div class="icon-row">
-            <div class="icon"><i class="fas fa-chevron-left"></i></div>
-            <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+            <div class="icon" [routerLink]="['/']">
+              <i class="fas fa-chevron-left"></i>
+            </div>
           </div>
           <div class="carousel">
             <div class="slides">
               <img
-                [src]="this.model.mainImage"
+                [src]="this.imgPrincipal"
                 [alt]="this.model.name"
                 class="slide"
               />
             </div>
           </div>
-          <div class="dots">
-            <div class="active"></div>
+        </div>
+
+        <!--Galeria del modelo-->
+        <div class="row mt-3" *ngIf="this.galeria && this.galeria.length > 0">
+          <div class="row align-items-center">
+            <div class="col-1"></div>
+            <figure
+              class="col-2 pb-3"
+              (click)="setImgPrincipal(this.model.mainImage || '')"
+            >
+              <img
+                [src]="this.model.mainImage"
+                alt=""
+                class="img-fluid img-rounded"
+                height="100px"
+              />
+            </figure>
+            <figure
+              class="col-2 pb-3"
+              *ngFor="let pic of galeria"
+              (click)="setImgPrincipal(pic)"
+            >
+              <img
+                [src]="pic"
+                alt=""
+                class="img-fluid img-rounded"
+                height="100px"
+              />
+            </figure>
+            <div class="col-1"></div>
           </div>
         </div>
         <div class="content-section">
@@ -36,35 +65,33 @@
               </div>
             </div>
             <div class="right">
-              <h1 class="price">$120</h1>
+              <h1 class="price">
+                {{ this.calculoPrecioSubscripcion() | currency: "USD" }}
+              </h1>
             </div>
           </div>
+          <!--Tipo de subscripcion-->
           <div class="color-section">
             <div class="left">
-              <p class="label">Choose Size</p>
+              <p class="label">
+                Seleccione el tipo de subscripción en meses por la que desea
+                participar
+              </p>
               <div class="sizes">
-                <div class="select">
-                  <input type="radio" name="size" id="S" />
-                  <label for="S">S</label>
-                </div>
-                <div class="select">
-                  <input type="radio" name="size" id="M" />
-                  <label for="M">M</label>
-                </div>
-                <div class="select">
-                  <input type="radio" name="size" id="L" checked />
-                  <label for="L">L</label>
-                </div>
-                <div class="select">
-                  <input type="radio" name="size" id="XL" />
-                  <label for="XL">XL</label>
+                <div
+                  class="select"
+                  *ngFor="let price of this.model.price; let i = index"
+                >
+                  <input
+                    type="radio"
+                    id="{{ 'price_' + i }}"
+                    name="{{ 'price_' + i }}"
+                    (click)="this.subscriptionModelInputChange(i)"
+                    [checked]="this.timeSubscriptionInput[i].checked"
+                  />
+                  <label for="{{ 'price_' + i }}">{{ price.time }}</label>
                 </div>
               </div>
-            </div>
-            <div class="right">
-              <div></div>
-              <div></div>
-              <div></div>
             </div>
           </div>
           <div class="description">
@@ -76,8 +103,10 @@
             </p>
           </div>
 
-          <div class="add-to-catr-btn">
-            <button class="btn">Participar</button>
+          <div class="add-to-catr-btn" *ngIf="this.price">
+            <button class="btn" (click)="this.clickParticipar()">
+              Participar
+            </button>
           </div>
         </div>
       </div>

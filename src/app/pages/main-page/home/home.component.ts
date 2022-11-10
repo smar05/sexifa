@@ -24,8 +24,8 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getAllCategories();
-    this.getAllModels({ id: '0' });
+    //this.getAllCategories();
+    this.getAllModels();
   }
 
   public getAllCategories(): void {
@@ -50,11 +50,11 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  public getAllModels(category: Icategories): void {
+  public getAllModels(): void {
     this.models = [];
     let queryParams: IQueryParams = {
-      orderBy: '"categorie"',
-      equalTo: `"${category.id}"`,
+      orderBy: '"active"',
+      equalTo: true,
       print: 'pretty',
     };
     this.modelsService.getData(queryParams).subscribe(

@@ -15,7 +15,6 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #a896e0, #8474b5);
 }
 .container .box1 {
   max-width: 420px;
@@ -571,7 +570,7 @@
   .select
   input[type="radio"]:checked
   + label {
-  background: linear-gradient(135deg, #ada5d5, #8676b5);
+  background: var(--color-red);
   color: #fff;
 }
 .box2 .box .content-section .color-section .right {
@@ -665,7 +664,7 @@
 @media (max-width: 550px) {
   .box1 .box .gallery-section {
     max-width: 420px;
-    max-height: 350px;
+    /*max-height: 350px;*/
     margin-top: 20px;
     display: flex;
     justify-content: center;

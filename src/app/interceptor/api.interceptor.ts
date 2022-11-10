@@ -9,6 +9,7 @@ import {
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { LocalStorageEnum } from '../enum/localStorageEnum';
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
@@ -24,10 +25,13 @@ export class ApiInterceptor implements HttpInterceptor {
     //ni de refrescar token
     if (
       request.url == environment.urlLogin ||
-      request.url == environment.urlRefreshToken
+      request.url == environment.urlRefreshToken ||
+      (request.url.includes(environment.urlCollections.users) &&
+        request.method == 'POST') || //Para registrar un nuevo usuario
+      request.url.includes(environment.urlLocation)
     )
       return next.handle(request);
-    this.token = localStorage.getItem('token');
+    this.token = localStorage.getItem(LocalStorageEnum.TOKEN);
     //Se captura la fecha de expiracion en
     //formato epoch
     const payload: any = JSON.parse(atob(this.token.split('.')[1])).exp;
@@ -40,14 +44,17 @@ export class ApiInterceptor implements HttpInterceptor {
     if (tokenExp.getTime() < now.getTime()) {
       const body = {
         grant_type: 'refresh_token',
-        refresh_token: localStorage.getItem('refreshToken'),
+        refresh_token: localStorage.getItem(LocalStorageEnum.REFRESH_TOKEN),
       };
       this.http
         .post(environment.urlRefreshToken, body)
         .subscribe((resp: any) => {
           //Se captura el idToken y refreshToken
-          localStorage.setItem('token', resp.id_token);
-          localStorage.setItem('refreshToken', resp.refresh_token);
+          localStorage.setItem(LocalStorageEnum.TOKEN, resp.id_token);
+          localStorage.setItem(
+            LocalStorageEnum.REFRESH_TOKEN,
+            resp.refresh_token
+          );
           this.token = resp.id_token;
         });
     }

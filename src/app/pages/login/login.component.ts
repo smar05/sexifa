@@ -1,3 +1,4 @@
+import { UrlPagesEnum } from './../../enum/urlPagesEnum';
 import { LoginService } from './../../services/login.service';
 import { Ilogin } from './../../interface/ilogin';
 import { Component, OnInit } from '@angular/core';
@@ -6,6 +7,7 @@ import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Router } from '@angular/router';
 import '../../shared/spinkit/sk-folding-cube.css';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-login',
@@ -47,26 +49,55 @@ export class LoginComponent implements OnInit {
 
     //Servicio de login
     this.loading = true;
-    this.loginService.login(data).subscribe(
-      (resp: any) => {
+    this.loginService
+      .loginWithAuthFire(data)
+      .then((res: any) => {
+        if (!res.user.multiFactor.user.emailVerified) {
+          alerts.basicAlert(
+            'Error',
+            'La cuenta no ha sido verificada',
+            'error'
+          );
+          this.loading = false;
+          return;
+        }
+
+        //Se captura el idToken y refreshToken
+        localStorage.setItem(
+          LocalStorageEnum.TOKEN,
+          res.user.multiFactor.user.stsTokenManager.accessToken
+        );
+        localStorage.setItem(
+          LocalStorageEnum.REFRESH_TOKEN,
+          res.user.multiFactor.user.stsTokenManager.refreshToken
+        );
+
+        //Se captura el localId
+        localStorage.setItem(
+          LocalStorageEnum.LOCAL_ID,
+          res.user.multiFactor.user.uid
+        );
+
         //Entramos al sistema
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl(`/${UrlPagesEnum.HOME}`);
         this.loading = false;
-      },
-      (err: any) => {
+      })
+      .catch((err: any) => {
+        console.error(err);
         //Errores al ingresar
-        if (err.error.error.message == 'EMAIL_NOT_FOUND') {
+        let error: any = err.error.errors[0];
+
+        if (error.message == 'EMAIL_NOT_FOUND') {
           alerts.basicAlert('Error', 'Correo no encontrado', 'error');
-        } else if (err.error.error.message == 'INVALID_PASSWORD') {
+        } else if (error.message == 'INVALID_PASSWORD') {
           alerts.basicAlert('Error', 'Contraseña invalida', 'error');
-        } else if (err.error.error.message == 'INVALID_EMAIL') {
+        } else if (error.message == 'INVALID_EMAIL') {
           alerts.basicAlert('Error', 'Correo invalido', 'error');
         } else {
           alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
         }
         this.loading = false;
-      }
-    );
+      });
   }
 
   /**

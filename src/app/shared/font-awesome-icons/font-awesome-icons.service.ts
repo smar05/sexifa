@@ -1,4 +1,10 @@
-import { faStar, faStarHalfStroke } from '@fortawesome/free-solid-svg-icons';
+import {
+  faStar,
+  faStarHalfStroke,
+  faVenus,
+  faMars,
+  faCartShopping,
+} from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { Injectable } from '@angular/core';
 
@@ -10,6 +16,9 @@ export class FontAwesomeIconsService {
     faStar, //Estrella solida
     faStarHalfStroke, //Estrella media
     faStarRegular, //Estrella vacia
+    faVenus, //Mujeres
+    faMars, //Hombres
+    faCartShopping, // Carrito de compras
   };
 
   constructor() {}

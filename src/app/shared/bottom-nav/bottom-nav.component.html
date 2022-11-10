@@ -1,5 +1,9 @@
 <div class="bottom-nav">
-  <i class="fas fa-user"></i>
-  <i class="fas fa-home"></i>
-  <i class="fas fa-cogs"></i>
+  <i class="fas fa-user" [routerLink]="['/user']"></i>
+  <i class="fas fa-home" [routerLink]="['/']"></i>
+  <fa-icon
+    class="color-red"
+    [routerLink]="['/checkout']"
+    [icon]="this.fontAwesomeIconsService.getIcon('faCartShopping' || '')"
+  ></fa-icon>
 </div>
