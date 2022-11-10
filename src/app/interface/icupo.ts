@@ -1,10 +1,10 @@
 export interface Icupo {
   id?: number;
   idUser?: string;
-  state?: StateCupo;
+  state?: StateCupoEnum;
 }
 
-export enum StateCupo {
+export enum StateCupoEnum {
   AVAILABLE = 'AVAILABLE', //Disponible
   SOLD = 'SOLD', //Vendido
   SELECT = 'SELECT', //Seleccionado

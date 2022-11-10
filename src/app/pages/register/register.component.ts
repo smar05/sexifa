@@ -1,3 +1,4 @@
+import { UrlPagesEnum } from './../../enum/urlPagesEnum';
 import { LocationService } from './../../services/location.service';
 import { UserService } from './../../services/user.service';
 import { alerts } from 'src/app/helpers/alerts';
@@ -157,7 +158,7 @@ export class RegisterComponent implements OnInit {
 
       this.loading = false;
 
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
     } catch (error: any) {
       console.error(error);
 

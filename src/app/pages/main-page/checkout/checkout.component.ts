@@ -1,4 +1,5 @@
-import { StateRifas, Irifas } from './../../../interface/irifas';
+import { UrlPagesEnum } from './../../../enum/urlPagesEnum';
+import { StateRifasEnum, Irifas } from './../../../interface/irifas';
 import { Router } from '@angular/router';
 import { IpriceModel } from './../../../interface/iprice-model';
 import { Imodels } from './../../../interface/imodels';
@@ -148,14 +149,14 @@ export class CheckoutComponent implements OnInit {
 
     let params: IQueryParams = {
       orderBy: '"state"',
-      equalTo: `"${StateRifas.ACTIVE}"`,
+      equalTo: `"${StateRifasEnum.ACTIVE}"`,
     };
 
     try {
       let rifa: Irifas = await this.rifasService.getData(params).toPromise();
       let idRifa: string = Object.keys(rifa)[0];
 
-      this.router.navigateByUrl(`/rifa/${idRifa}`);
+      this.router.navigateByUrl(`/${UrlPagesEnum.RIFA}/${idRifa}`);
     } catch (error) {
       console.error(error);
     }

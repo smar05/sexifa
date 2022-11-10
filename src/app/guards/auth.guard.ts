@@ -1,3 +1,4 @@
+import { UrlPagesEnum } from './../enum/urlPagesEnum';
 import { environment } from './../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -25,12 +26,12 @@ export class AuthGuard implements CanActivate {
           (err: any): any => {
             localStorage.removeItem(LocalStorageEnum.TOKEN);
             localStorage.removeItem(LocalStorageEnum.REFRESH_TOKEN);
-            this.router.navigateByUrl('/login');
+            this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
             resolve(false);
           }
         );
       } else {
-        this.router.navigateByUrl('/login');
+        this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
         resolve(false);
       }
     });

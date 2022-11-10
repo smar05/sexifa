@@ -1,4 +1,5 @@
-import { StateRifas, Irifas } from './../../../interface/irifas';
+import { UrlPagesEnum } from './../../../enum/urlPagesEnum';
+import { StateRifasEnum, Irifas } from './../../../interface/irifas';
 import { RifasService } from './../../../services/rifas.service';
 import { IpriceModel } from './../../../interface/iprice-model';
 import { Imodels } from './../../../interface/imodels';
@@ -98,7 +99,7 @@ export class ModelComponent implements OnInit {
   public async clickParticipar(): Promise<void> {
     let params: IQueryParams = {
       orderBy: '"state"',
-      equalTo: `"${StateRifas.ACTIVE}"`,
+      equalTo: `"${StateRifasEnum.ACTIVE}"`,
     };
 
     try {
@@ -124,7 +125,7 @@ export class ModelComponent implements OnInit {
         JSON.stringify(infoModelSubscription)
       );
 
-      this.router.navigateByUrl(`/rifa/${idRifa}`);
+      this.router.navigateByUrl(`/${UrlPagesEnum.RIFA}/${idRifa}`);
     } catch (error) {
       console.error(error);
     }

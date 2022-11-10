@@ -1,3 +1,4 @@
+import { UrlPagesEnum } from './../../enum/urlPagesEnum';
 import { LoginService } from './../../services/login.service';
 import { Ilogin } from './../../interface/ilogin';
 import { Component, OnInit } from '@angular/core';
@@ -78,7 +79,7 @@ export class LoginComponent implements OnInit {
         );
 
         //Entramos al sistema
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl(`/${UrlPagesEnum.HOME}`);
         this.loading = false;
       })
       .catch((err: any) => {

@@ -1,12 +1,13 @@
+import { UrlPagesEnum } from './../../../enum/urlPagesEnum';
 import { alerts } from './../../../helpers/alerts';
 import { IpriceModel } from './../../../interface/iprice-model';
 import { IInfoModelSubscription } from './../../../interface/i-info-model-subscription';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
-import { Irifas, StateRifas } from './../../../interface/irifas';
+import { Irifas, StateRifasEnum } from './../../../interface/irifas';
 import { RifasService } from './../../../services/rifas.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Icupo, StateCupo } from './../../../interface/icupo';
+import { Icupo, StateCupoEnum } from './../../../interface/icupo';
 import { Component, OnInit } from '@angular/core';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
@@ -86,11 +87,12 @@ export class ListCuposComponent implements OnInit {
         if (cupoEncontradoIndex >= 0) {
           // Si los cupos ya fueron vendidos, los eliminamos del carrito
           if (
-            this.rifa.listCupos[cupoEncontradoIndex].state == StateCupo.SOLD
+            this.rifa.listCupos[cupoEncontradoIndex].state == StateCupoEnum.SOLD
           ) {
             cuposVendidosYEnCarrito.push(cupoId);
           } else {
-            this.rifa.listCupos[cupoEncontradoIndex].state = StateCupo.SELECT;
+            this.rifa.listCupos[cupoEncontradoIndex].state =
+              StateCupoEnum.SELECT;
 
             if (
               this.cuposSeleccionadosModeloActual.findIndex(
@@ -130,14 +132,14 @@ export class ListCuposComponent implements OnInit {
 
     if (index == -1) return;
 
-    if (cupo.state == StateCupo.AVAILABLE) {
-      this.rifa.listCupos[index].state = StateCupo.SELECT;
+    if (cupo.state == StateCupoEnum.AVAILABLE) {
+      this.rifa.listCupos[index].state = StateCupoEnum.SELECT;
       this.cuposSeleccionadosEnPagina.push(this.rifa.listCupos[index]);
       this.cuposSeleccionadosModeloActual.push(
         this.rifa.listCupos[index].id || NaN
       );
     } else {
-      this.rifa.listCupos[index].state = StateCupo.AVAILABLE;
+      this.rifa.listCupos[index].state = StateCupoEnum.AVAILABLE;
       let i: number = this.cuposSeleccionadosEnPagina.findIndex(
         (cupoS: Icupo) => cupoS.id == cupo.id
       );
@@ -150,7 +152,7 @@ export class ListCuposComponent implements OnInit {
   }
 
   public async getInfoForSubscription(): Promise<void> {
-    if (this.rifa.state == StateRifas.ACTIVE) {
+    if (this.rifa.state == StateRifasEnum.ACTIVE) {
       //Para las rifas activas
       let { idModel, timeSubscription } = JSON.parse(
         localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION) || ''
@@ -176,7 +178,7 @@ export class ListCuposComponent implements OnInit {
               'Ha ocurrido un error, por favor seleccione un model@',
               'error'
             );
-            this.router.navigateByUrl('/');
+            this.router.navigateByUrl(`/${UrlPagesEnum.HOME}`);
           }
         } catch (error) {
           console.error(error);
@@ -187,7 +189,7 @@ export class ListCuposComponent implements OnInit {
           'Primero debe seleccionar al model@ y el tiempo de subscripcion por el cual quieres participar',
           'error'
         );
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl(`/${UrlPagesEnum.HOME}`);
       }
     }
   }
@@ -230,7 +232,7 @@ export class ListCuposComponent implements OnInit {
 
     localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(cart));
 
-    this.router.navigateByUrl('/checkout');
+    this.router.navigateByUrl(`/${UrlPagesEnum.CHECKOUT}`);
   }
 
   public disabledPorSerDeOtroModelo(cupo: Icupo): boolean {

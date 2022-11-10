@@ -1,6 +1,6 @@
 import { Icupo } from './icupo';
 export interface Irifas {
-  state?: StateRifas;
+  state?: StateRifasEnum;
   created?: Date;
   finish?: Date;
   winnerId?: string;
@@ -8,7 +8,7 @@ export interface Irifas {
   listCupos: Icupo[];
 }
 
-export enum StateRifas {
+export enum StateRifasEnum {
   ACTIVE = 'ACTIVE', //Activo
   FINISHED = 'FINISHED', //Finalizada
   CANCELED = 'CANCELED', //Anulada

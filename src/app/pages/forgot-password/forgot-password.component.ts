@@ -1,3 +1,4 @@
+import { UrlPagesEnum } from './../../enum/urlPagesEnum';
 import { Router } from '@angular/router';
 import { RegisterService } from './../../services/register.service';
 import { alerts } from 'src/app/helpers/alerts';
@@ -53,7 +54,7 @@ export class ForgotPasswordComponent implements OnInit {
           'success'
         );
 
-        this.router.navigateByUrl('/login');
+        this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
         this.loading = false;
       })
       .catch((error: any) => {
