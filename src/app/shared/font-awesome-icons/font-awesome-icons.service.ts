@@ -4,6 +4,7 @@ import {
   faVenus,
   faMars,
   faCartShopping,
+  faTransgender,
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { Injectable } from '@angular/core';
@@ -18,6 +19,7 @@ export class FontAwesomeIconsService {
     faStarRegular, //Estrella vacia
     faVenus, //Mujeres
     faMars, //Hombres
+    faTransgender, //Transgenero
     faCartShopping, // Carrito de compras
   };
 

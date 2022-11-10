@@ -24,14 +24,14 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    //this.getAllCategories();
+    this.getAllCategories();
     this.getAllModels();
   }
 
   public getAllCategories(): void {
     let queryParams: IQueryParams = {
-      orderBy: '"name"',
-      limitToFirst: 4,
+      orderBy: '"active"',
+      equalTo: true,
       print: 'pretty',
     };
     this.categoriesService.getData(queryParams).subscribe(
@@ -50,11 +50,11 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  public getAllModels(): void {
+  public getAllModels(categoria: Icategories = {}): void {
     this.models = [];
     let queryParams: IQueryParams = {
-      orderBy: '"active"',
-      equalTo: true,
+      orderBy: categoria.id ? '"categorie"' : '"active"',
+      equalTo: categoria.id ? `"${categoria.id}"` : true,
       print: 'pretty',
     };
     this.modelsService.getData(queryParams).subscribe(
