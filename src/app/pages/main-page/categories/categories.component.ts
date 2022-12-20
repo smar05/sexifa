@@ -21,13 +21,16 @@ export class CategoriesComponent implements OnInit {
   }
 
   public getAllCategories(): void {
-    this.categoriesService.getData().subscribe(
-      (res: Icategories[]) => {
-        this.categories = res;
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+    this.categoriesService
+      .getData()
+      .toPromise()
+      .then(
+        (res: Icategories[]) => {
+          this.categories = res;
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
   }
 }

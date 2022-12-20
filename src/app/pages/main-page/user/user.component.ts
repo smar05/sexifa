@@ -111,20 +111,23 @@ export class UserComponent implements OnInit {
       orderBy: '"id"',
       equalTo: `"${localStorage.getItem(LocalStorageEnum.LOCAL_ID)}"`,
     };
-    this.userService.getData(params).subscribe((data: any) => {
-      let user: Iuser = Object.keys(data).map((a: any) => {
-        this.nameUserId = a;
-        return data[a];
-      })[0];
-      this.name.setValue(user.name);
-      this.email.setValue(user.email);
-      this.celphone.setValue(user.celphone);
-      this.bornDate.setValue(user.bornDate);
-      this.sex.setValue(user.sex);
-      this.country.setValue(user.country);
-      this.state.setValue(user.state);
-      this.city.setValue(user.city);
-    });
+    this.userService
+      .getData(params)
+      .toPromise()
+      .then((data: any) => {
+        let user: Iuser = Object.keys(data).map((a: any) => {
+          this.nameUserId = a;
+          return data[a];
+        })[0];
+        this.name.setValue(user.name);
+        this.email.setValue(user.email);
+        this.celphone.setValue(user.celphone);
+        this.bornDate.setValue(user.bornDate);
+        this.sex.setValue(user.sex);
+        this.country.setValue(user.country);
+        this.state.setValue(user.state);
+        this.city.setValue(user.city);
+      });
   }
 
   public async onSubmit(f: any): Promise<void> {
@@ -145,23 +148,26 @@ export class UserComponent implements OnInit {
       city: this.city.value,
     };
 
-    this.userService.patchData(this.nameUserId, data).subscribe(
-      (res: any) => {
-        alerts.basicAlert(
-          'Listo',
-          'Se ha guardado la informacion del usuario',
-          'success'
-        );
-        this.loading = false;
-      },
-      (error: any) => {
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error al guardar la informacion del usuario',
-          'error'
-        );
-      }
-    );
+    this.userService
+      .patchData(this.nameUserId, data)
+      .toPromise()
+      .then(
+        (res: any) => {
+          alerts.basicAlert(
+            'Listo',
+            'Se ha guardado la informacion del usuario',
+            'success'
+          );
+          this.loading = false;
+        },
+        (error: any) => {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error al guardar la informacion del usuario',
+            'error'
+          );
+        }
+      );
   }
 
   /**

@@ -34,20 +34,23 @@ export class HomeComponent implements OnInit {
       equalTo: true,
       print: 'pretty',
     };
-    this.categoriesService.getData(queryParams).subscribe(
-      (res: Icategories[]) => {
-        this.categories = Object.keys(res).map((a: any) => {
-          return {
-            id: a,
-            icon: res[a].icon,
-            name: res[a].name,
-          };
-        });
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+    this.categoriesService
+      .getData(queryParams)
+      .toPromise()
+      .then(
+        (res: Icategories[]) => {
+          this.categories = Object.keys(res).map((a: any) => {
+            return {
+              id: a,
+              icon: res[a].icon,
+              name: res[a].name,
+            };
+          });
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
   }
 
   public getAllModels(categoria: Icategories = {}): void {
@@ -57,34 +60,37 @@ export class HomeComponent implements OnInit {
       equalTo: categoria.id ? `"${categoria.id}"` : true,
       print: 'pretty',
     };
-    this.modelsService.getData(queryParams).subscribe(
-      async (res: Imodels[]) => {
-        let imodels: Imodels[] = Object.keys(res)
-          .map((a: any) => {
-            return {
-              id: a,
-              categorie: res[a].categorie,
-              name: res[a].name,
-              page: res[a].page,
-              url: res[a].url,
-              description: res[a].description,
-            };
-          })
-          .sort((a: Imodels, b: Imodels) =>
-            a.name.toLowerCase()?.localeCompare(b.name.toLowerCase())
-          );
+    this.modelsService
+      .getData(queryParams)
+      .toPromise()
+      .then(
+        async (res: Imodels[]) => {
+          let imodels: Imodels[] = Object.keys(res)
+            .map((a: any) => {
+              return {
+                id: a,
+                categorie: res[a].categorie,
+                name: res[a].name,
+                page: res[a].page,
+                url: res[a].url,
+                description: res[a].description,
+              };
+            })
+            .sort((a: Imodels, b: Imodels) =>
+              a.name.toLowerCase()?.localeCompare(b.name.toLowerCase())
+            );
 
-        //Imodel to DTO
-        imodels.forEach(async (imodel: Imodels) => {
-          this.models?.push(
-            await this.modelsService.modelInterfaceToDTO(imodel)
-          );
-        });
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+          //Imodel to DTO
+          imodels.forEach(async (imodel: Imodels) => {
+            this.models?.push(
+              await this.modelsService.modelInterfaceToDTO(imodel)
+            );
+          });
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
   }
 
   public getUrlModel(model: ModelsDTO) {

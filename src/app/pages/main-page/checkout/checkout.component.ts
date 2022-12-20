@@ -42,11 +42,14 @@ export class CheckoutComponent implements OnInit {
       orderBy: '"id"',
       equalTo: `"${localStorage.getItem(LocalStorageEnum.LOCAL_ID)}"`,
     };
-    this.userService.getData(params).subscribe((data: any) => {
-      this.user = Object.keys(data).map((a: any) => {
-        return data[a];
-      })[0];
-    });
+    this.userService
+      .getData(params)
+      .toPromise()
+      .then((data: any) => {
+        this.user = Object.keys(data).map((a: any) => {
+          return data[a];
+        })[0];
+      });
   }
 
   public getCartData(): void {
