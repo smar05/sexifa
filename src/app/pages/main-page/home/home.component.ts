@@ -1,6 +1,6 @@
 import { functions } from './../../../helpers/functions';
 import { ModelsDTO } from './../../../dto/models-dto';
-import { Imodels } from './../../../interface/imodels';
+import { Imodels, ModelsFilterEnum } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
 import { IQueryParams } from './../../../interface/i-query-params';
 import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
@@ -55,9 +55,12 @@ export class HomeComponent implements OnInit {
 
   public getAllModels(categoria: Icategories = {}): void {
     this.models = [];
+    let equalTo: string = `"true_${categoria.id}"`;
     let queryParams: IQueryParams = {
-      orderBy: categoria.id ? '"categorie"' : '"active"',
-      equalTo: categoria.id ? `"${categoria.id}"` : true,
+      orderBy: categoria.id
+        ? `"filter/${ModelsFilterEnum.active_categorie}"`
+        : '"active"',
+      equalTo: categoria.id ? equalTo : true,
       print: 'pretty',
     };
     this.modelsService

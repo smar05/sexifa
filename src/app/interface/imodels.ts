@@ -9,4 +9,9 @@ export interface Imodels {
   description?: string;
   active?: boolean;
   price?: IpriceModel[];
+  filter?: any;
+}
+
+export enum ModelsFilterEnum {
+  active_categorie = 'active_categorie',
 }
