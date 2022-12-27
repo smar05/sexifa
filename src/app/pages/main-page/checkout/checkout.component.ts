@@ -1,3 +1,4 @@
+import { Icupo, StateCupoEnum } from './../../../interface/icupo';
 import { UrlPagesEnum } from './../../../enum/urlPagesEnum';
 import { StateRifasEnum, Irifas } from './../../../interface/irifas';
 import { Router } from '@angular/router';
@@ -21,9 +22,10 @@ import { RifasService } from 'src/app/services/rifas.service';
 })
 export class CheckoutComponent implements OnInit {
   public user: Iuser = {};
-  public cartLocal: IInfoModelSubscription[] = [];
-  public cart: ICart[] = [];
+  public cartLocal: IInfoModelSubscription[] = []; // Carrito de localstorage en local
+  public cart: ICart[] = []; // Objeto que se muestra en pantalla
   public total: number = 0;
+  public rifa!: Irifas;
 
   constructor(
     private userService: UserService,
@@ -32,9 +34,10 @@ export class CheckoutComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.getUserData();
-    this.getCartData();
+    await this.getRifa();
+    await this.getCartData();
   }
 
   public getUserData(): void {
@@ -52,7 +55,7 @@ export class CheckoutComponent implements OnInit {
       });
   }
 
-  public getCartData(): void {
+  public async getCartData(): Promise<void> {
     this.cartLocal = JSON.parse(
       localStorage.getItem(LocalStorageEnum.CART) || ''
     );
@@ -62,52 +65,130 @@ export class CheckoutComponent implements OnInit {
     if (!this.cartLocal) return;
 
     this.cartLocal.forEach(async (cartLocalItem: IInfoModelSubscription) => {
+      let i: number = this.cartLocal.findIndex(
+        (cart: IInfoModelSubscription) => cart == cartLocalItem
+      );
       try {
-        if (!cartLocalItem.idModel) return;
-        let cartItem: ICart = {};
-        let model: Imodels = await this.modelsService
-          .getItem(cartLocalItem.idModel)
-          .toPromise();
-        let price: number | undefined = 0;
+        if (!cartLocalItem.idModel) {
+          if (i >= 0) this.cartLocal = this.cartLocal.splice(i, 1);
 
-        let index: any = model.price?.findIndex(
-          (price: IpriceModel) => price.time == cartLocalItem.timeSubscription
-        );
+          localStorage.setItem(
+            LocalStorageEnum.CART,
+            JSON.stringify(this.cartLocal)
+          );
 
-        if (index >= 0) {
-          let priceModel: IpriceModel =
-            model.price?.find(
+          alerts.basicAlert(
+            'Modelo no encontrad@',
+            `No se encontro el modelo`,
+            'error'
+          );
+        } else {
+          let cartItem: ICart = {};
+          let model: Imodels = await this.modelsService
+            .getItem(cartLocalItem.idModel)
+            .toPromise();
+
+          // Si el modelo esta activo se coloca en el carrito
+          if (model.active) {
+            // Verificacion de que los cupos esten disponibles
+            cartLocalItem.cupos?.forEach((numeroCupo: number) => {
+              let cupo: Icupo | undefined = this.rifa.listCupos.find(
+                (cupo: Icupo) => cupo.id == numeroCupo
+              );
+
+              if (cupo && cupo.state == StateCupoEnum.SOLD) {
+                cartLocalItem.cupos = cartLocalItem.cupos?.filter(
+                  (cupoN: number) => cupoN != numeroCupo
+                );
+
+                localStorage.setItem(
+                  LocalStorageEnum.CART,
+                  JSON.stringify(this.cartLocal)
+                );
+
+                alerts.basicAlert(
+                  'Cupo no disponible',
+                  `El cupo ${cupo.id} no se encuentra disponible`,
+                  'error'
+                );
+              }
+            });
+
+            // Item de carrito sin cupos
+            if (cartLocalItem.cupos?.length == 0) {
+              this.cartLocal = this.cartLocal.filter(
+                (itemCart: IInfoModelSubscription) =>
+                  itemCart.idModel != cartLocalItem.idModel
+              );
+
+              this.cart = this.cart.filter(
+                (itemCart: ICart) => itemCart.model?.id != cartLocalItem.idModel
+              );
+
+              localStorage.setItem(
+                LocalStorageEnum.CART,
+                JSON.stringify(this.cartLocal)
+              );
+
+              return;
+            }
+
+            let price: number | undefined = 0;
+
+            let index: any = model.price?.findIndex(
               (price: IpriceModel) =>
                 price.time == cartLocalItem.timeSubscription
-            ) || {};
+            );
 
-          if (
-            this.modelsService.calculoPrecioSubscripcion(priceModel) !=
-              undefined &&
-            cartLocalItem.cupos
-          ) {
-            let precioUnCupo: number =
-              this.modelsService.calculoPrecioSubscripcion(priceModel) || 0;
-            let cantidadCupos: number = cartLocalItem.cupos.length;
+            if (index >= 0) {
+              let priceModel: IpriceModel =
+                model.price?.find(
+                  (price: IpriceModel) =>
+                    price.time == cartLocalItem.timeSubscription
+                ) || {};
 
-            price = precioUnCupo * cantidadCupos;
+              if (
+                this.modelsService.calculoPrecioSubscripcion(priceModel) !=
+                  undefined &&
+                cartLocalItem.cupos
+              ) {
+                let precioUnCupo: number =
+                  this.modelsService.calculoPrecioSubscripcion(priceModel) || 0;
+                let cantidadCupos: number = cartLocalItem.cupos.length;
+
+                price = precioUnCupo * cantidadCupos;
+              }
+            } else {
+              return;
+            }
+
+            cartItem.model = model;
+            cartItem.infoModelSubscription = cartLocalItem;
+            cartItem.price = price;
+            cartItem.detalle = `${
+              cartLocalItem.timeSubscription
+                ? 'Tiempo subscripcion: ' + cartLocalItem.timeSubscription
+                : ''
+            }`;
+
+            this.total += cartItem.price;
+
+            this.cart.push(cartItem);
+          } else {
+            if (i >= 0) this.cartLocal = this.cartLocal.splice(i, 1);
+
+            localStorage.setItem(
+              LocalStorageEnum.CART,
+              JSON.stringify(this.cartLocal)
+            );
+
+            alerts.basicAlert(
+              'Modelo no disponible',
+              `El modelo ${model.name} no se encuentra disponible`,
+              'warning'
+            );
           }
-        } else {
-          return;
         }
-
-        cartItem.model = model;
-        cartItem.infoModelSubscription = cartLocalItem;
-        cartItem.price = price;
-        cartItem.detalle = `${
-          cartLocalItem.timeSubscription
-            ? 'Tiempo subscripcion: ' + cartLocalItem.timeSubscription
-            : ''
-        }`;
-
-        this.total += cartItem.price;
-
-        this.cart.push(cartItem);
       } catch (error) {
         throw error;
       }
@@ -163,5 +244,19 @@ export class CheckoutComponent implements OnInit {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  public async getRifa(): Promise<void> {
+    let params: IQueryParams = {
+      orderBy: '"state"',
+      equalTo: `"${StateRifasEnum.ACTIVE}"`,
+    };
+    this.rifa = (await this.rifasService.getData(params).toPromise())[0];
+
+    // Se asigna el id de los cupos de la rifa
+    this.rifa.listCupos = Object.keys(this.rifa.listCupos).map((a: any) => {
+      this.rifa.listCupos[a].id = a;
+      return this.rifa.listCupos[a];
+    });
   }
 }

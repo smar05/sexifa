@@ -19,10 +19,10 @@
   <section class="content m-2">
     <div class="grid">
       <div class="row">
-        <h4><strong> Modelo: </strong>{{ this.modelForRifa.name }}</h4>
+        <h4><strong> Modelo: </strong>{{ this.modelForRifa?.name }}</h4>
         <h4>
           <strong>Precio por cupo: </strong>
-          {{ this.modelSubscriptionPrice | currency: "USD" }}
+          {{ this.modelSubscriptionPrice | currency : "USD" }}
         </h4>
       </div>
       <!--Tipos de cupos-->
@@ -91,7 +91,7 @@
           Total:
           {{
             this.modelSubscriptionPrice * this.cuposSeleccionadosEnPagina.length
-              | currency: "USD"
+              | currency : "USD"
           }}
         </h2>
       </div>
