@@ -56,13 +56,13 @@ export class CheckoutComponent implements OnInit {
   }
 
   public async getCartData(): Promise<void> {
+    if (!localStorage.getItem(LocalStorageEnum.CART)) return;
+
     this.cartLocal = JSON.parse(
       localStorage.getItem(LocalStorageEnum.CART) || ''
     );
     this.cart = [];
     this.total = 0;
-
-    if (!this.cartLocal) return;
 
     this.cartLocal.forEach(async (cartLocalItem: IInfoModelSubscription) => {
       let i: number = this.cartLocal.findIndex(
