@@ -24,18 +24,29 @@
         </div>
         <div class="image-list">
           <!--Categorias-->
-          <ng-container *ngFor="let category of categories">
-            <div class="single-image-box" (click)="this.getAllModels(category)">
-              <div class="img">
-                <fa-icon
-                  [icon]="
-                    this.fontAwesomeIconsService.getIcon(category.icon || '')
-                  "
-                ></fa-icon>
+          <ng-container
+            *ngIf="this.categories && this.categories.length > 0; else loading"
+          >
+            <ng-container *ngFor="let category of categories">
+              <div
+                class="single-image-box"
+                (click)="this.getAllModels(category)"
+              >
+                <div class="img">
+                  <fa-icon
+                    [icon]="
+                      this.fontAwesomeIconsService.getIcon(category.icon || '')
+                    "
+                  ></fa-icon>
+                </div>
+                <p class="lable">{{ this.category.name }}</p>
               </div>
-              <p class="lable">{{ this.category.name }}</p>
-            </div>
+            </ng-container>
           </ng-container>
+          <ng-template #loading>
+            <app-sk-folding-cube></app-sk-folding-cube>
+          </ng-template>
+
           <!--Categorias-->
         </div>
         <!--
@@ -58,42 +69,48 @@
         -->
         <div class="gallery-section">
           <!--Modelos-->
-          <ng-container *ngFor="let model of models">
-            <div
-              class="img-box"
-              [routerLink]="['/model/' + this.getUrlModel(model)]"
-            >
-              <img [src]="model.mainImage" [alt]="model.name" loading="lazy" />
-              <div class="description">
-                <div class="headring-row">
-                  <h6 class="heading font-weight-bold">{{ model.name }}</h6>
-                  <!--<p class="price">$120</p>-->
-                </div>
-                <!--Categoria-->
-                <div class="sub-desc">
-                  <p>
-                    <span class="font-weight-bold">Categoria: </span
-                    >{{ model.categorie?.name }}
-                  </p>
-                </div>
-                <!--Pagina de la modelo-->
-                <div class="sub-desc">
-                  <p>
-                    <span class="font-weight-bold">Pagina: </span
-                    >{{ model.page?.name }}
-                  </p>
-                </div>
-                <div class="reting">
-                  <fa-icon
-                    [icon]="
-                      this.fontAwesomeIconsService.getIcon(
-                        model.categorie?.icon || ''
-                      )
-                    "
-                  ></fa-icon>
+          <ng-container *ngIf="models && models.length > 0; else loading">
+            <ng-container *ngFor="let model of models">
+              <div
+                class="img-box"
+                [routerLink]="['/model/' + this.getUrlModel(model)]"
+              >
+                <img
+                  [src]="model.mainImage"
+                  [alt]="model.name"
+                  loading="lazy"
+                />
+                <div class="description">
+                  <div class="headring-row">
+                    <h6 class="heading font-weight-bold">{{ model.name }}</h6>
+                    <!--<p class="price">$120</p>-->
+                  </div>
+                  <!--Categoria-->
+                  <div class="sub-desc">
+                    <p>
+                      <span class="font-weight-bold">Categoria: </span
+                      >{{ model.categorie?.name }}
+                    </p>
+                  </div>
+                  <!--Pagina de la modelo-->
+                  <div class="sub-desc">
+                    <p>
+                      <span class="font-weight-bold">Pagina: </span
+                      >{{ model.page?.name }}
+                    </p>
+                  </div>
+                  <div class="reting">
+                    <fa-icon
+                      [icon]="
+                        this.fontAwesomeIconsService.getIcon(
+                          model.categorie?.icon || ''
+                        )
+                      "
+                    ></fa-icon>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
           </ng-container>
         </div>
       </div>

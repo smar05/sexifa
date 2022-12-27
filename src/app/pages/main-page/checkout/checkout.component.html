@@ -13,22 +13,24 @@
   <div class="row mt-2">
     <div class="col-lg-6">
       <div class="card">
-        <div class="card-body">
-          <h2 class="text-center mb-3">
-            <strong>Detalles de facturación</strong>
-          </h2>
-          <!--nombre-->
-          <label for="name"><strong>Nombre</strong></label>
-          <p>{{ this.user.name }}</p>
+        <ng-container *ngIf="this.user && this.user.id; else loading">
+          <div class="card-body">
+            <h2 class="text-center mb-3">
+              <strong>Detalles de facturación</strong>
+            </h2>
+            <!--nombre-->
+            <label for="name"><strong>Nombre</strong></label>
+            <p>{{ this.user.name }}</p>
 
-          <!--Correo-->
-          <label for="email"><strong>Correo</strong></label>
-          <p>{{ this.user.email }}</p>
+            <!--Correo-->
+            <label for="email"><strong>Correo</strong></label>
+            <p>{{ this.user.email }}</p>
 
-          <!--Celular-->
-          <label for="celphone"><strong>Celular</strong></label>
-          <p>{{ this.user.celphone }}</p>
-        </div>
+            <!--Celular-->
+            <label for="celphone"><strong>Celular</strong></label>
+            <p>{{ this.user.celphone }}</p>
+          </div>
+        </ng-container>
       </div>
     </div>
 
@@ -45,49 +47,51 @@
           </div>
 
           <!--Carrito de compras-->
-          <div class="ps-block__content">
-            <table class="table ps-block__products">
-              <tbody>
-                <tr *ngFor="let cartItem of this.cart; let i = index">
-                  <td>
-                    <a
-                      [routerLink]="[
-                        '/model/' + this.getUrlModel(cartItem.model!)
-                      ]"
-                      >{{ cartItem.model?.name }}</a
-                    >
-                    <p>
-                      <strong>Numeros para rifa: </strong
-                      >{{ cartItem.infoModelSubscription?.cupos }}
-                    </p>
-                    <p>
-                      <strong>Detalle: </strong> <br />
-                      {{ cartItem.detalle }}
-                    </p>
-                  </td>
+          <ng-container *ngIf="this.cart && this.cart.length > 0; else loading">
+            <div class="ps-block__content">
+              <table class="table ps-block__products">
+                <tbody>
+                  <tr *ngFor="let cartItem of this.cart; let i = index">
+                    <td>
+                      <a
+                        [routerLink]="[
+                          '/model/' + this.getUrlModel(cartItem.model!)
+                        ]"
+                        >{{ cartItem.model?.name }}</a
+                      >
+                      <p>
+                        <strong>Numeros para rifa: </strong
+                        >{{ cartItem.infoModelSubscription?.cupos }}
+                      </p>
+                      <p>
+                        <strong>Detalle: </strong> <br />
+                        {{ cartItem.detalle }}
+                      </p>
+                    </td>
 
-                  <!--Editar-->
-                  <td (click)="this.editarCartItem(cartItem)">
-                    <i class="far fa-edit text-info"></i>
-                  </td>
+                    <!--Editar-->
+                    <td (click)="this.editarCartItem(cartItem)">
+                      <i class="far fa-edit text-info"></i>
+                    </td>
 
-                  <!--Eliminar-->
-                  <td (click)="this.eliminarCartItem(cartItem)">
-                    <i class="far fa-trash-alt text-danger"></i>
-                  </td>
+                    <!--Eliminar-->
+                    <td (click)="this.eliminarCartItem(cartItem)">
+                      <i class="far fa-trash-alt text-danger"></i>
+                    </td>
 
-                  <td class="text-right">
-                    {{ cartItem.price | currency: "USD" }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <td class="text-right">
+                      {{ cartItem.price | currency : "USD" }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
-            <h3 class="text-right">
-              <strong>Total: </strong>
-              <span>{{ this.total | currency: "USD" }}</span>
-            </h3>
-          </div>
+              <h3 class="text-right">
+                <strong>Total: </strong>
+                <span>{{ this.total | currency : "USD" }}</span>
+              </h3>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -187,3 +191,7 @@
     </div>
   </div>
 </div>
+
+<ng-template #loading>
+  <app-sk-folding-cube></app-sk-folding-cube>
+</ng-template>

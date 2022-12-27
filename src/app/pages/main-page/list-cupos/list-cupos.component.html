@@ -18,13 +18,18 @@
   </section>
   <section class="content m-2">
     <div class="grid">
-      <div class="row">
-        <h4><strong> Modelo: </strong>{{ this.modelForRifa?.name }}</h4>
-        <h4>
-          <strong>Precio por cupo: </strong>
-          {{ this.modelSubscriptionPrice | currency : "USD" }}
-        </h4>
-      </div>
+      <ng-container
+        *ngIf="this.modelForRifa && this.modelForRifa.id; else loading"
+      >
+        <div class="row">
+          <h4><strong> Modelo: </strong>{{ this.modelForRifa?.name }}</h4>
+          <h4>
+            <strong>Precio por cupo: </strong>
+            {{ this.modelSubscriptionPrice | currency : "USD" }}
+          </h4>
+        </div>
+      </ng-container>
+
       <!--Tipos de cupos-->
       <div class="row">
         <p class="font-weight-bold">Tipos de cupos</p>
@@ -54,38 +59,41 @@
       <div class="row">
         <h3 class="font-weight-bold">Listado de cupos</h3>
       </div>
-      <div class="row align-items-center">
-        <div class="col-3 mb-3" *ngFor="let cupo of this.rifa?.listCupos">
-          <!--Disponible-->
-          <button
-            type="button"
-            class="btn btn-block btn-lg btn-outline-success"
-            *ngIf="cupo.state == 'AVAILABLE'"
-            (click)="this.changeCupoState(cupo)"
-          >
-            {{ cupo.id }}
-          </button>
-          <!--Seleccionado-->
-          <button
-            type="button"
-            class="btn btn-block btn-lg btn-success"
-            *ngIf="cupo.state == 'SELECT'"
-            (click)="this.changeCupoState(cupo)"
-            [disabled]="this.disabledPorSerDeOtroModelo(cupo)"
-          >
-            {{ cupo.id }}
-          </button>
-          <!--Vendido-->
-          <button
-            type="button"
-            class="btn btn-block btn-lg btn-danger"
-            *ngIf="cupo.state == 'SOLD'"
-            disabled
-          >
-            {{ cupo.id }}
-          </button>
+      <ng-container *ngIf="this.rifa; else loading">
+        <div class="row align-items-center">
+          <div class="col-3 mb-3" *ngFor="let cupo of this.rifa?.listCupos">
+            <!--Disponible-->
+            <button
+              type="button"
+              class="btn btn-block btn-lg btn-outline-success"
+              *ngIf="cupo.state == 'AVAILABLE'"
+              (click)="this.changeCupoState(cupo)"
+            >
+              {{ cupo.id }}
+            </button>
+            <!--Seleccionado-->
+            <button
+              type="button"
+              class="btn btn-block btn-lg btn-success"
+              *ngIf="cupo.state == 'SELECT'"
+              (click)="this.changeCupoState(cupo)"
+              [disabled]="this.disabledPorSerDeOtroModelo(cupo)"
+            >
+              {{ cupo.id }}
+            </button>
+            <!--Vendido-->
+            <button
+              type="button"
+              class="btn btn-block btn-lg btn-danger"
+              *ngIf="cupo.state == 'SOLD'"
+              disabled
+            >
+              {{ cupo.id }}
+            </button>
+          </div>
         </div>
-      </div>
+      </ng-container>
+
       <div class="row">
         <h2 class="font-weight-bold">
           Total:
@@ -114,3 +122,6 @@
     </div>
   </section>
 </div>
+<ng-template #loading>
+  <app-sk-folding-cube></app-sk-folding-cube>
+</ng-template>
