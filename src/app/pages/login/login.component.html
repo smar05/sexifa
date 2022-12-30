@@ -1,0 +1,107 @@
+<div class="hold-transition login-page">
+  <div class="login-box">
+    <!-- /.login-logo -->
+    <div class="card card-outline">
+      <div class="card-header text-center">
+        <img width="100%" src="../../../assets/img/sexifa_logo.png" alt="" />
+      </div>
+      <div class="card-body">
+        <p class="login-box-msg font-weight-bold">Bienvenido a Sexifa</p>
+        <p class="login-box-msg">
+          Gana subscripciones para ver a l@s mejores modelos webcam
+        </p>
+
+        <ng-container *ngIf="loading">
+          <app-sk-folding-cube></app-sk-folding-cube>
+        </ng-container>
+
+        <ng-container *ngIf="!loading">
+          <form autocomplete="off" [formGroup]="f" (ngSubmit)="login()">
+            <div class="input-group mb-3">
+              <input
+                type="email"
+                class="form-control"
+                placeholder="Correo"
+                formControlName="email"
+                [ngClass]="{ 'is-invalid': invalidField('email') }"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-envelope"></span>
+                </div>
+              </div>
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  invalidField('email') && f.controls.email.errors.required
+                "
+              >
+                Por favor llene este campo
+              </div>
+              <div
+                class="invalid-feedback"
+                *ngIf="invalidField('email') && f.controls.email.errors.email"
+              >
+                Por favor ingrese un correo valido
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Contraseña"
+                formControlName="password"
+                [ngClass]="{ 'is-invalid': invalidField('password') }"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+              <div class="invalid-feedback" *ngIf="invalidField('password')">
+                Por favor llene este campo
+              </div>
+            </div>
+            <div class="row">
+              <!-- /.col -->
+              <div class="col-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-block"
+                  [disabled]="f.invalid"
+                >
+                  Iniciar sesion
+                </button>
+              </div>
+              <!-- /.col -->
+            </div>
+          </form>
+        </ng-container>
+
+        <!--
+        <div class="social-auth-links text-center mt-2 mb-3">
+          <a href="#" class="btn btn-block btn-primary">
+            <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
+          </a>
+          <a href="#" class="btn btn-block btn-danger">
+            <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
+          </a>
+        </div>
+        -->
+        <p class="mb-0 mt-2 text-center">
+          <a
+            [routerLink]="['/register']"
+            class="btn btn-primary btn-block bg-wine"
+            >Crear cuenta nueva</a
+          >
+        </p>
+        <p class="mb-1 mt-2">
+          <a [routerLink]="['/forgot-password']">Olvide mi contraseña</a>
+        </p>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  <!-- /.login-box -->
+</div>

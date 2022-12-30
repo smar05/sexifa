@@ -1,0 +1,120 @@
+<div class="content-wrapper">
+  <section class="content">
+    <ng-container *ngIf="this.model && this.model.id; else loading">
+      <div class="box2">
+        <div class="box">
+          <div class="top-image-container">
+            <div class="icon-row">
+              <div class="icon" [routerLink]="['/']">
+                <i class="fas fa-chevron-left"></i>
+              </div>
+            </div>
+            <div class="carousel">
+              <div class="slides">
+                <img
+                  [src]="this.imgPrincipal"
+                  [alt]="this.model.name"
+                  class="slide"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!--Galeria del modelo-->
+          <div class="row mt-3" *ngIf="this.galeria && this.galeria.length > 0">
+            <div class="row align-items-center">
+              <div class="col-1"></div>
+              <figure
+                class="col-2 pb-3"
+                (click)="setImgPrincipal(this.model.mainImage || '')"
+              >
+                <img
+                  [src]="this.model.mainImage"
+                  alt=""
+                  class="img-fluid img-rounded"
+                  height="100px"
+                />
+              </figure>
+              <figure
+                class="col-2 pb-3"
+                *ngFor="let pic of galeria"
+                (click)="setImgPrincipal(pic)"
+              >
+                <img
+                  [src]="pic"
+                  alt=""
+                  class="img-fluid img-rounded"
+                  height="100px"
+                />
+              </figure>
+              <div class="col-1"></div>
+            </div>
+          </div>
+          <div class="content-section">
+            <div class="main-heading">
+              <div class="left">
+                <h2 class="title">{{ this.model.name }}</h2>
+                <div class="subtitle">
+                  <span class="font-weight-bold">Categoria: </span
+                  >{{ this.model.categorie?.name }}
+                </div>
+                <div class="subtitle">
+                  <span class="font-weight-bold">Pagina: </span>
+                  <a [href]="this.model.url" target="_blank">{{
+                    this.model.page?.name
+                  }}</a>
+                </div>
+              </div>
+              <div class="right">
+                <h1 class="price">
+                  {{ this.calculoPrecioSubscripcion() | currency : "USD" }}
+                </h1>
+              </div>
+            </div>
+            <!--Tipo de subscripcion-->
+            <div class="color-section">
+              <div class="left">
+                <p class="label">
+                  Seleccione el tipo de subscripción en meses por la que desea
+                  participar
+                </p>
+                <div class="sizes">
+                  <div
+                    class="select"
+                    *ngFor="let price of this.model.price; let i = index"
+                  >
+                    <input
+                      type="radio"
+                      id="{{ 'price_' + i }}"
+                      name="{{ 'price_' + i }}"
+                      (click)="this.subscriptionModelInputChange(i)"
+                      [checked]="this.timeSubscriptionInput[i].checked"
+                    />
+                    <label for="{{ 'price_' + i }}">{{ price.time }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="description">
+              <div class="tab">
+                <p class="font-weight-bold">Descripción</p>
+              </div>
+              <p class="text">
+                {{ this.model.description }}
+              </p>
+            </div>
+
+            <div class="add-to-catr-btn" *ngIf="this.price">
+              <button class="btn" (click)="this.clickParticipar()">
+                Participar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </section>
+</div>
+<ng-template #loading>
+  <app-sk-folding-cube></app-sk-folding-cube>
+</ng-template>

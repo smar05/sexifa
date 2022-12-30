@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+/*Paleta de colores*/
+:root {
+  --color-red: #ca0010;
+  --color-wine: #8d0611;
+  --color-dark-wine: #500c12;
+  --color-grey: #e2e2e2;
+}
+
+.content-wrapper {
+  height: max-content !important;
+}
+
+.bg-wine {
+  background-color: var(--color-wine);
+  border-color: var(--color-wine);
+}
+
+.bg-red {
+  background-color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+.color-red {
+  color: var(--color-red);
+}
