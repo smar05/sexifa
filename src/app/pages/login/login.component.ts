@@ -6,7 +6,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Router } from '@angular/router';
-import '../../shared/spinkit/sk-folding-cube.css';
+//import '../../shared/spinkit/sk-folding-cube.css';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({

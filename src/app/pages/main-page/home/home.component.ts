@@ -3,7 +3,7 @@ import { ModelsDTO } from './../../../dto/models-dto';
 import { Imodels, ModelsFilterEnum } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
 import { IQueryParams } from './../../../interface/i-query-params';
-import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
+//import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
 import { Icategories } from './../../../interface/icategories';
 import { CategoriesService } from './../../../services/categories.service';
 import { Component, OnInit } from '@angular/core';
@@ -19,9 +19,9 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private categoriesService: CategoriesService,
-    private modelsService: ModelsService,
-    public fontAwesomeIconsService: FontAwesomeIconsService
-  ) {}
+    private modelsService: ModelsService
+  ) //public fontAwesomeIconsService: FontAwesomeIconsService
+  {}
 
   ngOnInit(): void {
     this.getAllCategories();

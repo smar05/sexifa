@@ -1,4 +1,4 @@
-import {
+/*import {
   faStar,
   faStarHalfStroke,
   faVenus,
@@ -6,14 +6,14 @@ import {
   faCartShopping,
   faTransgender,
 } from '@fortawesome/free-solid-svg-icons';
-import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
+import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';*/
 import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FontAwesomeIconsService {
-  private icons: any = {
+  /*private icons: any = {
     faStar, //Estrella solida
     faStarHalfStroke, //Estrella media
     faStarRegular, //Estrella vacia
@@ -21,7 +21,7 @@ export class FontAwesomeIconsService {
     faMars, //Hombres
     faTransgender, //Transgenero
     faCartShopping, // Carrito de compras
-  };
+  };*/
 
   constructor() {}
 
@@ -32,7 +32,7 @@ export class FontAwesomeIconsService {
    * @return {*}  {*}
    * @memberof FontAwesomeIcons
    */
-  public getIcon(iconName: string): any {
+  /*public getIcon(iconName: string): any {
     return this.icons[iconName];
-  }
+  }*/
 }

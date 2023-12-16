@@ -1,5 +1,5 @@
 import { ListCuposComponent } from './list-cupos.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+//import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -11,7 +11,7 @@ import { ListCuposRoutingModule } from './list-cupos-routing.module';
   imports: [
     CommonModule,
     ListCuposRoutingModule,
-    FontAwesomeModule,
+    //FontAwesomeModule,
     SharedModule,
   ],
 })

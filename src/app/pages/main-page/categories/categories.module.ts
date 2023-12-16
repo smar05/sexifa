@@ -1,4 +1,4 @@
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+//import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -7,6 +7,6 @@ import { CategoriesRoutingModule } from './categories-routing.module';
 
 @NgModule({
   declarations: [CategoriesComponent],
-  imports: [CommonModule, CategoriesRoutingModule, FontAwesomeModule],
+  imports: [CommonModule, CategoriesRoutingModule /*FontAwesomeModule*/],
 })
 export class CategoriesModule {}

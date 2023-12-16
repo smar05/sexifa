@@ -13,7 +13,7 @@ import { AngularFireModule } from '@angular/fire/compat';
 
 //Modulos personalizados
 import { PagesModule } from './pages/pages.module';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+//import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,7 +22,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     AppRoutingModule,
     PagesModule,
     HttpClientModule,
-    FontAwesomeModule,
+    //FontAwesomeModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideStorage(() => getStorage()),

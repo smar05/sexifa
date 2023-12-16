@@ -1,4 +1,4 @@
-import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
+//import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
 import { CategoriesService } from './../../../services/categories.service';
 import { Icategories } from './../../../interface/icategories';
 import { Component, OnInit } from '@angular/core';
@@ -12,9 +12,9 @@ export class CategoriesComponent implements OnInit {
   public categories: Icategories[] | null = [];
 
   constructor(
-    private categoriesService: CategoriesService,
-    public fontAwesomeIconsService: FontAwesomeIconsService
-  ) {}
+    private categoriesService: CategoriesService
+  ) //public fontAwesomeIconsService: FontAwesomeIconsService
+  {}
 
   ngOnInit(): void {
     this.getAllCategories();
