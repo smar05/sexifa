@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RifasService } from './rifas.service';
+import { FireStorageService } from './fire-storage.service';
 
-describe('RifasService', () => {
-  let service: RifasService;
+describe('FireStorageService', () => {
+  let service: FireStorageService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(RifasService);
+    service = TestBed.inject(FireStorageService);
   });
 
   it('should be created', () => {

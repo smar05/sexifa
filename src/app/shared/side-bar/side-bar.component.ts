@@ -1,7 +1,6 @@
-import { UrlPagesEnum } from './../../enum/urlPagesEnum';
-import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { LoginService } from 'src/app/services/login.service';
 
 @Component({
   selector: 'app-side-bar',
@@ -9,17 +8,16 @@ import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
   styleUrls: ['./side-bar.component.css'],
 })
 export class SideBarComponent implements OnInit {
-  constructor(private router: Router) {}
+  public userType: string = '';
 
-  ngOnInit(): void {}
+  constructor(private loginService: LoginService) {}
+
+  ngOnInit(): void {
+    this.userType = localStorage.getItem(LocalStorageEnum.USER_TYPE) || '';
+  }
 
   //Funcion de salida del sistema
   public logout(): void {
-    localStorage.removeItem(LocalStorageEnum.TOKEN);
-    localStorage.removeItem(LocalStorageEnum.LOCAL_ID);
-    localStorage.removeItem(LocalStorageEnum.REFRESH_TOKEN);
-    localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
-    localStorage.removeItem(LocalStorageEnum.CART);
-    this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
+    this.loginService.logout();
   }
 }

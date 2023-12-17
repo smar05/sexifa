@@ -5,6 +5,34 @@
         <h2 class="login-box-msg font-weight-bold">Registrarte</h2>
 
         <form (ngSubmit)="onSubmit(f)" [formGroup]="f" autocomplete="on">
+          <!--Tipo de usuario-->
+          <div class="input-group mb-3">
+            <select
+              type="text"
+              class="form-control"
+              placeholder="Tipo de cuenta"
+              formControlName="type"
+              required
+              [ngClass]="{
+                'is-invalid': invalidField('type')
+              }"
+            >
+              <option value="" disabled selected>Tipo de cuenta</option>
+              <option
+                value="{{ tipo }}"
+                *ngFor="let tipo of this.tipoDeUsuarios()"
+              >
+                {{ tipo }}
+              </option>
+            </select>
+
+            <span
+              class="invalid-feedback"
+              *ngIf="invalidField('type') && f.controls.type.errors?.required"
+            >
+              Por favor ingrese su tipo de cuenta
+            </span>
+          </div>
           <!--Nombre-->
           <div class="input-group mb-3">
             <input
@@ -122,6 +150,57 @@
               El numero de celular no puede tener mas de 10 digitos
             </span>
           </div>
+
+          <!--chatId-->
+          <div class="input-group mb-3" *ngIf="this.type.value == 'cliente'">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="No. Id de Telegram"
+              formControlName="chatId"
+              [ngClass]="{
+                'is-invalid':
+                  invalidField('chatId') ||
+                  (f.controls.chatId.invalid &&
+                    f.controls.chatId.errors?.max) ||
+                  (f.controls.chatId.invalid &&
+                    f.controls.chatId.errors?.pattern)
+              }"
+            />
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <i class="fa-brands fa-telegram"></i>
+              </div>
+            </div>
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('chatId') && f.controls.chatId.errors?.required
+              "
+            >
+              Por favor ingrese su numero de id en Telegram
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.chatId.errors?.pattern"
+            >
+              Se encontraron caracteres invalidos
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.chatId.errors?.max"
+            >
+              El numero de id de telegram no puede tener mas de 20 digitos
+            </span>
+
+            <a
+              (click)="probarConexionBot()"
+              class="btn btn-primary btn-block bg-principal mb-2 mt-1"
+            >
+              Probar conexion con el bot
+            </a>
+          </div>
+
           <!--Fecha de nacimiento-->
           <div class="form-group mb-3">
             <label for="born-date">Fecha de nacimiento</label>
@@ -367,7 +446,7 @@
             <div class="col-4">
               <button
                 type="submit"
-                class="btn btn-block bg-red"
+                class="btn btn-block bg-secundario"
                 [disabled]="f.invalid"
               >
                 Registrar

@@ -193,4 +193,39 @@ export class functions {
 
     return [...dataArr];
   }
+
+  /**
+   * En mayuscula la primera letra de cada palabra del texto
+   *
+   * @static
+   * @param {string} text
+   * @return {*}  {string}
+   * @memberof functions
+   */
+  static capitalizeFirstLetters(text: string): string {
+    return text
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  /**
+   * Incrementar la fecha x cantidad de meses
+   *
+   * @static
+   * @param {Date} fecha
+   * @param {number} meses
+   * @return {*}  {Date}
+   * @memberof functions
+   */
+  static incrementarMeses(fecha: Date, meses: number): Date {
+    // Clonamos la fecha original para evitar modificarla directamente
+    const fechaClonada = new Date(fecha);
+
+    // Obtenemos el mes actual y lo incrementamos según la cantidad de meses
+    const mesActual = fechaClonada.getMonth();
+    fechaClonada.setMonth(mesActual + meses);
+
+    return fechaClonada;
+  }
 }

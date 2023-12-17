@@ -3,20 +3,68 @@ import { IState } from './../../../interface/istate';
 import { ICountries } from './../../../interface/icountries';
 import { LocationService } from './../../../services/location.service';
 import { Iuser } from 'src/app/interface/iuser';
-import { IQueryParams } from './../../../interface/i-query-params';
 import { UserService } from './../../../services/user.service';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { TelegramLocalService } from 'src/app/services/telegram-local.service';
+import { QueryFn } from '@angular/fire/compat/firestore';
+import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
+import { MatTableDataSource } from '@angular/material/table';
+import { Isubscriptions } from 'src/app/interface/i- subscriptions';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { SubscriptionsService } from 'src/app/services/subscriptions.service';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { ModelsService } from 'src/app/services/models.service';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.css'],
+  animations: [
+    trigger('detailExpand', [
+      state(
+        'collapsed,void',
+        style({ height: '0px', minHeight: '0', display: 'none' })
+      ),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+      transition(
+        'expanded <=> void',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+    ]),
+  ],
 })
 export class UserComponent implements OnInit {
+  public showSubscripciones: boolean = false;
+
+  public dataSource!: MatTableDataSource<Isubscriptions>; //Instancia la data que aparecera en la tabla
+  public expandedElement!: Isubscriptions | null;
+  public displayedColumns: string[] = [
+    'position',
+    'fecha',
+    'status',
+    'actions',
+  ]; //Variable para nombrar las columnas de la tabla
+  //Paginador
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  //Orden
+  @ViewChild(MatSort) sort!: MatSort;
+
   public f: any = this.form.group({
     name: [
       '',
@@ -32,6 +80,14 @@ export class UserComponent implements OnInit {
       [
         Validators.required,
         Validators.max(9999999999),
+        Validators.pattern(/^[0-9]+$/),
+      ],
+    ],
+    chatId: [
+      '',
+      [
+        Validators.required,
+        Validators.max(99999999999999999999),
         Validators.pattern(/^[0-9]+$/),
       ],
     ],
@@ -53,6 +109,10 @@ export class UserComponent implements OnInit {
 
   get celphone() {
     return this.f.controls.celphone;
+  }
+
+  get chatId() {
+    return this.f.controls.chatId;
   }
 
   get bornDate() {
@@ -90,6 +150,7 @@ export class UserComponent implements OnInit {
   public formSubmitted: boolean = false;
   public loading: boolean = false;
   private nameUserId: string = '';
+  private user!: Iuser;
 
   public allCountrys: ICountries[] = [];
   public allStates: IState[] = [];
@@ -98,36 +159,48 @@ export class UserComponent implements OnInit {
   constructor(
     private form: FormBuilder,
     private userService: UserService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private telegramLocalService: TelegramLocalService,
+    private subscriptionsService: SubscriptionsService,
+    private modelsService: ModelsService
   ) {}
 
-  ngOnInit(): void {
-    this.getUserData();
-    this.getLocationData();
+  async ngOnInit(): Promise<void> {
+    await this.getUserData();
+    await this.getLocationData();
   }
 
-  public getUserData(): void {
-    let params: IQueryParams = {
-      orderBy: '"id"',
-      equalTo: `"${localStorage.getItem(LocalStorageEnum.LOCAL_ID)}"`,
-    };
-    this.userService
-      .getData(params)
-      .toPromise()
-      .then((data: any) => {
-        let user: Iuser = Object.keys(data).map((a: any) => {
-          this.nameUserId = a;
-          return data[a];
-        })[0];
-        this.name.setValue(user.name);
-        this.email.setValue(user.email);
-        this.celphone.setValue(user.celphone);
-        this.bornDate.setValue(user.bornDate);
-        this.sex.setValue(user.sex);
-        this.country.setValue(user.country);
-        this.state.setValue(user.state);
-        this.city.setValue(user.city);
-      });
+  public async getUserData(): Promise<void> {
+    this.loading = true;
+    let qf: QueryFn = (ref) =>
+      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+    this.user = await new Promise((resolve) => {
+      this.userService
+        .getDataFS(qf)
+        .toPromise()
+        .then(
+          (data: IFireStoreRes[]) => {
+            this.nameUserId = data[0].id;
+            resolve(data[0].data);
+          },
+          (err) => {
+            console.error(err);
+            resolve(null);
+          }
+        );
+    });
+
+    this.name.setValue(this.user.name);
+    this.email.setValue(this.user.email);
+    this.celphone.setValue(this.user.celphone);
+    this.bornDate.setValue(this.user.bornDate);
+    this.sex.setValue(this.user.sex);
+    this.country.setValue(this.user.country);
+    this.state.setValue(this.user.state);
+    this.city.setValue(this.user.city);
+    this.chatId.setValue(this.user.chatId);
+
+    this.loading = false;
   }
 
   public async onSubmit(f: any): Promise<void> {
@@ -140,34 +213,37 @@ export class UserComponent implements OnInit {
     this.loading = true;
 
     const data: Iuser = {
+      id: this.user.id,
       name: this.name.value,
+      email: this.user.email,
       celphone: this.celphone.value,
+      bornDate: this.user.bornDate,
       sex: this.sex.value,
+      status: this.user.status,
       country: this.country.value,
       state: this.state.value,
       city: this.city.value,
+      chatId: this.chatId.value,
+      type: this.user.type,
     };
 
-    this.userService
-      .patchData(this.nameUserId, data)
-      .toPromise()
-      .then(
-        (res: any) => {
-          alerts.basicAlert(
-            'Listo',
-            'Se ha guardado la informacion del usuario',
-            'success'
-          );
-          this.loading = false;
-        },
-        (error: any) => {
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error al guardar la informacion del usuario',
-            'error'
-          );
-        }
-      );
+    this.userService.patchDataFS(this.nameUserId, data).then(
+      (res: any) => {
+        alerts.basicAlert(
+          'Listo',
+          'Se ha guardado la informacion del usuario',
+          'success'
+        );
+        this.loading = false;
+      },
+      (error: any) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error al guardar la informacion del usuario',
+          'error'
+        );
+      }
+    );
   }
 
   /**
@@ -192,6 +268,7 @@ export class UserComponent implements OnInit {
   }
 
   public async getLocationData(): Promise<void> {
+    this.loading = true;
     try {
       this.allCountrys = JSON.parse(
         await this.locationService.getAllContries()
@@ -205,6 +282,8 @@ export class UserComponent implements OnInit {
           this.state.value
         )
       );
+
+      this.loading = false;
     } catch (error) {
       this.allCountrys = [];
       this.allStates = [];
@@ -239,5 +318,54 @@ export class UserComponent implements OnInit {
       this.allCities = [];
       this.city.setValue(null);
     }
+  }
+
+  public probarConexionBot(): void {
+    this.telegramLocalService.probarConexionBot(this.chatId.value);
+  }
+
+  //FIltro de busqueda
+  public applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  public async misSubscripciones(): Promise<void> {
+    this.showSubscripciones = !this.showSubscripciones;
+
+    if (!this.showSubscripciones) return;
+
+    this.loading = true;
+
+    let userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    let qf: QueryFn = (ref) =>
+      ref.where('userId', '==', userId).limitToLast(50).orderBy('date_created');
+
+    let res: IFireStoreRes[] = await this.subscriptionsService
+      .getDataFS(qf)
+      .toPromise();
+    let position: number = res.length;
+
+    let subscriptionsAux: any[] = res.map((r: IFireStoreRes) => {
+      return {
+        position: position--,
+        idGrupo: r.data.modelId,
+        fecha: r.data.date_created,
+        status: r.data.status,
+        price: r.data.price,
+        beginTime: r.data.beginTime,
+        endTime: r.data.endTime,
+        payMethod: r.data.payMethod,
+      };
+    });
+
+    this.dataSource = new MatTableDataSource(subscriptionsAux);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+
+    this.loading = false;
   }
 }

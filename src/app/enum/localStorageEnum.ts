@@ -4,4 +4,7 @@ export enum LocalStorageEnum {
   LOCAL_ID = 'localId',
   CART = 'cart',
   INFO_MODEL_SUBSCRIPTION = 'infoModelSubscription',
+  USER_TYPE = 'userType',
+  VIEWS_MODEL = 'viewsModel',
+  PAYU_PROCESO = 'payu_proceso',
 }

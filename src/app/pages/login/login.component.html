@@ -3,12 +3,12 @@
     <!-- /.login-logo -->
     <div class="card card-outline">
       <div class="card-header text-center">
-        <img width="100%" src="../../../assets/img/sexifa_logo.png" alt="" />
+        <img width="100%" src="../../../assets/img/onlygram_logo.png" alt="" />
       </div>
       <div class="card-body">
-        <p class="login-box-msg font-weight-bold">Bienvenido a Sexifa</p>
+        <p class="login-box-msg font-weight-bold">Bienvenido a OnlyGram</p>
         <p class="login-box-msg">
-          Gana subscripciones para ver a l@s mejores modelos webcam
+          Regístrate para apoyar a tus creadores en sus grupos de Telegram
         </p>
 
         <ng-container *ngIf="loading">
@@ -67,7 +67,7 @@
               <div class="col-12">
                 <button
                   type="submit"
-                  class="btn btn-primary btn-block"
+                  class="btn btn-primary btn-block bg-principal"
                   [disabled]="f.invalid"
                 >
                   Iniciar sesion
@@ -91,7 +91,7 @@
         <p class="mb-0 mt-2 text-center">
           <a
             [routerLink]="['/register']"
-            class="btn btn-primary btn-block bg-wine"
+            class="btn btn-primary btn-block bg-secundario"
             >Crear cuenta nueva</a
           >
         </p>

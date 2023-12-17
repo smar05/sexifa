@@ -1,0 +1,412 @@
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Editar Pagina</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active">
+              <a [routerLink]="['/home-seller']">Home</a>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="card card-warning">
+    <ng-container *ngIf="!loadData; else load">
+      <form autocomplete="off" [formGroup]="f" (ngSubmit)="saveModel()">
+        <div class="card-body">
+          <ng-container>
+            <!--Nombre-->
+            <div class="form-group">
+              <label for="inputName"
+                >Nombre <sup class="text-danger">*</sup></label
+              >
+              <input
+                type="text"
+                placeholder="Nombre"
+                class="form-control"
+                id="inputName"
+                formControlName="name"
+                maxlength="50"
+                required
+                [ngClass]="{
+                  'is-invalid':
+                    invalidField('name') ||
+                    (name.invalid && name.errors?.product) ||
+                    (name.invalid && name.errors?.pattern)
+                }"
+              />
+              <span
+                class="invalid-feedback"
+                *ngIf="name.invalid && name.errors?.required"
+              >
+                Por favor ingrese el nombre
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="name.invalid && name.errors?.pattern"
+              >
+                Se encontraron caracteres invalidos
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="name.invalid && name.errors?.maxlength"
+              >
+                El nombre no puede tener mas de 50 caracteres
+              </span>
+            </div>
+            <!--Id del grupo de telegram-->
+            <div class="form-group">
+              <label for="inputName"
+                >Id del grupo de Telegram
+                <sup class="text-danger">*</sup></label
+              >
+              <input
+                type="text"
+                placeholder="Id del grupo de Telegram"
+                class="form-control"
+                id="groupId"
+                formControlName="groupId"
+                maxlength="50"
+                required
+                [ngClass]="{
+                  'is-invalid': invalidField('groupId')
+                }"
+              />
+              <span
+                class="invalid-feedback"
+                *ngIf="name.invalid && name.errors?.required"
+              >
+                Por favor ingrese el Id del grupo de Telegram
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="name.invalid && name.errors?.maxlength"
+              >
+                El Id de Telegram no puede tener mas de 50 caracteres
+              </span>
+            </div>
+            <!--Categoria-->
+            <div class="form-group">
+              <label for="inputCategory"
+                >Categoria <sup class="text-danger">*</sup></label
+              >
+              <select
+                class="form-control"
+                formControlName="category"
+                [ngClass]="{ 'is-invalid': invalidField('category') }"
+              >
+                <option value="" disabled>Seleccione una categoria</option>
+                <option
+                  value="{{ category.id }}"
+                  *ngFor="let category of categories"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+              <span
+                class="invalid-feedback"
+                *ngIf="category.invalid && category.errors?.required"
+              >
+                Porfavor seleccione una categoria
+              </span>
+            </div>
+            <!--Listado de titulo-->
+            <div class="form-group" *ngIf="titleList != ''">
+              <label for="titleList">Listado de titulo</label>
+              <input
+                type="text"
+                id="titleList"
+                class="form-control"
+                placeholder="Listado de titulo"
+                value="{{ titleList }}"
+                readonly
+              />
+            </div>
+            <!--Imagen-->
+            <div class="form-group">
+              <label for=""
+                >Imagen principal <sup class="text-danger">*</sup></label
+              >
+              <br />
+              <label for="customFile">
+                <img
+                  [src]="imgTemp"
+                  class="img-fluid"
+                  *ngIf="imgTemp; else noImgPrincipal"
+                />
+                <ng-template #noImgPrincipal>
+                  <img
+                    src="../../../../../assets/img/products/default/default-image.jpg"
+                    class="img-fluid"
+                  />
+                </ng-template>
+              </label>
+              <div class="custom-file">
+                <input
+                  type="file"
+                  class="custom-file-input"
+                  id="customFile"
+                  formControlName="image"
+                  [ngClass]="{ 'is-invalid': invalidField('image') }"
+                  (change)="validateImage($event, 'main')"
+                  accept="image/*"
+                />
+                <span class="invalid-feedback">
+                  Porfavor seleccione una imagen
+                </span>
+
+                <label
+                  class="custom-file-label"
+                  for="customFile"
+                  *ngIf="!image.value"
+                >
+                  Seleccione una imagen
+                </label>
+                <label
+                  class="custom-file-label"
+                  for="customFile"
+                  *ngIf="image.value"
+                >
+                  {{ image.value }}
+                </label>
+                <small class="mt-2">
+                  Tamaño: 300px * 300px | Formato: JPG o PNG
+                </small>
+              </div>
+            </div>
+            <!--Galeria-->
+            <div class="form-group">
+              <label for="">Galeria</label>
+
+              <div class="row">
+                <figure class="col-sm-2 pb-3" *ngFor="let pic of editGallery">
+                  <img src="{{ pic }}" alt="" class="img-fluid" />
+
+                  <button
+                    class="btn btn-danger btn-sm"
+                    (click)="removeGallery(pic)"
+                  >
+                    Remover
+                  </button>
+                </figure>
+              </div>
+
+              <ngx-dropzone
+                (change)="onSelect($event)"
+                accept="image/jpeg,image/jpg,image/png,image/gif"
+              >
+                <ngx-dropzone-label>
+                  <h2 class="text-muted small text-center">
+                    Galeria de fotos | Tamaño: 1000px * 1000px | Cantidad
+                    maxima: 4
+                  </h2>
+                </ngx-dropzone-label>
+                <ngx-dropzone-image-preview
+                  *ngFor="let f of files"
+                  [removable]="true"
+                  (removed)="onRemove(f)"
+                  [file]="f"
+                >
+                </ngx-dropzone-image-preview>
+              </ngx-dropzone>
+              <span class="text-danger small" *ngIf="files.length > 4">
+                Se permiten maximo 4 fotos
+              </span>
+            </div>
+            <!--Descripcion del producto-->
+            <div class="form-group">
+              <label for="">Descripcion <sup class="text-danger">*</sup></label>
+              <div
+                [ngxSummernote]="config"
+                formControlName="description"
+                [ngClass]="{ 'is-invalid': invalidField('description') }"
+              ></div>
+              <span
+                class="invalid-feedback"
+                *ngIf="description.invalid && description.errors?.required"
+              >
+                Por favor coloque una descripcion.
+              </span>
+            </div>
+
+            <!--Prcio del producto-->
+            <div class="form-group" formArrayName="price">
+              <label for=""
+                >Precios de la subscripción <sup class="text-danger">*</sup>
+              </label>
+              <div
+                *ngFor="let price of price.controls; let i = index"
+                class="row mb-3"
+              >
+                <!--Tiempo-->
+                <div class="col-12 col-lg-6 input-group" [formGroup]="price">
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <button
+                        type="button"
+                        class="btn btn-danger btn-sm"
+                        (click)="removeInput(i, 'price')"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  </div>
+                  <div class="input-group-append">
+                    <span class="input-group-text"> Tiempo (#Meses): </span>
+                  </div>
+                  <input
+                    type="number"
+                    class="form-control py-4"
+                    formControlName="time"
+                    [ngClass]="{
+                      'is-invalid':
+                        formSubmitted && price.controls.time.errors?.required
+                    }"
+                  />
+
+                  <span
+                    *ngIf="
+                      formSubmitted && price.controls.time.errors?.required
+                    "
+                    class="invalid-feedback"
+                    >Por favor inserte un tiempo en meses</span
+                  >
+                </div>
+                <!--Valor-->
+                <div class="col-12 col-lg-6 input-group" [formGroup]="price">
+                  <div class="input-group-append">
+                    <span class="input-group-text"> Valor (USD): </span>
+                  </div>
+                  <input
+                    type="number"
+                    class="form-control py-4"
+                    formControlName="value"
+                    [ngClass]="{
+                      'is-invalid':
+                        formSubmitted && price.controls.value.errors?.required
+                    }"
+                  />
+                  <span
+                    *ngIf="
+                      formSubmitted && price.controls.value.errors?.required
+                    "
+                    class="invalid-feedback"
+                    >Por favor inserte un valor</span
+                  >
+                </div>
+                <!--tipo de oferta-->
+                <div class="col-12 col-lg-6 input-group" [formGroup]="price">
+                  <div class="input-group append">
+                    <span class="input-group-text"> Tipo de oferta: </span>
+                  </div>
+                  <select
+                    name=""
+                    id=""
+                    class="form-control"
+                    formControlName="type_offer"
+                    name="type_offer"
+                  >
+                    <option value="">N/A</option>
+                    <option value="Disccount">Descuento</option>
+                    <option value="Fixed">Fijo</option>
+                  </select>
+                </div>
+                <ng-container *ngIf="price.controls.type_offer.value">
+                  <!--Valor de la oferta-->
+                  <div class="col-12 col-lg-6 input-group" [formGroup]="price">
+                    <div class="input-group append">
+                      <span class="input-group-text">
+                        {{
+                          price.controls.type_offer.value === "Fixed"
+                            ? "Precio $"
+                            : "Porcentaje %"
+                        }}
+                      </span>
+                    </div>
+                    <input
+                      type="number"
+                      class="form-control"
+                      min="0"
+                      step="any"
+                      formControlName="value_offer"
+                      [ngClass]="{
+                        'is-invalid':
+                          formSubmitted && price.controls.value_offer.invalid
+                      }"
+                    />
+
+                    <div
+                      class="invalid-feedback"
+                      *ngIf="
+                        price.controls.value_offer.invalid &&
+                        price.controls.value_offer.errors?.required
+                      "
+                    >
+                      Por favor ingrese un valor
+                    </div>
+                    <div
+                      class="invalid-feedback"
+                      *ngIf="
+                        price.controls.value_offer.invalid &&
+                        price.controls.value_offer.errors?.pattern
+                      "
+                    >
+                      Por favor ingrese un valor valido
+                    </div>
+                  </div>
+
+                  <!--Fecha de vencimiento-->
+                  <div class="col-12 col-lg-6 input-group" [formGroup]="price">
+                    <div class="input-group append">
+                      <span class="input-group-text"> Fin de la oferta: </span>
+                    </div>
+                    <input
+                      type="date"
+                      class="form-control"
+                      min="0"
+                      step="any"
+                      formControlName="date_offer"
+                    />
+                  </div>
+                </ng-container>
+
+                <label for=""
+                  >Precio Final: {{ this.calcularPrecio(price.value) }}
+                </label>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm mb-2"
+                (click)="addInput('price')"
+              >
+                Añadir precio subscripción
+              </button>
+            </div>
+          </ng-container>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-secondary" [routerLink]="['/home-seller']">
+            Regresar
+          </button>
+          <button
+            type="submit"
+            [disabled]="f.pending"
+            class="btn btn-warning float-right"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </ng-container>
+    <ng-template #load>
+      <app-sk-folding-cube></app-sk-folding-cube>
+    </ng-template>
+  </div>
+</div>

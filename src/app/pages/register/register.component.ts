@@ -12,6 +12,9 @@ import { Iuser } from 'src/app/interface/iuser';
 import { ICountries } from 'src/app/interface/icountries';
 import { IState } from 'src/app/interface/istate';
 import { ICities } from 'src/app/interface/icities';
+import { TelegramLocalService } from 'src/app/services/telegram-local.service';
+import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
+import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 
 @Component({
   selector: 'app-register',
@@ -42,6 +45,10 @@ export class RegisterComponent implements OnInit {
         Validators.pattern(/^[0-9]+$/),
       ],
     ],
+    chatId: [
+      '',
+      [Validators.max(99999999999999999999), Validators.pattern(/^[0-9]+$/)],
+    ],
     bornDate: ['', [Validators.required]],
     country: ['', [Validators.required]],
     state: ['', [Validators.required]],
@@ -50,6 +57,7 @@ export class RegisterComponent implements OnInit {
     password: ['', [Validators.required, Validators.minLength(6)]],
     repeatPassword: ['', [Validators.required]],
     terms: ['', [Validators.required]],
+    type: ['', [Validators.required]],
   });
 
   //Validaciones personalizadas
@@ -63,6 +71,10 @@ export class RegisterComponent implements OnInit {
 
   get celphone() {
     return this.f.controls.celphone;
+  }
+
+  get chatId() {
+    return this.f.controls.chatId;
   }
 
   get bornDate() {
@@ -97,6 +109,10 @@ export class RegisterComponent implements OnInit {
     return this.f.controls.terms;
   }
 
+  get type() {
+    return this.f.controls.type;
+  }
+
   public formSubmitted: boolean = false;
   public loading: boolean = false;
 
@@ -105,10 +121,12 @@ export class RegisterComponent implements OnInit {
     private registerService: RegisterService,
     private router: Router,
     private userService: UserService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private telegramLocalService: TelegramLocalService
   ) {}
 
   ngOnInit(): void {
+    this.tipoDeUsuarios();
     this.getCountries();
   }
 
@@ -146,15 +164,20 @@ export class RegisterComponent implements OnInit {
         name: this.name.value,
         email: this.email.value,
         celphone: this.celphone.value,
-        bornDate: new Date(this.bornDate.value),
+        bornDate: this.bornDate.value,
         sex: this.sex.value,
-        active: true,
+        status:
+          this.type == UserTypeEnum.CLIENTE
+            ? UserStatusEnum.ACTIVO
+            : UserStatusEnum.PENDIENTE_CONFIRMAR,
         country: this.country.value,
         state: this.state.value,
         city: this.city.value,
+        chatId: this.chatId.value,
+        type: this.type.value,
       };
 
-      await this.userService.postData(user).toPromise();
+      await this.userService.postDataFS(user);
 
       this.loading = false;
 
@@ -255,5 +278,17 @@ export class RegisterComponent implements OnInit {
       this.city.setValue(null);
       this.allCities = [];
     }
+  }
+
+  public probarConexionBot(): void {
+    if (this.chatId.value) {
+      this.telegramLocalService.probarConexionBot(this.chatId.value);
+    } else {
+      alerts.basicAlert('Error', 'Ingrese un Id valido de Telegram', 'error');
+    }
+  }
+
+  public tipoDeUsuarios(): string[] {
+    return Object.values(UserTypeEnum);
   }
 }

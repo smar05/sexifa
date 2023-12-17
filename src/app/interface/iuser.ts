@@ -3,10 +3,12 @@ export interface Iuser {
   name?: string;
   email?: string;
   celphone?: number;
-  bornDate?: Date;
+  bornDate?: string;
   sex?: string;
-  active?: boolean;
+  status?: string;
   country?: string;
   state?: string;
   city?: string;
+  chatId?: number;
+  type?: string;
 }

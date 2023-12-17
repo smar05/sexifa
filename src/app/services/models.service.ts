@@ -1,6 +1,5 @@
-import { IpriceModel } from './../interface/iprice-model';
+import { IpriceModel, TypeOfferEnum } from './../interface/iprice-model';
 import { environment } from './../../environments/environment';
-import { PagesService } from './pages.service';
 import { CategoriesService } from './categories.service';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
@@ -9,6 +8,10 @@ import { Observable } from 'rxjs';
 import { IQueryParams } from './../interface/i-query-params';
 import { ApiService } from './api.service';
 import { Injectable } from '@angular/core';
+import { ImgModelEnum } from '../enum/imgModelEnum';
+import { FireStorageService } from './fire-storage.service';
+import { QueryFn } from '@angular/fire/compat/firestore';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +24,7 @@ export class ModelsService {
     private apiService: ApiService,
     private storageService: StorageService,
     private categoriesService: CategoriesService,
-    private pagesService: PagesService
+    private fireStorageService: FireStorageService
   ) {}
 
   /**
@@ -81,6 +84,70 @@ export class ModelsService {
     return this.apiService.delete(`${this.urlModels}/${id}.json`);
   }
 
+  //------------ FireStorage---------------//
+  /**
+   * Se toma la informacion de la coleccion de modelos en Firebase
+   *
+   * @param {QueryFn} [qf=null]
+   * @return {*}  {Observable<any>}
+   * @memberof ModelsService
+   */
+  public getDataFS(qf: QueryFn = null): Observable<any> {
+    return this.fireStorageService
+      .getData(this.urlModels, qf)
+      .pipe(this.fireStorageService.mapForPipe('many'));
+  }
+
+  /**
+   * Tomar un documento de modelos
+   *
+   * @param {string} doc
+   * @param {QueryFn} [qf=null]
+   * @return {*}  {Observable<any>}
+   * @memberof ModelsService
+   */
+  public getItemFS(doc: string, qf: QueryFn = null): Observable<any> {
+    return this.fireStorageService
+      .getItem(this.urlModels, doc, qf)
+      .pipe(this.fireStorageService.mapForPipe('one'));
+  }
+
+  /**
+   * Guardar informacion del modelo
+   *
+   * @param {Imodels} data
+   * @return {*}  {Promise<any>}
+   * @memberof ModelsService
+   */
+  public postDataFS(data: Imodels): Promise<any> {
+    return this.fireStorageService.post(this.urlModels, data);
+  }
+
+  /**
+   * Actualizar modelo
+   *
+   * @param {string} doc
+   * @param {Imodels} data
+   * @return {*}  {Promise<any>}
+   * @memberof ModelsService
+   */
+  public patchDataFS(doc: string, data: Imodels): Promise<any> {
+    return this.fireStorageService.patch(this.urlModels, doc, data);
+  }
+
+  /**
+   * Eliminar modelo
+   *
+   * @param {string} doc
+   * @return {*}  {Promise<any>}
+   * @memberof ModelsService
+   */
+  public deleteDataFS(doc: string): Promise<any> {
+    return this.fireStorageService.delete(this.urlModels, doc);
+  }
+
+  //------------ FireStorage---------------//
+
   //-------- Funciones comunes ---------//
   /**
    * Retorna la url para el router link
@@ -90,20 +157,51 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public getRouterLinkUrl(model: ModelsDTO | Imodels): string {
-    let modelArray: string[] | undefined = model.name?.split(' ');
-    return `${modelArray?.join('-')}_${model.id}`;
+    //let modelArray: string[] | undefined = model.name?.split(' ');
+    return `${model.id}`;
   }
 
   /**
    * Obtener el precio del cupo de la modelo
    *
    * @param {IpriceModel} price
+   * @param {Date} [fechaCompra=null]
    * @return {*}  {(number | undefined)}
    * @memberof ModelsService
    */
-  public calculoPrecioSubscripcion(price: IpriceModel): number | undefined {
-    if (price?.price && price?.percentage) {
-      return Math.floor(price.price * (price.percentage / 100) * 100) / 100;
+  public calculoPrecioSubscripcion(
+    price: IpriceModel,
+    fechaCompra: Date = null
+  ): number | undefined {
+    if (
+      price.value &&
+      price.value_offer &&
+      price.type_offer &&
+      price.date_offer
+    ) {
+      // Obtener la fecha actual
+      let fechaActual: Date = fechaCompra ? fechaCompra : new Date();
+
+      // Crear una fecha a partir de un string (por ejemplo, "2023-07-27")
+      let fechaComparacion: Date = new Date(price.date_offer?.toString());
+
+      // Comparar las fechas
+      if (!(fechaComparacion >= fechaActual)) return price.value;
+
+      switch (price.type_offer) {
+        case TypeOfferEnum.DESCUENTO:
+          return (
+            Math.floor(price.value * (1 - price.value_offer / 100) * 100) / 100
+          );
+
+        case TypeOfferEnum.FIJO:
+          return price.value - price.value_offer;
+
+        default:
+          return price.value;
+      }
+    } else if (price.value) {
+      return price.value;
     }
 
     return undefined;
@@ -165,6 +263,50 @@ export class ModelsService {
     return [];
   }
 
+  /**
+   * Eliminar las imagenes del producto
+   *
+   * @param {string} url
+   * @return {*}  {Promise<boolean>}
+   * @memberof ModelsService
+   */
+  public async deleteImages(url: string): Promise<boolean> {
+    let complete: boolean = true;
+    try {
+      let images: any[] = (
+        await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
+      ).items;
+
+      if (images && images.length > 0) {
+        for (const image of images) {
+          if (image._location.path) {
+            await this.storageService.deleteImage(image._location.path);
+          } else {
+            continue;
+          }
+        }
+      }
+    } catch (error) {
+      complete = false;
+    }
+
+    return complete;
+  }
+
+  /**
+   * Guardar la imagen
+   *
+   * @param {File} file
+   * @param {string} name
+   * @return {*}  {Promise<any>}
+   * @memberof ModelsService
+   */
+  public async saveImage(file: File, name: string): Promise<any> {
+    let url: string = `${this.urlImage}/${name}`;
+
+    return await this.storageService.saveImage(file, url);
+  }
+
   //-------- DTO functions ------------//
 
   /**
@@ -181,20 +323,26 @@ export class ModelsService {
     modelDTO.id = imodel.id;
     modelDTO.description = imodel.description;
     modelDTO.name = imodel.name;
-    modelDTO.url = imodel.url;
     modelDTO.price = imodel.price;
+    modelDTO.groupId = imodel.groupId;
+    modelDTO.gallery = [];
+
+    if (imodel.gallery)
+      JSON.parse(imodel.gallery).forEach(async (galleryItem: string) => {
+        let urlImage: string = await this.getImage(
+          `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+        );
+
+        modelDTO.gallery?.push(urlImage);
+      });
 
     //Imagen principal
-    modelDTO.mainImage = await this.getImage(`${imodel.id}/main`);
-
+    modelDTO.mainImage = await this.getImage(
+      `${imodel.id}/${ImgModelEnum.MAIN}`
+    );
     //Categoria
     modelDTO.categorie = await this.categoriesService
       .getItem(imodel.categorie || '')
-      .toPromise();
-
-    //Pages
-    modelDTO.page = await this.pagesService
-      .getItem(imodel.page || '')
       .toPromise();
 
     return modelDTO;

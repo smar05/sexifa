@@ -1,26 +1,56 @@
 /* You can add global styles to this file, and also import other style files */
 /*Paleta de colores*/
 :root {
-  --color-red: #ca0010;
-  --color-wine: #8d0611;
+  --color-primario: #3c4d8b;
+  --color-secundario: #5f6fa0;
   --color-dark-wine: #500c12;
   --color-grey: #e2e2e2;
+
+  --paleta-1: #f9f9f9;
+  --paleta-2: #3c4d8b;
+  --paleta-3: #5f6fa0;
+  --paleta-4: #8291b5;
+  --paleta-5: #a5b4ca;
 }
 
 .content-wrapper {
   height: max-content !important;
 }
 
-.bg-wine {
-  background-color: var(--color-wine);
-  border-color: var(--color-wine);
+.bg-principal {
+  background-color: var(--paleta-2);
+  border-color: var(--paleta-2);
 }
 
-.bg-red {
-  background-color: var(--color-red);
-  border-color: var(--color-red);
+.bg-secundario {
+  background-color: var(--paleta-3);
+  border-color: var(--paleta-3);
 }
 
-.color-red {
-  color: var(--color-red);
+.bg-tercero {
+  background-color: var(--paleta-4);
+  border-color: var(--paleta-4);
+}
+
+.bg-payu {
+  background-color: #a6c307;
+  border-color: #a6c307;
+}
+
+.color-primario {
+  color: var(--paleta-2);
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 48;
+  color: var(--color-primario);
 }

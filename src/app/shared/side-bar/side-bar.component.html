@@ -1,13 +1,16 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
-  <a [routerLink]="['/']" class="brand-link">
+  <a
+    [routerLink]="[this.userType == 'cliente' ? '/' : '/home-seller']"
+    class="brand-link"
+  >
     <img
-      src="../../../assets/img/sexifa_logo.png"
-      alt="sexifa Logo"
+      src="../../../assets/img/onlygram_logo.png"
+      alt="OnlyGram Logo"
       class="brand-image img-circle elevation-3"
       style="opacity: 0.8"
     />
-    <span class="brand-text font-weight-light">Sexifa</span>
+    <span class="brand-text font-weight-light">OnlyGram</span>
   </a>
 
   <!-- Sidebar -->
@@ -21,7 +24,12 @@
         data-accordion="false"
       >
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/user']">
+          <a
+            class="nav-link"
+            [routerLink]="[
+              this.userType == 'cliente' ? '/user' : '/user-seller'
+            ]"
+          >
             <i class="nav-icon fas fa-user"></i>
             <p>Mi cuenta</p>
           </a>
@@ -39,12 +47,30 @@
       >
         <!-- Add icons to the links using the .nav-icon class
              with font-awesome or any other icon font library -->
-        <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/']">
-            <i class="nav-icon fas fa-home"></i>
-            <p>Home</p>
-          </a>
-        </li>
+        <ng-container *ngIf="this.userType == 'cliente'">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/']">
+              <i class="nav-icon fas fa-home"></i>
+              <p>Home</p>
+            </a>
+          </li>
+        </ng-container>
+
+        <ng-container *ngIf="this.userType == 'vendedor'">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/home-seller']">
+              <i class="nav-icon fas fa-home"></i>
+              <p>Home</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/page-seller']">
+              <i class="nav-icon fas fa-page"></i>
+              <p>Mi pagina</p>
+            </a>
+          </li>
+        </ng-container>
+
         <li class="nav-item">
           <a class="nav-link btn text-left" (click)="logout()">
             <i class="nav-icon fas fa-sign-out-alt"></i>

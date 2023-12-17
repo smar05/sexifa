@@ -3,21 +3,26 @@
 }
 
 button {
-  background-color: var(--color-red);
-  border-color: var(--color-red);
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
 }
 
 button:hover {
-  background-color: var(--color-wine);
-  border-color: var(--color-wine);
+  background-color: var(--color-secundario);
+  border-color: var(--color-secundario);
 }
 
 button:disabled {
-  background-color: var(--color-red);
-  border-color: var(--color-red);
+  background-color: var(--paleta-4);
+  border-color: var(--paleta-4);
 }
 
 .btn-register {
-  background-color: var(--color-wine);
-  border-color: var(--color-wine);
+  background-color: var(--color-secundario);
+  border-color: var(--color-secundario);
+}
+
+.btn-login {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
 }

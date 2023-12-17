@@ -1,6 +1,12 @@
 export interface IpriceModel {
-  currency?: string;
-  percentage?: number;
-  price?: number;
   time?: number;
+  value?: number;
+  value_offer?: number;
+  type_offer?: string;
+  date_offer?: string;
+}
+
+export enum TypeOfferEnum {
+  DESCUENTO = 'Disccount',
+  FIJO = 'Fixed',
 }
