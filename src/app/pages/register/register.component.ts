@@ -115,6 +115,7 @@ export class RegisterComponent implements OnInit {
 
   public formSubmitted: boolean = false;
   public loading: boolean = false;
+  public fechaMinimaEdad: string = null;
 
   constructor(
     private form: FormBuilder,
@@ -127,6 +128,16 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     localStorage.clear();
+    // Fecha minima para escoger la edad
+    let fechaActual: Date = new Date();
+    this.fechaMinimaEdad = new Date(
+      fechaActual.getFullYear() - 18,
+      fechaActual.getMonth(),
+      fechaActual.getDate()
+    )
+      .toISOString()
+      .split('T')[0];
+
     this.tipoDeUsuarios();
     this.f.controls.type.value = UserTypeEnum.USUARIO;
     this.getCountries();

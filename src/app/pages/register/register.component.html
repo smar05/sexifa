@@ -215,6 +215,7 @@
               [ngClass]="{
                 'is-invalid': invalidField('bornDate') || !mayor18Anios()
               }"
+              [max]="this.fechaMinimaEdad"
             />
             <span
               class="invalid-feedback"
