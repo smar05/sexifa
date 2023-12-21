@@ -167,7 +167,7 @@ export class RegisterComponent implements OnInit {
         bornDate: this.bornDate.value,
         sex: this.sex.value,
         status:
-          this.type == UserTypeEnum.CLIENTE
+          this.type == UserTypeEnum.USUARIO
             ? UserStatusEnum.ACTIVO
             : UserStatusEnum.PENDIENTE_CONFIRMAR,
         country: this.country.value,

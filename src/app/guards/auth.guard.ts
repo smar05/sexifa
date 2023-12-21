@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
             let usuarioPuedeAcceder: boolean = true;
 
             switch (tipoCliente) {
-              case UserTypeEnum.CLIENTE:
+              case UserTypeEnum.USUARIO:
                 usuarioPuedeAcceder =
                   pathActual == `/${UrlPagesEnum.HOME}` ||
                   pathActual.includes(UrlPagesEnum.GROUP) ||

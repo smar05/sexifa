@@ -5,6 +5,6 @@
  * @enum {number}
  */
 export enum UserTypeEnum {
-  CLIENTE = 'cliente',
+  USUARIO = 'usuario',
   VENDEDOR = 'vendedor',
 }

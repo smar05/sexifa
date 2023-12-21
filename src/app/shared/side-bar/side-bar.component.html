@@ -1,7 +1,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a
-    [routerLink]="[this.userType == 'cliente' ? '/' : '/home-seller']"
+    [routerLink]="[this.userType == 'usuario' ? '/' : '/home-seller']"
     class="brand-link"
   >
     <img
@@ -27,7 +27,7 @@
           <a
             class="nav-link"
             [routerLink]="[
-              this.userType == 'cliente' ? '/user' : '/user-seller'
+              this.userType == 'usuario' ? '/user' : '/user-seller'
             ]"
           >
             <i class="nav-icon fas fa-user"></i>
@@ -47,7 +47,7 @@
       >
         <!-- Add icons to the links using the .nav-icon class
              with font-awesome or any other icon font library -->
-        <ng-container *ngIf="this.userType == 'cliente'">
+        <ng-container *ngIf="this.userType == 'usuario'">
           <li class="nav-item">
             <a class="nav-link" [routerLink]="['/']">
               <i class="nav-icon fas fa-home"></i>

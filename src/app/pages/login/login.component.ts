@@ -117,10 +117,10 @@ export class LoginComponent implements OnInit {
         let url: string;
 
         switch (user.type) {
-          case UserTypeEnum.CLIENTE:
+          case UserTypeEnum.USUARIO:
             localStorage.setItem(
               LocalStorageEnum.USER_TYPE,
-              UserTypeEnum.CLIENTE
+              UserTypeEnum.USUARIO
             );
             url = `/${UrlPagesEnum.HOME}`;
             break;
