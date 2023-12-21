@@ -26,7 +26,6 @@ export class ApiInterceptor implements HttpInterceptor {
     if (
       request.url == environment.urlLogin ||
       request.url == environment.urlRefreshToken ||
-      request.url.includes(environment.urlServidorLocal) ||
       (request.url.includes(environment.urlCollections.users) &&
         request.method == 'POST') || //Para registrar un nuevo usuario
       request.url.includes(environment.urlLocation) ||

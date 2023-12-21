@@ -51,6 +51,16 @@ export class LoginService {
   }
 
   /**
+   * Método para obtener el token de autenticación
+   *
+   * @return {*}  {*}
+   * @memberof LoginService
+   */
+  public getAuthToken(): any {
+    return this.afAuth.currentUser.then((user) => user?.getIdToken());
+  }
+
+  /**
    * Funcion de salida del sistema
    *
    * @memberof LoginService
