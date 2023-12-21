@@ -38,7 +38,9 @@ export class LoginComponent implements OnInit {
     private userService: UserService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    localStorage.clear();
+  }
 
   public login(): void {
     this.formSubmitted = true; //Formulario enviado

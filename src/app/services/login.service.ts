@@ -66,11 +66,7 @@ export class LoginService {
    * @memberof LoginService
    */
   public logout(): void {
-    let localStorageValues: string[] = Object.keys(LocalStorageEnum);
-
-    localStorageValues.forEach((value: string) => {
-      localStorage.removeItem(value);
-    });
+    localStorage.clear();
 
     this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
   }

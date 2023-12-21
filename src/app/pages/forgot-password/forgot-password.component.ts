@@ -31,7 +31,9 @@ export class ForgotPasswordComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    localStorage.clear();
+  }
 
   public onSubmit(f: any): void {
     this.loading = true;

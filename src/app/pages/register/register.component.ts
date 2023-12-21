@@ -126,6 +126,7 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    localStorage.clear();
     this.tipoDeUsuarios();
     this.getCountries();
   }

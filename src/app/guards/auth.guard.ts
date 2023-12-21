@@ -27,13 +27,13 @@ export class AuthGuard implements CanActivate {
             let tipoCliente: string = localStorage.getItem(
               LocalStorageEnum.USER_TYPE
             );
-            let pathActual: string = window.location.pathname;
+            let pathActual: string = window.location.hash;
             let usuarioPuedeAcceder: boolean = true;
 
             switch (tipoCliente) {
               case UserTypeEnum.USUARIO:
                 usuarioPuedeAcceder =
-                  pathActual == `/${UrlPagesEnum.HOME}` ||
+                  pathActual == `#/${UrlPagesEnum.HOME}` ||
                   pathActual.includes(UrlPagesEnum.GROUP) ||
                   pathActual.includes(UrlPagesEnum.USER) ||
                   pathActual.includes(UrlPagesEnum.LOGIN) ||
