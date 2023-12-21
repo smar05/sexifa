@@ -128,6 +128,7 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     localStorage.clear();
     this.tipoDeUsuarios();
+    this.f.controls.type.value = UserTypeEnum.USUARIO;
     this.getCountries();
   }
 
