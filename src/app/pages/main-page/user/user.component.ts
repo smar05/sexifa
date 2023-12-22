@@ -166,11 +166,14 @@ export class UserComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    functions.bloquearPantalla(true);
     await this.getUserData();
     await this.getLocationData();
+    functions.bloquearPantalla(false);
   }
 
   public async getUserData(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) =>
       ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
@@ -200,6 +203,7 @@ export class UserComponent implements OnInit {
     this.city.setValue(this.user.city);
     this.chatId.setValue(this.user.chatId);
 
+    functions.bloquearPantalla(false);
     this.loading = false;
   }
 
@@ -210,6 +214,7 @@ export class UserComponent implements OnInit {
       return;
     }
 
+    functions.bloquearPantalla(true);
     this.loading = true;
 
     const data: Iuser = {
@@ -234,6 +239,7 @@ export class UserComponent implements OnInit {
           'Se ha guardado la informacion del usuario',
           'success'
         );
+        functions.bloquearPantalla(false);
         this.loading = false;
       },
       (error: any) => {
@@ -268,6 +274,7 @@ export class UserComponent implements OnInit {
   }
 
   public async getLocationData(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loading = true;
     try {
       this.allCountrys = JSON.parse(
@@ -283,6 +290,7 @@ export class UserComponent implements OnInit {
         )
       );
 
+      functions.bloquearPantalla(false);
       this.loading = false;
     } catch (error) {
       this.allCountrys = [];
@@ -338,6 +346,7 @@ export class UserComponent implements OnInit {
 
     if (!this.showSubscripciones) return;
 
+    functions.bloquearPantalla(true);
     this.loading = true;
 
     let userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
@@ -366,6 +375,7 @@ export class UserComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
+    functions.bloquearPantalla(false);
     this.loading = false;
   }
 }

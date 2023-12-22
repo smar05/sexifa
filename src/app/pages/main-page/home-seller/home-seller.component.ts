@@ -11,6 +11,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { functions } from 'src/app/helpers/functions';
 import { Isubscriptions } from 'src/app/interface/i- subscriptions';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { Imodels } from 'src/app/interface/imodels';
@@ -61,9 +62,11 @@ export class HomeSellerComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   async ngOnInit(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
     await this.getMiGroup();
     await this.getSubscriptions();
+    functions.bloquearPantalla(false);
   }
 
   constructor(
@@ -72,6 +75,7 @@ export class HomeSellerComponent implements OnInit {
   ) {}
 
   public async getMiGroup(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) => ref.where('idUser', '==', this.userId);
 
@@ -82,10 +86,12 @@ export class HomeSellerComponent implements OnInit {
     this.model = res[0].data;
     this.model.id = res[0].id;
 
+    functions.bloquearPantalla(false);
     this.loading = false;
   }
 
   public async getSubscriptions(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) =>
       ref
@@ -122,6 +128,7 @@ export class HomeSellerComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
 
+    functions.bloquearPantalla(false);
     this.loading = false;
   }
 

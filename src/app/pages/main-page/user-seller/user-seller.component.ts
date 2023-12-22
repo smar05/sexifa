@@ -4,7 +4,6 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
-import { IQueryParams } from 'src/app/interface/i-query-params';
 import { ICities } from 'src/app/interface/icities';
 import { ICountries } from 'src/app/interface/icountries';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
@@ -105,11 +104,14 @@ export class UserSellerComponent {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    functions.bloquearPantalla(true);
     await this.getUserData();
     await this.getLocationData();
+    functions.bloquearPantalla(false);
   }
 
   public async getUserData(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) =>
       ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
@@ -139,6 +141,7 @@ export class UserSellerComponent {
     this.state.setValue(this.user.state);
     this.city.setValue(this.user.city);
 
+    functions.bloquearPantalla(false);
     this.loading = false;
   }
 
@@ -149,6 +152,7 @@ export class UserSellerComponent {
       return;
     }
 
+    functions.bloquearPantalla(true);
     this.loading = true;
 
     const data: Iuser = {
@@ -173,6 +177,7 @@ export class UserSellerComponent {
           'Se ha guardado la informacion del usuario',
           'success'
         );
+        functions.bloquearPantalla(false);
         this.loading = false;
       },
       (error: any) => {
@@ -207,6 +212,7 @@ export class UserSellerComponent {
   }
 
   public async getLocationData(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loading = true;
     try {
       this.allCountrys = JSON.parse(
@@ -222,6 +228,7 @@ export class UserSellerComponent {
         )
       );
 
+      functions.bloquearPantalla(false);
       this.loading = false;
     } catch (error) {
       this.allCountrys = [];

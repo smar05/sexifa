@@ -15,6 +15,7 @@ import { Isubscriptions } from 'src/app/interface/i- subscriptions';
 import { alerts } from 'src/app/helpers/alerts';
 import { ViewsModelService } from 'src/app/services/views-model.service';
 import { IviewsModel } from 'src/app/interface/i-views-model';
+import { functions } from 'src/app/helpers/functions';
 
 @Component({
   selector: 'app-model',
@@ -40,6 +41,7 @@ export class ModelComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    functions.bloquearPantalla(true);
     //Id del modelo
     this.modelId = this.route.snapshot.paramMap.get('url') || '';
 
@@ -50,9 +52,11 @@ export class ModelComponent implements OnInit {
 
     // Guardamos la visita del usuario a la pagina
     await this.setViewsModelData();
+    functions.bloquearPantalla(false);
   }
 
   public async getModel(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.load = true;
     let res1: IFireStoreRes = await this.modelsService
       .getItemFS(this.modelId || '')
@@ -73,6 +77,7 @@ export class ModelComponent implements OnInit {
     this.model = await this.modelsService.modelInterfaceToDTO(res);
     this.imgPrincipal = this.model.mainImage || '';
 
+    functions.bloquearPantalla(false);
     this.load = false;
   }
 
@@ -121,6 +126,7 @@ export class ModelComponent implements OnInit {
   }
 
   public async clickParticipar(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.load = true;
 
     try {
@@ -135,6 +141,7 @@ export class ModelComponent implements OnInit {
         await this.subscriptionsService.getDataFS(qf).toPromise();
 
       if (subscritionsActivas && subscritionsActivas.length > 0) {
+        functions.bloquearPantalla(false);
         this.load = false;
 
         alerts.basicAlert(
@@ -186,10 +193,12 @@ export class ModelComponent implements OnInit {
 
       localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(cart));
 
+      functions.bloquearPantalla(false);
       this.load = false;
 
       this.router.navigateByUrl(`/${UrlPagesEnum.CHECKOUT}`);
     } catch (error) {
+      functions.bloquearPantalla(false);
       this.load = false;
       console.error(error);
     }

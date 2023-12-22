@@ -228,4 +228,17 @@ export class functions {
 
     return fechaClonada;
   }
+
+  /**
+   * Bloquear o desbloquear la pantalla
+   *
+   * @static
+   * @param {boolean} bloquear
+   * @memberof functions
+   */
+  static bloquearPantalla(bloquear: boolean): void {
+    let divBloquear: HTMLElement = document.querySelector('#bloquear');
+
+    divBloquear.style.display = bloquear ? 'flex' : 'none';
+  }
 }

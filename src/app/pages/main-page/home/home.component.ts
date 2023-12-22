@@ -34,7 +34,9 @@ export class HomeComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     //this.getAllCategories();
+    functions.bloquearPantalla(true);
     await this.getAllModels();
+    functions.bloquearPantalla(false);
   }
 
   public async clickSearch(): Promise<void> {
@@ -75,6 +77,7 @@ export class HomeComponent implements OnInit {
   }
 
   public async getAllModels(consulta: string = ''): Promise<void> {
+    functions.bloquearPantalla(true);
     this.load = true;
     let qr: QueryFn;
     this.search;
@@ -138,6 +141,7 @@ export class HomeComponent implements OnInit {
     imodels.forEach(async (imodel: Imodels) => {
       this.models?.push(await this.modelsService.modelInterfaceToDTO(imodel));
     });
+    functions.bloquearPantalla(false);
     this.load = false;
   }
 

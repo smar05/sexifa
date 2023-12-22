@@ -32,10 +32,13 @@ export class ForgotPasswordComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    functions.bloquearPantalla(true);
     localStorage.clear();
+    functions.bloquearPantalla(false);
   }
 
   public onSubmit(f: any): void {
+    functions.bloquearPantalla(true);
     this.loading = true;
     this.formSubmitted = true; //Formulario enviado
 
@@ -57,9 +60,11 @@ export class ForgotPasswordComponent implements OnInit {
         );
 
         this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
+        functions.bloquearPantalla(false);
         this.loading = false;
       })
       .catch((error: any) => {
+        functions.bloquearPantalla(false);
         this.loading = false;
       });
   }

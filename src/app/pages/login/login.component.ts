@@ -6,15 +6,12 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Router } from '@angular/router';
-//import '../../shared/spinkit/sk-folding-cube.css';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { UserService } from 'src/app/services/user.service';
 import { Iuser } from 'src/app/interface/iuser';
-import { IQueryParams } from 'src/app/interface/i-query-params';
 import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
 import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 import { QueryFn } from '@angular/fire/compat/firestore';
-import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +36,9 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    functions.bloquearPantalla(true);
     localStorage.clear();
+    functions.bloquearPantalla(false);
   }
 
   public login(): void {
@@ -58,6 +57,7 @@ export class LoginComponent implements OnInit {
     };
 
     //Servicio de login
+    functions.bloquearPantalla(true);
     this.loading = true;
     this.loginService
       .loginWithAuthFire(data)
@@ -68,6 +68,7 @@ export class LoginComponent implements OnInit {
             'La cuenta no ha sido verificada',
             'error'
           );
+          functions.bloquearPantalla(false);
           this.loading = false;
           return;
         }
@@ -141,6 +142,7 @@ export class LoginComponent implements OnInit {
         }
 
         this.router.navigateByUrl(url);
+        functions.bloquearPantalla(false);
         this.loading = false;
       })
       .catch((err: any) => {
@@ -170,6 +172,7 @@ export class LoginComponent implements OnInit {
             break;
         }
 
+        functions.bloquearPantalla(false);
         this.loading = false;
       });
   }

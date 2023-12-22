@@ -5,10 +5,8 @@ import {
   UntypedFormArray,
   UntypedFormBuilder,
   Validators,
-  AbstractControl,
-  UntypedFormGroup,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ModelsService } from 'src/app/services/models.service';
 import { CategoriesService } from 'src/app/services/categories.service';
 import { ImgModelEnum } from 'src/app/enum/imgModelEnum';
@@ -18,7 +16,6 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import { UserService } from 'src/app/services/user.service';
 import { Iuser } from 'src/app/interface/iuser';
-import { IQueryParams } from 'src/app/interface/i-query-params';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { IpriceModel } from 'src/app/interface/iprice-model';
 import { UrlPagesEnum } from 'src/app/enum/urlPagesEnum';
@@ -141,10 +138,12 @@ export class PageSellerComponent {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID) || '';
     this.getCategories();
     await this.getUserModel();
     await this.getData();
+    functions.bloquearPantalla(false);
   }
 
   /**
@@ -154,6 +153,7 @@ export class PageSellerComponent {
    * @memberof PageSellerComponent
    */
   public async getUserModel(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loadData = true;
     let qf: QueryFn = (ref) => ref.where('id', '==', this.userId);
 
@@ -163,10 +163,12 @@ export class PageSellerComponent {
         .toPromise()
         .then(
           (res: IFireStoreRes[]) => {
+            functions.bloquearPantalla(false);
             this.loadData = false;
             resolve(res[0].data);
           },
           (err) => {
+            functions.bloquearPantalla(false);
             this.loadData = false;
             console.error(err);
             resolve(null);
@@ -176,6 +178,7 @@ export class PageSellerComponent {
   }
 
   public async getData(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.loadData = true;
 
     // Se obtiene el modelo del usuario actual
@@ -257,6 +260,7 @@ export class PageSellerComponent {
         );
       }
     }
+    functions.bloquearPantalla(false);
     this.loadData = false;
   }
 
@@ -294,6 +298,7 @@ export class PageSellerComponent {
       );
       return;
     }
+    functions.bloquearPantalla(true);
     this.loadData = true;
 
     //Informacion del formulario en la interfaz
@@ -325,6 +330,7 @@ export class PageSellerComponent {
           this.save(this.modelEnDb.id, dataModel, 'update');
         },
         (err: any) => {
+          functions.bloquearPantalla(false);
           this.loadData = false;
           alerts.basicAlert(
             'Error',
@@ -340,6 +346,7 @@ export class PageSellerComponent {
           this.save(res.id, dataModel, 'save');
         },
         (err: any) => {
+          functions.bloquearPantalla(false);
           this.loadData = false;
           alerts.basicAlert(
             'Error',
@@ -409,6 +416,7 @@ export class PageSellerComponent {
       if (dataModel.gallery)
         await this.modelService.patchDataFS(res, dataModel);
 
+      functions.bloquearPantalla(false);
       this.loadData = false;
       alerts.basicAlert('Listo', 'La información ha sido guardado', 'success');
 
@@ -469,6 +477,7 @@ export class PageSellerComponent {
       if (dataModel.gallery)
         await this.modelService.patchDataFS(this.modelEnDb.id, dataModel);
 
+      functions.bloquearPantalla(false);
       this.loadData = false;
       alerts.basicAlert('Listo', 'La información ha sido guardado', 'success');
 
@@ -525,11 +534,13 @@ export class PageSellerComponent {
   }
 
   public getCategories(): any {
+    functions.bloquearPantalla(true);
     this.loadData = true;
     this.categoriesService
       .getData()
       .toPromise()
       .then((resp: any) => {
+        functions.bloquearPantalla(false);
         this.loadData = false;
         this.categories = Object.keys(resp).map((a: any) => ({
           id: a,
@@ -563,6 +574,7 @@ export class PageSellerComponent {
           `Ha ocurrido un error guardando la imagen ${type}`,
           'error'
         );
+        functions.bloquearPantalla(false);
         this.loadData = false;
         return;
       }
@@ -596,6 +608,7 @@ export class PageSellerComponent {
             `Ha ocurrido un error guardando la imagen de la galeria del producto`,
             'error'
           );
+          functions.bloquearPantalla(false);
           this.loadData = false;
         }
       }

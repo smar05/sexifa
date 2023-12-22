@@ -127,6 +127,7 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    functions.bloquearPantalla(true);
     localStorage.clear();
     // Fecha minima para escoger la edad
     let fechaActual: Date = new Date();
@@ -141,6 +142,7 @@ export class RegisterComponent implements OnInit {
     this.tipoDeUsuarios();
     this.f.controls.type.value = UserTypeEnum.USUARIO;
     this.getCountries();
+    functions.bloquearPantalla(false);
   }
 
   public async onSubmit(f: any): Promise<void> {
@@ -158,6 +160,7 @@ export class RegisterComponent implements OnInit {
       password: this.f.controls.password.value,
     };
 
+    functions.bloquearPantalla(true);
     this.loading = true;
 
     try {
@@ -192,6 +195,7 @@ export class RegisterComponent implements OnInit {
 
       await this.userService.postDataFS(user);
 
+      functions.bloquearPantalla(false);
       this.loading = false;
 
       this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
@@ -220,6 +224,7 @@ export class RegisterComponent implements OnInit {
       }
 
       alerts.basicAlert('Error', errorText, 'error');
+      functions.bloquearPantalla(false);
       this.loading = false;
     }
   }

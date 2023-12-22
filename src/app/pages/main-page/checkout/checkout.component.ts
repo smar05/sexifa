@@ -67,6 +67,7 @@ export class CheckoutComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.getUserData();
     await this.getCartData();
 
@@ -78,6 +79,7 @@ export class CheckoutComponent implements OnInit {
     await this.ifPayU();
 
     this.paypalData();
+    functions.bloquearPantalla(false);
   }
 
   private async ifPayU(): Promise<void> {
@@ -325,6 +327,7 @@ export class CheckoutComponent implements OnInit {
   }
 
   public getUserData(): void {
+    functions.bloquearPantalla(true);
     this.load = true;
     let qf: QueryFn = (ref) =>
       ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
@@ -334,15 +337,18 @@ export class CheckoutComponent implements OnInit {
       .then(
         (data: IFireStoreRes[]) => {
           this.user = data[0].data;
+          functions.bloquearPantalla(false);
           this.load = false;
         },
         (err: any) => {
+          functions.bloquearPantalla(false);
           this.load = false;
         }
       );
   }
 
   public async getCartData(): Promise<void> {
+    functions.bloquearPantalla(true);
     this.load = true;
 
     if (!localStorage.getItem(LocalStorageEnum.CART)) return;
@@ -455,8 +461,10 @@ export class CheckoutComponent implements OnInit {
           }
         }
 
+        functions.bloquearPantalla(false);
         this.load = false;
       } catch (error) {
+        functions.bloquearPantalla(false);
         this.load = false;
         throw error;
       }
