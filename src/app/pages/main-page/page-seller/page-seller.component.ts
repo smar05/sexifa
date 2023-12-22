@@ -31,6 +31,7 @@ export class PageSellerComponent {
   public modelEnDb!: Imodels;
   public galeriaValores: Map<string, string> = new Map(); // <url,nombre>
   public imagenesABorrarGaleria: string[] = [];
+  public fechaMinima: string = '';
 
   public f = this.form.group({
     name: [
@@ -139,6 +140,10 @@ export class PageSellerComponent {
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+
+    // Fecha minima de las ofertas
+    this.fechaMinima = new Date().toISOString().split('T')[0];
+
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID) || '';
     this.getCategories();
     try {
@@ -149,6 +154,30 @@ export class PageSellerComponent {
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
     }
     functions.bloquearPantalla(false);
+  }
+
+  /**
+   * Validar que la fecha ingresada sea mayor o igual a la actual
+   *
+   * @private
+   * @param {string} fechaIngresada
+   * @return {*}  {boolean}
+   * @memberof PageSellerComponent
+   */
+  private validarFechaIngresada(fechaIngresada: string): boolean {
+    // Obtener la fecha actual
+    let fechaActual = new Date();
+
+    // Convierte la fecha ingresada a un objeto Date
+    let fechaIngresadaObj = new Date(fechaIngresada);
+    fechaIngresadaObj.setDate(fechaIngresadaObj.getDate() + 1);
+
+    // Ajusta la fecha ingresada para ignorar la parte de la hora
+    fechaIngresadaObj.setHours(0, 0, 0, 0);
+    fechaActual.setHours(0, 0, 0, 0);
+
+    // Compara las fechas
+    return fechaIngresadaObj >= fechaActual;
   }
 
   /**
@@ -332,6 +361,21 @@ export class PageSellerComponent {
       );
       return;
     }
+    // Validacion de las fechas de promociones
+    let fechaInvalida: boolean = false;
+    this.f.controls.price.value.forEach((price: IpriceModel) => {
+      if (!this.validarFechaIngresada(price.date_offer)) fechaInvalida = true;
+    });
+
+    if (fechaInvalida) {
+      alerts.basicAlert(
+        'Error',
+        'Ha seleccionado una fecha de la oferta invalida',
+        'error'
+      );
+      return;
+    }
+
     functions.bloquearPantalla(true);
     this.loadData = true;
 
