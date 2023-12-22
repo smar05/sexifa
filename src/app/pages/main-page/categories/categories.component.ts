@@ -2,6 +2,7 @@
 import { CategoriesService } from './../../../services/categories.service';
 import { Icategories } from './../../../interface/icategories';
 import { Component, OnInit } from '@angular/core';
+import { alerts } from 'src/app/helpers/alerts';
 
 @Component({
   selector: 'app-categories',
@@ -12,9 +13,8 @@ export class CategoriesComponent implements OnInit {
   public categories: Icategories[] | null = [];
 
   constructor(
-    private categoriesService: CategoriesService
-  ) //public fontAwesomeIconsService: FontAwesomeIconsService
-  {}
+    private categoriesService: CategoriesService //public fontAwesomeIconsService: FontAwesomeIconsService
+  ) {}
 
   ngOnInit(): void {
     this.getAllCategories();
@@ -29,6 +29,11 @@ export class CategoriesComponent implements OnInit {
           this.categories = res;
         },
         (error) => {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error en la consulta de categorias',
+            'error'
+          );
           console.error(error);
         }
       );

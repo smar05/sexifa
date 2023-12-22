@@ -141,8 +141,12 @@ export class PageSellerComponent {
     functions.bloquearPantalla(true);
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID) || '';
     this.getCategories();
-    await this.getUserModel();
-    await this.getData();
+    try {
+      await this.getUserModel();
+      await this.getData();
+    } catch (error) {
+      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+    }
     functions.bloquearPantalla(false);
   }
 
@@ -171,6 +175,11 @@ export class PageSellerComponent {
             functions.bloquearPantalla(false);
             this.loadData = false;
             console.error(err);
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error en la consulta de usuarios',
+              'error'
+            );
             resolve(null);
           }
         );
@@ -199,6 +208,11 @@ export class PageSellerComponent {
           },
           (err) => {
             console.error(err);
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error en la consulta de modelos',
+              'error'
+            );
             resolve(null);
           }
         );
@@ -243,16 +257,33 @@ export class PageSellerComponent {
         });
 
       //Obtener imagenes del producto
-      this.imgTemp = await this.modelService.getImage(
-        `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`
-      );
+      try {
+        this.imgTemp = await this.modelService.getImage(
+          `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`
+        );
+      } catch (error) {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la obtencion de la imagen principal',
+          'error'
+        );
+      }
 
       if (this.modelEnDb.gallery) {
         JSON.parse(this.modelEnDb.gallery).forEach(
           async (galleryItem: string) => {
-            let urlImage: string = await this.modelService.getImage(
-              `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
-            );
+            let urlImage: string = null;
+            try {
+              urlImage = await this.modelService.getImage(
+                `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+              );
+            } catch (error) {
+              alerts.basicAlert(
+                'Error',
+                'Ha ocurrido un error en la obtencion de la imagen principal',
+                'error'
+              );
+            }
             this.allGallery.push(urlImage);
             this.editGallery.push(urlImage);
             this.galeriaValores.set(urlImage, galleryItem);
@@ -376,14 +407,32 @@ export class PageSellerComponent {
     if (saveOrUpdate == 'save') {
       //Guardar las imagenes en storage
       if (this.imgFile && this.imgTemp) {
-        await this.modelService.deleteImages(`${res}/${ImgModelEnum.MAIN}`);
-        await this.saveProductImages(res, this.imgFile, ImgModelEnum.MAIN);
+        try {
+          await this.modelService.deleteImages(`${res}/${ImgModelEnum.MAIN}`);
+          await this.saveProductImages(res, this.imgFile, ImgModelEnum.MAIN);
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error guardando la imagen principal',
+            'error'
+          );
+        }
       }
 
       let nombreGaleriaAGuardar: string[] = [];
       // Se guardan las imagenes nuevas
       if (this.files && this.files.length > 0) {
-        let nombres: string[] = await this.saveProductGallery(res, this.files);
+        let nombres: string[] = null;
+
+        try {
+          nombres = await this.saveProductGallery(res, this.files);
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error guardando la galeria',
+            'error'
+          );
+        }
         nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(nombres);
       }
       // Se eliminan las imagenes antiguas que el usuario quizo borrar
@@ -401,9 +450,17 @@ export class PageSellerComponent {
             )
           );
 
-          await this.modelService.deleteImages(
-            `${res}/${ImgModelEnum.GALLERY}/${name}`
-          );
+          try {
+            await this.modelService.deleteImages(
+              `${res}/${ImgModelEnum.GALLERY}/${name}`
+            );
+          } catch (error) {
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error eliminando las imagenes de la galeria',
+              'error'
+            );
+          }
         });
       }
 
@@ -413,8 +470,17 @@ export class PageSellerComponent {
 
       dataModel.gallery = JSON.stringify(nombreGaleriaAGuardar);
 
-      if (dataModel.gallery)
-        await this.modelService.patchDataFS(res, dataModel);
+      if (dataModel.gallery) {
+        try {
+          await this.modelService.patchDataFS(res, dataModel);
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error actualizando el modelo',
+            'error'
+          );
+        }
+      }
 
       functions.bloquearPantalla(false);
       this.loadData = false;
@@ -428,23 +494,40 @@ export class PageSellerComponent {
     ) {
       //Guardar las imagenes en storage
       if (this.imgFile && this.imgTemp) {
-        await this.modelService.deleteImages(
-          `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`
-        );
-        await this.saveProductImages(
-          this.modelEnDb.id,
-          this.imgFile,
-          ImgModelEnum.MAIN
-        );
+        try {
+          await this.modelService.deleteImages(
+            `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`
+          );
+          await this.saveProductImages(
+            this.modelEnDb.id,
+            this.imgFile,
+            ImgModelEnum.MAIN
+          );
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error guardando la imagen principal',
+            'error'
+          );
+        }
       }
 
       let nombreGaleriaAGuardar: string[] = [];
       // Se guardan las imagenes nuevas
       if (this.files && this.files.length > 0) {
-        let nombres: string[] = await this.saveProductGallery(
-          this.modelEnDb.id,
-          this.files
-        );
+        let nombres: string[] = null;
+        try {
+          nombres = await this.saveProductGallery(
+            this.modelEnDb.id,
+            this.files
+          );
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error guardando la galeria',
+            'error'
+          );
+        }
         nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(nombres);
       }
       // Se eliminan las imagenes antiguas que el usuario quizo borrar
@@ -462,9 +545,17 @@ export class PageSellerComponent {
             )
           );
 
-          await this.modelService.deleteImages(
-            `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${name}`
-          );
+          try {
+            await this.modelService.deleteImages(
+              `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${name}`
+            );
+          } catch (error) {
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error eliminando la galeria',
+              'error'
+            );
+          }
         });
       }
 
@@ -474,8 +565,17 @@ export class PageSellerComponent {
 
       dataModel.gallery = JSON.stringify(nombreGaleriaAGuardar);
 
-      if (dataModel.gallery)
-        await this.modelService.patchDataFS(this.modelEnDb.id, dataModel);
+      if (dataModel.gallery) {
+        try {
+          await this.modelService.patchDataFS(this.modelEnDb.id, dataModel);
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error actualizando el modelo',
+            'error'
+          );
+        }
+      }
 
       functions.bloquearPantalla(false);
       this.loadData = false;
@@ -497,6 +597,11 @@ export class PageSellerComponent {
       resp = await functions.validateImage(e);
     } catch (error) {
       console.error(error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error validando la imagen',
+        'error'
+      );
       return;
     }
     if (resp) {
@@ -548,6 +653,13 @@ export class PageSellerComponent {
           name: resp[a].name,
           url: resp[a].url,
         }));
+      })
+      .catch((err: any) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de categorias',
+          'error'
+        );
       });
   }
 

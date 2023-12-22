@@ -11,6 +11,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Isubscriptions } from 'src/app/interface/i- subscriptions';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
@@ -64,8 +65,12 @@ export class HomeSellerComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
-    await this.getMiGroup();
-    await this.getSubscriptions();
+    try {
+      await this.getMiGroup();
+      await this.getSubscriptions();
+    } catch (error) {
+      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+    }
     functions.bloquearPantalla(false);
   }
 
@@ -79,9 +84,17 @@ export class HomeSellerComponent implements OnInit {
     this.loading = true;
     let qf: QueryFn = (ref) => ref.where('idUser', '==', this.userId);
 
-    let res: IFireStoreRes[] = await this.modelsService
-      .getDataFS(qf)
-      .toPromise();
+    let res: IFireStoreRes[] = null;
+
+    try {
+      res = await this.modelsService.getDataFS(qf).toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelos',
+        'error'
+      );
+    }
 
     this.model = res[0].data;
     this.model.id = res[0].id;
@@ -99,9 +112,17 @@ export class HomeSellerComponent implements OnInit {
         .limitToLast(50)
         .orderBy('date_created');
 
-    let res: IFireStoreRes[] = await this.subscriptionsService
-      .getDataFS(qf)
-      .toPromise();
+    let res: IFireStoreRes[] = null;
+
+    try {
+      res = await this.subscriptionsService.getDataFS(qf).toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de subscripciones',
+        'error'
+      );
+    }
 
     this.subscriptions = res.map((r: IFireStoreRes) => {
       let s: Isubscriptions = r.data;

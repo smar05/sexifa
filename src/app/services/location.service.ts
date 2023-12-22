@@ -1,3 +1,4 @@
+import { alerts } from '../helpers/alerts';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 
@@ -29,6 +30,11 @@ export class LocationService {
     return fetch(`${this.urlLocation}countries`, requestOptions)
       .then((response: any) => response.text())
       .catch((err: any) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de paises',
+          'error'
+        );
         console.error(err);
       });
   }
@@ -49,6 +55,11 @@ export class LocationService {
     return fetch(`${this.urlLocation}countries/${iso}/states`, requestOptions)
       .then((response: any) => response.text())
       .catch((err: any) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de estados',
+          'error'
+        );
         console.error(err);
       });
   }
@@ -76,6 +87,11 @@ export class LocationService {
     )
       .then((response: any) => response.text())
       .catch((err: any) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de ciudades',
+          'error'
+        );
         console.error(err);
       });
   }

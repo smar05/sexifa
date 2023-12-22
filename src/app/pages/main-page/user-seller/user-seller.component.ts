@@ -105,8 +105,12 @@ export class UserSellerComponent {
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
-    await this.getUserData();
-    await this.getLocationData();
+    try {
+      await this.getUserData();
+      await this.getLocationData();
+    } catch (error) {
+      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+    }
     functions.bloquearPantalla(false);
   }
 
@@ -127,6 +131,11 @@ export class UserSellerComponent {
           },
           (err) => {
             console.error(err);
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error en la consulta de usuarios',
+              'error'
+            );
             resolve(null);
           }
         );
@@ -231,9 +240,16 @@ export class UserSellerComponent {
       functions.bloquearPantalla(false);
       this.loading = false;
     } catch (error) {
+      functions.bloquearPantalla(false);
+      this.loading = false;
       this.allCountrys = [];
       this.allStates = [];
       this.allCities = [];
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
     }
   }
 
@@ -245,6 +261,11 @@ export class UserSellerComponent {
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.allStates = [];
       this.state.setValue(null);
       this.city.setValue(null);
@@ -261,6 +282,11 @@ export class UserSellerComponent {
         )
       );
     } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.allCities = [];
       this.city.setValue(null);
     }

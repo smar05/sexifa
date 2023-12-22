@@ -12,6 +12,7 @@ import { ImgModelEnum } from '../enum/imgModelEnum';
 import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { map } from 'rxjs/operators';
+import { alerts } from '../helpers/alerts';
 
 @Injectable({
   providedIn: 'root',
@@ -229,9 +230,19 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public async getImage(url: string): Promise<string> {
-    let image: any = (
-      await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
-    ).items[0];
+    let image: any = null;
+
+    try {
+      image = (
+        await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
+      ).items[0];
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la obtencion de la imagen',
+        'error'
+      );
+    }
 
     if (image) {
       return this.storageService.getDownloadURL(image);
@@ -248,14 +259,34 @@ export class ModelsService {
    * @memberof ProductsService
    */
   public async getImages(url: string): Promise<string[]> {
-    let images: any[] = (
-      await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
-    ).items;
+    let images: any[] = null;
+
+    try {
+      images = (
+        await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
+      ).items;
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la obtencion de imagenes',
+        'error'
+      );
+    }
 
     if (images) {
       let imagesUrl: string[] = [];
       for (const image of images) {
-        imagesUrl.push(await this.storageService.getDownloadURL(image));
+        let url: string = null;
+        try {
+          url = await this.storageService.getDownloadURL(image);
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error en la obtencion de la imagen',
+            'error'
+          );
+        }
+        imagesUrl.push();
       }
       return imagesUrl;
     }
@@ -273,14 +304,32 @@ export class ModelsService {
   public async deleteImages(url: string): Promise<boolean> {
     let complete: boolean = true;
     try {
-      let images: any[] = (
-        await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
-      ).items;
+      let images: any[] = null;
+
+      try {
+        images = (
+          await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
+        ).items;
+      } catch (error) {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la obtencion de las imagenes',
+          'error'
+        );
+      }
 
       if (images && images.length > 0) {
         for (const image of images) {
           if (image._location.path) {
-            await this.storageService.deleteImage(image._location.path);
+            try {
+              await this.storageService.deleteImage(image._location.path);
+            } catch (error) {
+              alerts.basicAlert(
+                'Error',
+                'Ha ocurrido un error eliminando la imagen',
+                'error'
+              );
+            }
           } else {
             continue;
           }
@@ -303,8 +352,19 @@ export class ModelsService {
    */
   public async saveImage(file: File, name: string): Promise<any> {
     let url: string = `${this.urlImage}/${name}`;
+    let guardarImagen: any = null;
 
-    return await this.storageService.saveImage(file, url);
+    try {
+      guardarImagen = await this.storageService.saveImage(file, url);
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error guardando la imagen',
+        'error'
+      );
+    }
+
+    return guardarImagen;
   }
 
   //-------- DTO functions ------------//
@@ -329,21 +389,47 @@ export class ModelsService {
 
     if (imodel.gallery)
       JSON.parse(imodel.gallery).forEach(async (galleryItem: string) => {
-        let urlImage: string = await this.getImage(
-          `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
-        );
+        let urlImage: string = null;
+
+        try {
+          urlImage = await this.getImage(
+            `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+          );
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error obteniendo la galeria',
+            'error'
+          );
+        }
 
         modelDTO.gallery?.push(urlImage);
       });
 
     //Imagen principal
-    modelDTO.mainImage = await this.getImage(
-      `${imodel.id}/${ImgModelEnum.MAIN}`
-    );
+    try {
+      modelDTO.mainImage = await this.getImage(
+        `${imodel.id}/${ImgModelEnum.MAIN}`
+      );
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error obteniendo la imagen principal',
+        'error'
+      );
+    }
     //Categoria
-    modelDTO.categorie = await this.categoriesService
-      .getItem(imodel.categorie || '')
-      .toPromise();
+    try {
+      modelDTO.categorie = await this.categoriesService
+        .getItem(imodel.categorie || '')
+        .toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error obteniendo la categoria',
+        'error'
+      );
+    }
 
     return modelDTO;
   }

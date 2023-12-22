@@ -13,6 +13,7 @@ import { CategoriesService } from './../../../services/categories.service';
 import { Component, OnInit } from '@angular/core';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
+import { alerts } from 'src/app/helpers/alerts';
 
 @Component({
   selector: 'app-home',
@@ -35,12 +36,28 @@ export class HomeComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     //this.getAllCategories();
     functions.bloquearPantalla(true);
-    await this.getAllModels();
+    try {
+      await this.getAllModels();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelos',
+        'error'
+      );
+    }
     functions.bloquearPantalla(false);
   }
 
   public async clickSearch(): Promise<void> {
-    await this.getModelsWhereSearchByName();
+    try {
+      await this.getModelsWhereSearchByName();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelos pon nombre',
+        'error'
+      );
+    }
   }
 
   public getAllCategories(): void {
@@ -63,16 +80,29 @@ export class HomeComponent implements OnInit {
           });
         },
         (error) => {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error en la consulta de categorias',
+            'error'
+          );
           console.error(error);
         }
       );
   }
 
   public async nextPagination(): Promise<void> {
-    if (this.search) {
-      await this.getAllModels('search_plus');
-    } else {
-      await this.getAllModels('plus');
+    try {
+      if (this.search) {
+        await this.getAllModels('search_plus');
+      } else {
+        await this.getAllModels('plus');
+      }
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelos por paginacion',
+        'error'
+      );
     }
   }
 
@@ -119,9 +149,17 @@ export class HomeComponent implements OnInit {
           .limit(this.pageSize);
     }
 
-    let res: IFireStoreRes[] = await this.modelsService
-      .getDataFS(qr)
-      .toPromise();
+    let res: IFireStoreRes[] = null;
+
+    try {
+      res = await this.modelsService.getDataFS(qr).toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelos',
+        'error'
+      );
+    }
     // Guardar referencia al último documento de la página actual
     if (res.length > 0) {
       this.lastDocument = res[res.length - 1].data.name;
@@ -139,7 +177,15 @@ export class HomeComponent implements OnInit {
 
     //Imodel to DTO
     imodels.forEach(async (imodel: Imodels) => {
-      this.models?.push(await this.modelsService.modelInterfaceToDTO(imodel));
+      try {
+        this.models?.push(await this.modelsService.modelInterfaceToDTO(imodel));
+      } catch (error) {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la conversion de modelos a DTO',
+          'error'
+        );
+      }
     });
     functions.bloquearPantalla(false);
     this.load = false;
@@ -148,11 +194,27 @@ export class HomeComponent implements OnInit {
   public async getModelsWhereSearchByName(): Promise<void> {
     if (!this.search) {
       this.models = [];
-      await this.getAllModels();
+      try {
+        await this.getAllModels();
+      } catch (error) {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de modelos',
+          'error'
+        );
+      }
       return;
     }
 
-    await this.getAllModels('search');
+    try {
+      await this.getAllModels('search');
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelos',
+        'error'
+      );
+    }
   }
 
   public getUrlModel(model: ModelsDTO) {

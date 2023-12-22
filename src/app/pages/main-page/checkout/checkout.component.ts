@@ -69,14 +69,31 @@ export class CheckoutComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
     this.getUserData();
-    await this.getCartData();
+
+    try {
+      await this.getCartData();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta del carrito',
+        'error'
+      );
+    }
 
     console.log(
       '🚀 ~ file: checkout.component.ts:74 ~ CheckoutComponent ~ ngOnInit ~ this.cart:',
       this.cart
     );
 
-    await this.ifPayU();
+    try {
+      await this.ifPayU();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error con el metodo PayU',
+        'error'
+      );
+    }
 
     this.paypalData();
     functions.bloquearPantalla(false);
@@ -95,20 +112,39 @@ export class CheckoutComponent implements OnInit {
 
     localStorage.removeItem(LocalStorageEnum.PAYU_PROCESO);
     if (params.transactionState && payProceso < new Date()) {
-      await this.payUProcess(params);
+      try {
+        await this.payUProcess(params);
+      } catch (error) {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error con el proceso de PayU',
+          'error'
+        );
+      }
     }
   }
 
   private async payUProcess(params: QParamsPayU): Promise<void> {
     const timeNow: Date = new Date();
     let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
-    let usd_cop: number = Number(
-      (
-        await this.currencyConverterService
-          .getCurrencyConverter(`${params.currency}_COP`, 1)
-          .toPromise()
-      ).rates.COP.rate
-    );
+    let usd_cop: number = null;
+
+    try {
+      usd_cop = Number(
+        (
+          await this.currencyConverterService
+            .getCurrencyConverter(`${params.currency}_COP`, 1)
+            .toPromise()
+        ).rates.COP.rate
+      );
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la conversion de la moneda',
+        'error'
+      );
+    }
+
     let dataSubscriptions: Isubscriptions[] = [];
 
     switch (params.transactionState) {
@@ -160,7 +196,18 @@ export class CheckoutComponent implements OnInit {
         // Se guarda la informacion de las subscripciones compradas
         let idsSubscriptions: string[] = [];
         for (const data of dataSubscriptions) {
-          let res: any = await this.subscriptionsService.postDataFS(data);
+          let res: any = null;
+
+          try {
+            res = await this.subscriptionsService.postDataFS(data);
+          } catch (error) {
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error en la consulta de subscripciones',
+              'error'
+            );
+          }
+
           console.log(
             '🚀 ~ file: checkout.component.ts:130 ~ CheckoutComponent ~ payUProcess ~ res:',
             res
@@ -181,15 +228,34 @@ export class CheckoutComponent implements OnInit {
           currency: params.currency,
         };
 
-        let orderId: string = (await this.ordersService.postDataFS(dataOrder))
-          .id;
+        let orderId: string = null;
+
+        try {
+          orderId = (await this.ordersService.postDataFS(dataOrder)).id;
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error al guardar la orden',
+            'error'
+          );
+        }
 
         localStorage.removeItem(LocalStorageEnum.CART);
         localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
 
-        let res: any = await this.telegramLocalService
-          .getLinksOrden({ orderId })
-          .toPromise();
+        let res: any = null;
+
+        try {
+          res = await this.telegramLocalService
+            .getLinksOrden({ orderId })
+            .toPromise();
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error en la obtencion de los links de los grupos',
+            'error'
+          );
+        }
 
         alerts.basicAlert(
           'Pago exitoso',
@@ -229,7 +295,17 @@ export class CheckoutComponent implements OnInit {
           });
         },
         onApprove: async (data: any, actions: any) => {
-          const order: any = await actions.order.capture();
+          let order: any = null;
+
+          try {
+            order = await actions.order.capture();
+          } catch (error) {
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error en la captura de la orden',
+              'error'
+            );
+          }
 
           if (order.status == PayPalStatusEnum.COMPLETED) {
             const timeNow: Date = new Date();
@@ -237,13 +313,23 @@ export class CheckoutComponent implements OnInit {
               LocalStorageEnum.LOCAL_ID
             );
             let dataSubscriptions: Isubscriptions[] = [];
-            let usd_cop: number = Number(
-              (
-                await this.currencyConverterService
-                  .getCurrencyConverter(`USD_COP`, 1)
-                  .toPromise()
-              ).rates.COP.rate
-            );
+            let usd_cop: number = null;
+
+            try {
+              usd_cop = Number(
+                (
+                  await this.currencyConverterService
+                    .getCurrencyConverter(`USD_COP`, 1)
+                    .toPromise()
+                ).rates.COP.rate
+              );
+            } catch (error) {
+              alerts.basicAlert(
+                'Error',
+                'Ha ocurrido un error en la conversion de la divisa',
+                'error'
+              );
+            }
 
             // Se organiza la informacion de las subscripciones compradas
             for (const cart1 of this.cart) {
@@ -271,7 +357,17 @@ export class CheckoutComponent implements OnInit {
             // Se guarda la informacion de las subscripciones compradas
             let idsSubscriptions: string[] = [];
             for (const data of dataSubscriptions) {
-              let res: any = await this.subscriptionsService.postDataFS(data);
+              let res: any = null;
+
+              try {
+                res = await this.subscriptionsService.postDataFS(data);
+              } catch (error) {
+                alerts.basicAlert(
+                  'Error',
+                  'Ha ocurrido un error guardando la subscripcion',
+                  'error'
+                );
+              }
 
               idsSubscriptions.push(res.id);
             }
@@ -288,16 +384,34 @@ export class CheckoutComponent implements OnInit {
               currency: CurrencyEnum.USD,
             };
 
-            let orderId: string = (
-              await this.ordersService.postDataFS(dataOrder)
-            ).id;
+            let orderId: string = null;
+
+            try {
+              orderId = (await this.ordersService.postDataFS(dataOrder)).id;
+            } catch (error) {
+              alerts.basicAlert(
+                'Error',
+                'Ha ocurrido un errorguardando la orden',
+                'error'
+              );
+            }
 
             localStorage.removeItem(LocalStorageEnum.CART);
             localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
 
-            let res: any = await this.telegramLocalService
-              .getLinksOrden({ orderId })
-              .toPromise();
+            let res: any = null;
+
+            try {
+              res = await this.telegramLocalService
+                .getLinksOrden({ orderId })
+                .toPromise();
+            } catch (error) {
+              alerts.basicAlert(
+                'Error',
+                'Ha ocurrido un error obteniendo los links de los grupos',
+                'error'
+              );
+            }
 
             alerts.basicAlert(
               'Pago exitoso',
@@ -341,6 +455,11 @@ export class CheckoutComponent implements OnInit {
           this.load = false;
         },
         (err: any) => {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error en la consulta de usuarios',
+            'error'
+          );
           functions.bloquearPantalla(false);
           this.load = false;
         }
@@ -391,6 +510,11 @@ export class CheckoutComponent implements OnInit {
                 },
                 (err) => {
                   console.error(err);
+                  alerts.basicAlert(
+                    'Error',
+                    'Ha ocurrido un error en la obtencion de la modelo',
+                    'error'
+                  );
                   resolve(null);
                 }
               );

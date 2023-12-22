@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { Iregister } from './../interface/iregister';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { alerts } from '../helpers/alerts';
 
 @Injectable({
   providedIn: 'root',
@@ -41,8 +42,16 @@ export class RegisterService {
    * @memberof RegisterService
    */
   public verificEmail(): Promise<any> {
-    return this.afAuth.currentUser.then((user: any) => {
-      user.sendEmailVerification();
-    });
+    return this.afAuth.currentUser
+      .then((user: any) => {
+        user.sendEmailVerification();
+      })
+      .catch((err) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la verificacion del email',
+          'error'
+        );
+      });
   }
 }

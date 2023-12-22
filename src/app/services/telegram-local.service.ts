@@ -44,7 +44,17 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public async probarConexionBot(fromId: number = 0): Promise<void> {
-    let res: any = await this.getPruebaBotCliente({ fromId }).toPromise();
+    let res: any = null;
+
+    try {
+      res = await this.getPruebaBotCliente({ fromId }).toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error probando la conexion con el bot de Telegram',
+        'error'
+      );
+    }
 
     if (res.code == 200) {
       alerts.basicAlert(

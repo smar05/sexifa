@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { Router } from '@angular/router';
+import { alerts } from '../helpers/alerts';
 
 @Injectable({
   providedIn: 'root',
@@ -57,7 +58,15 @@ export class LoginService {
    * @memberof LoginService
    */
   public getAuthToken(): any {
-    return this.afAuth.currentUser.then((user) => user?.getIdToken());
+    return this.afAuth.currentUser
+      .then((user) => user?.getIdToken())
+      .catch((err) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta del token',
+          'error'
+        );
+      });
   }
 
   /**

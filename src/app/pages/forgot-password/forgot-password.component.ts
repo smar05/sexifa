@@ -64,6 +64,11 @@ export class ForgotPasswordComponent implements OnInit {
         this.loading = false;
       })
       .catch((error: any) => {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la recuperacion de la contraseña',
+          'error'
+        );
         functions.bloquearPantalla(false);
         this.loading = false;
       });

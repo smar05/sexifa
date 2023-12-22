@@ -167,13 +167,22 @@ export class RegisterComponent implements OnInit {
       let resp: any = await this.registerService.registerAuth(data);
       const uid: string = resp.user.uid;
 
-      this.registerService.verificEmail().then((res: any) => {
-        alerts.basicAlert(
-          'Correo enviado',
-          'Se te ha enviado un correo para verificacion',
-          'info'
-        );
-      });
+      this.registerService
+        .verificEmail()
+        .then((res: any) => {
+          alerts.basicAlert(
+            'Correo enviado',
+            'Se te ha enviado un correo para verificacion',
+            'info'
+          );
+        })
+        .catch((err: any) => {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error enviando el correo de verificacion',
+            'error'
+          );
+        });
 
       const user: Iuser = {
         id: uid,
@@ -264,6 +273,11 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllContries()
       );
     } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.allCountries = [];
     }
   }
@@ -276,6 +290,11 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allStatesByCountry = [];
@@ -292,6 +311,11 @@ export class RegisterComponent implements OnInit {
         )
       );
     } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allCities = [];

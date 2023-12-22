@@ -96,8 +96,17 @@ export class LoginComponent implements OnInit {
             localStorage.getItem(LocalStorageEnum.LOCAL_ID)
           );
 
-        let user: Iuser = (await this.userService.getDataFS(qf).toPromise())[0]
-          .data;
+        let user: Iuser = {};
+
+        try {
+          user = (await this.userService.getDataFS(qf).toPromise())[0].data;
+        } catch (error) {
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error en la consulta de usuarios',
+            'error'
+          );
+        }
 
         // Verificar el estado del usuario
         switch (user.status) {

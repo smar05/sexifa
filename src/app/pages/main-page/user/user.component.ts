@@ -167,8 +167,12 @@ export class UserComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
-    await this.getUserData();
-    await this.getLocationData();
+    try {
+      await this.getUserData();
+      await this.getLocationData();
+    } catch (error) {
+      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+    }
     functions.bloquearPantalla(false);
   }
 
@@ -188,6 +192,11 @@ export class UserComponent implements OnInit {
           },
           (err) => {
             console.error(err);
+            alerts.basicAlert(
+              'Error',
+              'Ha ocurrido un error en la consulta de usuarios',
+              'error'
+            );
             resolve(null);
           }
         );
@@ -296,6 +305,13 @@ export class UserComponent implements OnInit {
       this.allCountrys = [];
       this.allStates = [];
       this.allCities = [];
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
+      functions.bloquearPantalla(false);
+      this.loading = false;
     }
   }
 
@@ -310,6 +326,11 @@ export class UserComponent implements OnInit {
       this.allStates = [];
       this.state.setValue(null);
       this.city.setValue(null);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
     }
   }
 
@@ -325,6 +346,11 @@ export class UserComponent implements OnInit {
     } catch (error) {
       this.allCities = [];
       this.city.setValue(null);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
     }
   }
 
@@ -353,9 +379,16 @@ export class UserComponent implements OnInit {
     let qf: QueryFn = (ref) =>
       ref.where('userId', '==', userId).limitToLast(50).orderBy('date_created');
 
-    let res: IFireStoreRes[] = await this.subscriptionsService
-      .getDataFS(qf)
-      .toPromise();
+    let res: IFireStoreRes[] = null;
+    try {
+      res = await this.subscriptionsService.getDataFS(qf).toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de subscripciones',
+        'error'
+      );
+    }
     let position: number = res.length;
 
     let subscriptionsAux: any[] = res.map((r: IFireStoreRes) => {

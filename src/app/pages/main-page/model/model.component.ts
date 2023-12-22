@@ -47,20 +47,44 @@ export class ModelComponent implements OnInit {
 
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
 
-    await this.getModel();
+    try {
+      await this.getModel();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelo',
+        'error'
+      );
+    }
     this.setModelSubscripctionModelValues();
 
     // Guardamos la visita del usuario a la pagina
-    await this.setViewsModelData();
+    try {
+      await this.setViewsModelData();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error al guardar la visita',
+        'error'
+      );
+    }
     functions.bloquearPantalla(false);
   }
 
   public async getModel(): Promise<void> {
     functions.bloquearPantalla(true);
     this.load = true;
-    let res1: IFireStoreRes = await this.modelsService
-      .getItemFS(this.modelId || '')
-      .toPromise();
+    let res1: IFireStoreRes = null;
+
+    try {
+      res1 = await this.modelsService.getItemFS(this.modelId || '').toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de modelos',
+        'error'
+      );
+    }
 
     let res: Imodels = res1.data;
     res.id = res1.id;
@@ -74,7 +98,15 @@ export class ModelComponent implements OnInit {
 
     res.id = this.modelId;
     //Interface to DTO
-    this.model = await this.modelsService.modelInterfaceToDTO(res);
+    try {
+      this.model = await this.modelsService.modelInterfaceToDTO(res);
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la conversion de modelo a DTO',
+        'error'
+      );
+    }
     this.imgPrincipal = this.model.mainImage || '';
 
     functions.bloquearPantalla(false);
@@ -82,9 +114,17 @@ export class ModelComponent implements OnInit {
   }
 
   public async getGaleria(): Promise<void> {
-    this.galeria = await this.modelsService.getImages(
-      `${this.modelId}/gallery`
-    );
+    try {
+      this.galeria = await this.modelsService.getImages(
+        `${this.modelId}/gallery`
+      );
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la obtencion de la galeria',
+        'error'
+      );
+    }
   }
 
   public setImgPrincipal(img: string): void {
@@ -137,8 +177,19 @@ export class ModelComponent implements OnInit {
           .where('userId', '==', userId)
           .where('status', '==', StatusSubscriptionsEnum.ACTIVO);
 
-      let subscritionsActivas: Isubscriptions[] =
-        await this.subscriptionsService.getDataFS(qf).toPromise();
+      let subscritionsActivas: Isubscriptions[] = null;
+
+      try {
+        subscritionsActivas = await this.subscriptionsService
+          .getDataFS(qf)
+          .toPromise();
+      } catch (error) {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de subscripciones',
+          'error'
+        );
+      }
 
       if (subscritionsActivas && subscritionsActivas.length > 0) {
         functions.bloquearPantalla(false);
@@ -227,7 +278,15 @@ export class ModelComponent implements OnInit {
         userId: this.userId,
       };
 
-      await this.viewsModelService.postDataFS(viewData);
+      try {
+        await this.viewsModelService.postDataFS(viewData);
+      } catch (error) {
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error al guardar la visita',
+          'error'
+        );
+      }
     }
   }
 }
