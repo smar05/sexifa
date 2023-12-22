@@ -177,6 +177,7 @@ export class RegisterComponent implements OnInit {
           );
         })
         .catch((err: any) => {
+          console.error('Error: ', err);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error enviando el correo de verificacion',
@@ -209,7 +210,7 @@ export class RegisterComponent implements OnInit {
 
       this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
     } catch (error: any) {
-      console.error(error);
+      console.error('Error: ', error);
 
       let code: string = error.code;
       let errorText: string = '';
@@ -273,6 +274,7 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllContries()
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de ubicaciones',
@@ -290,6 +292,7 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de ubicaciones',
@@ -311,6 +314,7 @@ export class RegisterComponent implements OnInit {
         )
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de ubicaciones',

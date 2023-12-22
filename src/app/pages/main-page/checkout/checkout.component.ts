@@ -73,6 +73,7 @@ export class CheckoutComponent implements OnInit {
     try {
       await this.getCartData();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta del carrito',
@@ -88,6 +89,7 @@ export class CheckoutComponent implements OnInit {
     try {
       await this.ifPayU();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error con el metodo PayU',
@@ -115,6 +117,7 @@ export class CheckoutComponent implements OnInit {
       try {
         await this.payUProcess(params);
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error con el proceso de PayU',
@@ -138,6 +141,7 @@ export class CheckoutComponent implements OnInit {
         ).rates.COP.rate
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la conversion de la moneda',
@@ -201,6 +205,7 @@ export class CheckoutComponent implements OnInit {
           try {
             res = await this.subscriptionsService.postDataFS(data);
           } catch (error) {
+            console.error('Error: ', error);
             alerts.basicAlert(
               'Error',
               'Ha ocurrido un error en la consulta de subscripciones',
@@ -233,6 +238,7 @@ export class CheckoutComponent implements OnInit {
         try {
           orderId = (await this.ordersService.postDataFS(dataOrder)).id;
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error al guardar la orden',
@@ -250,6 +256,7 @@ export class CheckoutComponent implements OnInit {
             .getLinksOrden({ orderId })
             .toPromise();
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error en la obtencion de los links de los grupos',
@@ -300,6 +307,7 @@ export class CheckoutComponent implements OnInit {
           try {
             order = await actions.order.capture();
           } catch (error) {
+            console.error('Error: ', error);
             alerts.basicAlert(
               'Error',
               'Ha ocurrido un error en la captura de la orden',
@@ -324,6 +332,7 @@ export class CheckoutComponent implements OnInit {
                 ).rates.COP.rate
               );
             } catch (error) {
+              console.error('Error: ', error);
               alerts.basicAlert(
                 'Error',
                 'Ha ocurrido un error en la conversion de la divisa',
@@ -362,6 +371,7 @@ export class CheckoutComponent implements OnInit {
               try {
                 res = await this.subscriptionsService.postDataFS(data);
               } catch (error) {
+                console.error('Error: ', error);
                 alerts.basicAlert(
                   'Error',
                   'Ha ocurrido un error guardando la subscripcion',
@@ -389,6 +399,7 @@ export class CheckoutComponent implements OnInit {
             try {
               orderId = (await this.ordersService.postDataFS(dataOrder)).id;
             } catch (error) {
+              console.error('Error: ', error);
               alerts.basicAlert(
                 'Error',
                 'Ha ocurrido un errorguardando la orden',
@@ -406,6 +417,7 @@ export class CheckoutComponent implements OnInit {
                 .getLinksOrden({ orderId })
                 .toPromise();
             } catch (error) {
+              console.error('Error: ', error);
               alerts.basicAlert(
                 'Error',
                 'Ha ocurrido un error obteniendo los links de los grupos',
@@ -588,6 +600,7 @@ export class CheckoutComponent implements OnInit {
         functions.bloquearPantalla(false);
         this.load = false;
       } catch (error) {
+        console.error('Error: ', error);
         functions.bloquearPantalla(false);
         this.load = false;
         throw error;

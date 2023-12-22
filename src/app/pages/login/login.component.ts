@@ -101,6 +101,7 @@ export class LoginComponent implements OnInit {
         try {
           user = (await this.userService.getDataFS(qf).toPromise())[0].data;
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error en la consulta de usuarios',
@@ -155,6 +156,7 @@ export class LoginComponent implements OnInit {
         this.loading = false;
       })
       .catch((err: any) => {
+        console.error('Error: ', err);
         //Errores al ingresar
         let error: any = err.code;
 

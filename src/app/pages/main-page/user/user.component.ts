@@ -171,6 +171,7 @@ export class UserComponent implements OnInit {
       await this.getUserData();
       await this.getLocationData();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
     }
     functions.bloquearPantalla(false);
@@ -302,6 +303,7 @@ export class UserComponent implements OnInit {
       functions.bloquearPantalla(false);
       this.loading = false;
     } catch (error) {
+      console.error('Error: ', error);
       this.allCountrys = [];
       this.allStates = [];
       this.allCities = [];
@@ -323,6 +325,7 @@ export class UserComponent implements OnInit {
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
+      console.error('Error: ', error);
       this.allStates = [];
       this.state.setValue(null);
       this.city.setValue(null);
@@ -344,6 +347,7 @@ export class UserComponent implements OnInit {
         )
       );
     } catch (error) {
+      console.error('Error: ', error);
       this.allCities = [];
       this.city.setValue(null);
       alerts.basicAlert(
@@ -383,6 +387,7 @@ export class UserComponent implements OnInit {
     try {
       res = await this.subscriptionsService.getDataFS(qf).toPromise();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de subscripciones',

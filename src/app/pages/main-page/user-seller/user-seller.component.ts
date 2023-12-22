@@ -109,6 +109,7 @@ export class UserSellerComponent {
       await this.getUserData();
       await this.getLocationData();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
     }
     functions.bloquearPantalla(false);
@@ -240,6 +241,7 @@ export class UserSellerComponent {
       functions.bloquearPantalla(false);
       this.loading = false;
     } catch (error) {
+      console.error('Error: ', error);
       functions.bloquearPantalla(false);
       this.loading = false;
       this.allCountrys = [];
@@ -261,6 +263,7 @@ export class UserSellerComponent {
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de ubicaciones',
@@ -282,6 +285,7 @@ export class UserSellerComponent {
         )
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de ubicaciones',

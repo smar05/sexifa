@@ -61,6 +61,7 @@ export class LoginService {
     return this.afAuth.currentUser
       .then((user) => user?.getIdToken())
       .catch((err) => {
+        console.error('Error: ', err);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la consulta del token',

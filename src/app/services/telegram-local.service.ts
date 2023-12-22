@@ -49,6 +49,7 @@ export class TelegramLocalService {
     try {
       res = await this.getPruebaBotCliente({ fromId }).toPromise();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error probando la conexion con el bot de Telegram',

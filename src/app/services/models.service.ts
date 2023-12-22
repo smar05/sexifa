@@ -237,6 +237,7 @@ export class ModelsService {
         await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
       ).items[0];
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la obtencion de la imagen',
@@ -266,6 +267,7 @@ export class ModelsService {
         await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
       ).items;
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la obtencion de imagenes',
@@ -280,6 +282,7 @@ export class ModelsService {
         try {
           url = await this.storageService.getDownloadURL(image);
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error en la obtencion de la imagen',
@@ -311,6 +314,7 @@ export class ModelsService {
           await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
         ).items;
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la obtencion de las imagenes',
@@ -324,6 +328,7 @@ export class ModelsService {
             try {
               await this.storageService.deleteImage(image._location.path);
             } catch (error) {
+              console.error('Error: ', error);
               alerts.basicAlert(
                 'Error',
                 'Ha ocurrido un error eliminando la imagen',
@@ -336,6 +341,7 @@ export class ModelsService {
         }
       }
     } catch (error) {
+      console.error('Error: ', error);
       complete = false;
     }
 
@@ -357,6 +363,7 @@ export class ModelsService {
     try {
       guardarImagen = await this.storageService.saveImage(file, url);
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error guardando la imagen',
@@ -396,6 +403,7 @@ export class ModelsService {
             `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
           );
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error obteniendo la galeria',
@@ -412,6 +420,7 @@ export class ModelsService {
         `${imodel.id}/${ImgModelEnum.MAIN}`
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error obteniendo la imagen principal',
@@ -424,6 +433,7 @@ export class ModelsService {
         .getItem(imodel.categorie || '')
         .toPromise();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error obteniendo la categoria',

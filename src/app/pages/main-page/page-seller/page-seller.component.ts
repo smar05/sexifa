@@ -145,6 +145,7 @@ export class PageSellerComponent {
       await this.getUserModel();
       await this.getData();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
     }
     functions.bloquearPantalla(false);
@@ -262,6 +263,7 @@ export class PageSellerComponent {
           `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`
         );
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la obtencion de la imagen principal',
@@ -278,6 +280,7 @@ export class PageSellerComponent {
                 `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
               );
             } catch (error) {
+              console.error('Error: ', error);
               alerts.basicAlert(
                 'Error',
                 'Ha ocurrido un error en la obtencion de la imagen principal',
@@ -411,6 +414,7 @@ export class PageSellerComponent {
           await this.modelService.deleteImages(`${res}/${ImgModelEnum.MAIN}`);
           await this.saveProductImages(res, this.imgFile, ImgModelEnum.MAIN);
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error guardando la imagen principal',
@@ -427,6 +431,7 @@ export class PageSellerComponent {
         try {
           nombres = await this.saveProductGallery(res, this.files);
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error guardando la galeria',
@@ -455,6 +460,7 @@ export class PageSellerComponent {
               `${res}/${ImgModelEnum.GALLERY}/${name}`
             );
           } catch (error) {
+            console.error('Error: ', error);
             alerts.basicAlert(
               'Error',
               'Ha ocurrido un error eliminando las imagenes de la galeria',
@@ -474,6 +480,7 @@ export class PageSellerComponent {
         try {
           await this.modelService.patchDataFS(res, dataModel);
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error actualizando el modelo',
@@ -504,6 +511,7 @@ export class PageSellerComponent {
             ImgModelEnum.MAIN
           );
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error guardando la imagen principal',
@@ -522,6 +530,7 @@ export class PageSellerComponent {
             this.files
           );
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error guardando la galeria',
@@ -550,6 +559,7 @@ export class PageSellerComponent {
               `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${name}`
             );
           } catch (error) {
+            console.error('Error: ', error);
             alerts.basicAlert(
               'Error',
               'Ha ocurrido un error eliminando la galeria',
@@ -569,6 +579,7 @@ export class PageSellerComponent {
         try {
           await this.modelService.patchDataFS(this.modelEnDb.id, dataModel);
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             'Ha ocurrido un error actualizando el modelo',
@@ -596,6 +607,7 @@ export class PageSellerComponent {
     try {
       resp = await functions.validateImage(e);
     } catch (error) {
+      console.error('Error: ', error);
       console.error(error);
       alerts.basicAlert(
         'Error',
@@ -655,6 +667,7 @@ export class PageSellerComponent {
         }));
       })
       .catch((err: any) => {
+        console.error('Error: ', err);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la consulta de categorias',
@@ -681,6 +694,7 @@ export class PageSellerComponent {
             `${idProduct}/${type}/${name}`
           );
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           `Ha ocurrido un error guardando la imagen ${type}`,
@@ -715,6 +729,7 @@ export class PageSellerComponent {
 
           nombres.push(nameSinTipo);
         } catch (error) {
+          console.error('Error: ', error);
           alerts.basicAlert(
             'Error',
             `Ha ocurrido un error guardando la imagen de la galeria del producto`,

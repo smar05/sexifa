@@ -30,6 +30,7 @@ export class LocationService {
     return fetch(`${this.urlLocation}countries`, requestOptions)
       .then((response: any) => response.text())
       .catch((err: any) => {
+        console.error('Error: ', err);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la consulta de paises',
@@ -55,6 +56,7 @@ export class LocationService {
     return fetch(`${this.urlLocation}countries/${iso}/states`, requestOptions)
       .then((response: any) => response.text())
       .catch((err: any) => {
+        console.error('Error: ', err);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la consulta de estados',
@@ -87,6 +89,7 @@ export class LocationService {
     )
       .then((response: any) => response.text())
       .catch((err: any) => {
+        console.error('Error: ', err);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la consulta de ciudades',

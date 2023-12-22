@@ -69,6 +69,7 @@ export class HomeSellerComponent implements OnInit {
       await this.getMiGroup();
       await this.getSubscriptions();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
     }
     functions.bloquearPantalla(false);
@@ -89,6 +90,7 @@ export class HomeSellerComponent implements OnInit {
     try {
       res = await this.modelsService.getDataFS(qf).toPromise();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelos',
@@ -117,6 +119,7 @@ export class HomeSellerComponent implements OnInit {
     try {
       res = await this.subscriptionsService.getDataFS(qf).toPromise();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de subscripciones',

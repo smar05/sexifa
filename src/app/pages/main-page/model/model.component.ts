@@ -50,6 +50,7 @@ export class ModelComponent implements OnInit {
     try {
       await this.getModel();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelo',
@@ -62,6 +63,7 @@ export class ModelComponent implements OnInit {
     try {
       await this.setViewsModelData();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error al guardar la visita',
@@ -79,6 +81,7 @@ export class ModelComponent implements OnInit {
     try {
       res1 = await this.modelsService.getItemFS(this.modelId || '').toPromise();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelos',
@@ -101,6 +104,7 @@ export class ModelComponent implements OnInit {
     try {
       this.model = await this.modelsService.modelInterfaceToDTO(res);
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la conversion de modelo a DTO',
@@ -119,6 +123,7 @@ export class ModelComponent implements OnInit {
         `${this.modelId}/gallery`
       );
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la obtencion de la galeria',
@@ -184,6 +189,7 @@ export class ModelComponent implements OnInit {
           .getDataFS(qf)
           .toPromise();
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la consulta de subscripciones',
@@ -249,6 +255,7 @@ export class ModelComponent implements OnInit {
 
       this.router.navigateByUrl(`/${UrlPagesEnum.CHECKOUT}`);
     } catch (error) {
+      console.error('Error: ', error);
       functions.bloquearPantalla(false);
       this.load = false;
       console.error(error);
@@ -281,6 +288,7 @@ export class ModelComponent implements OnInit {
       try {
         await this.viewsModelService.postDataFS(viewData);
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error al guardar la visita',

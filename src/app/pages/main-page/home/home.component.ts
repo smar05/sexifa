@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit {
     try {
       await this.getAllModels();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelos',
@@ -52,6 +53,7 @@ export class HomeComponent implements OnInit {
     try {
       await this.getModelsWhereSearchByName();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelos pon nombre',
@@ -98,6 +100,7 @@ export class HomeComponent implements OnInit {
         await this.getAllModels('plus');
       }
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelos por paginacion',
@@ -154,6 +157,7 @@ export class HomeComponent implements OnInit {
     try {
       res = await this.modelsService.getDataFS(qr).toPromise();
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelos',
@@ -180,6 +184,7 @@ export class HomeComponent implements OnInit {
       try {
         this.models?.push(await this.modelsService.modelInterfaceToDTO(imodel));
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la conversion de modelos a DTO',
@@ -197,6 +202,7 @@ export class HomeComponent implements OnInit {
       try {
         await this.getAllModels();
       } catch (error) {
+        console.error('Error: ', error);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la consulta de modelos',
@@ -209,6 +215,7 @@ export class HomeComponent implements OnInit {
     try {
       await this.getAllModels('search');
     } catch (error) {
+      console.error('Error: ', error);
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelos',

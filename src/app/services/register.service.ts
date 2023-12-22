@@ -47,6 +47,7 @@ export class RegisterService {
         user.sendEmailVerification();
       })
       .catch((err) => {
+        console.error('Error: ', err);
         alerts.basicAlert(
           'Error',
           'Ha ocurrido un error en la verificacion del email',
