@@ -274,7 +274,7 @@ export class PageSellerComponent {
       if (this.modelEnDb.gallery) {
         JSON.parse(this.modelEnDb.gallery).forEach(
           async (galleryItem: string) => {
-            let urlImage: string = null;
+            let urlImage: string = '';
             try {
               urlImage = await this.modelService.getImage(
                 `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
@@ -426,7 +426,7 @@ export class PageSellerComponent {
       let nombreGaleriaAGuardar: string[] = [];
       // Se guardan las imagenes nuevas
       if (this.files && this.files.length > 0) {
-        let nombres: string[] = null;
+        let nombres: string[] = [];
 
         try {
           nombres = await this.saveProductGallery(res, this.files);
@@ -470,9 +470,9 @@ export class PageSellerComponent {
         });
       }
 
-      nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(
-        JSON.parse(dataModel.gallery)
-      );
+      nombreGaleriaAGuardar = dataModel.gallery
+        ? nombreGaleriaAGuardar.concat(JSON.parse(dataModel.gallery))
+        : [];
 
       dataModel.gallery = JSON.stringify(nombreGaleriaAGuardar);
 
@@ -523,7 +523,7 @@ export class PageSellerComponent {
       let nombreGaleriaAGuardar: string[] = [];
       // Se guardan las imagenes nuevas
       if (this.files && this.files.length > 0) {
-        let nombres: string[] = null;
+        let nombres: string[] = [];
         try {
           nombres = await this.saveProductGallery(
             this.modelEnDb.id,
@@ -569,9 +569,9 @@ export class PageSellerComponent {
         });
       }
 
-      nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(
-        JSON.parse(dataModel.gallery)
-      );
+      nombreGaleriaAGuardar = dataModel.gallery
+        ? nombreGaleriaAGuardar.concat(JSON.parse(dataModel.gallery))
+        : [];
 
       dataModel.gallery = JSON.stringify(nombreGaleriaAGuardar);
 
