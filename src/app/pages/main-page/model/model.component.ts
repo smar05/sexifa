@@ -57,6 +57,9 @@ export class ModelComponent implements OnInit {
         'error'
       );
     }
+
+    if (!this.model || Object.keys(this.model).length === 0) return;
+
     this.setModelSubscripctionModelValues();
 
     // Guardamos la visita del usuario a la pagina
@@ -87,6 +90,19 @@ export class ModelComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos',
         'error'
       );
+    }
+
+    // Si no se encuentra un modelo con el id colocado en la url
+    if (!res1) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+
+      alerts.basicAlert(
+        'Error',
+        'No se ha encontrado la informacion solicitada',
+        'error'
+      );
+
+      return;
     }
 
     let res: Imodels = res1.data;

@@ -101,6 +101,8 @@ export class FireStorageService {
       documentData = docChange.data();
     }
 
+    if (!documentData || !documentId) return null;
+
     let res: IFireStoreRes = {
       id: documentId,
       data: documentData,
