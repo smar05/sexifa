@@ -181,13 +181,16 @@ export class ModelsService {
       price.date_offer
     ) {
       // Obtener la fecha actual
-      let fechaActual: Date = fechaCompra ? fechaCompra : new Date();
+      let fechaActual: Date = fechaCompra ?? new Date();
 
       // Crear una fecha a partir de un string (por ejemplo, "2023-07-27")
       let fechaComparacion: Date = new Date(price.date_offer?.toString());
+      fechaComparacion.setDate(fechaComparacion.getDate() + 2);
+
+      fechaComparacion.setHours(0, 0, 0, 0);
 
       // Comparar las fechas
-      if (!(fechaComparacion >= fechaActual)) return price.value;
+      if (fechaComparacion < fechaActual) return price.value;
 
       switch (price.type_offer) {
         case TypeOfferEnum.DESCUENTO:
