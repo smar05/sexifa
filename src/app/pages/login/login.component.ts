@@ -37,7 +37,15 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     functions.bloquearPantalla(true);
+    let auxRedirectTo: string = localStorage.getItem(
+      LocalStorageEnum.REDIRECT_TO
+    );
     localStorage.clear();
+
+    if (auxRedirectTo) {
+      localStorage.setItem(LocalStorageEnum.REDIRECT_TO, auxRedirectTo);
+      alerts.basicAlert('Info', 'Debes acceder a tu cuenta primero', 'info');
+    }
     functions.bloquearPantalla(false);
   }
 
@@ -135,6 +143,15 @@ export class LoginComponent implements OnInit {
               LocalStorageEnum.USER_TYPE,
               UserTypeEnum.USUARIO
             );
+            let pathRedirectTo: string = localStorage.getItem(
+              LocalStorageEnum.REDIRECT_TO
+            );
+
+            if (pathRedirectTo) {
+              url = pathRedirectTo;
+              break;
+            }
+
             url = `/${UrlPagesEnum.HOME}`;
             break;
 

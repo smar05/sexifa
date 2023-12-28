@@ -15,8 +15,19 @@ export class AuthGuard implements CanActivate {
 
   canActivate(): Promise<boolean> {
     return new Promise((resolve) => {
+      // Se guarda la url para redirigir si no se ha logueado el usuario
+      let pathActual: string = window.location.hash;
+      let token: string = localStorage.getItem(LocalStorageEnum.TOKEN);
+
+      if (pathActual.includes(UrlPagesEnum.GROUP) && !token) {
+        localStorage.setItem(
+          LocalStorageEnum.REDIRECT_TO,
+          pathActual.split('#')[1]
+        );
+      }
+
       //Validamos que exista el token
-      if (localStorage.getItem(LocalStorageEnum.TOKEN) != null) {
+      if (token) {
         //Validamos que el token sea real
         let body: any = {
           idToken: localStorage.getItem(LocalStorageEnum.TOKEN),
@@ -70,7 +81,11 @@ export class AuthGuard implements CanActivate {
           }
         );
       } else {
+        let auxRedirectTo: string = localStorage.getItem(
+          LocalStorageEnum.REDIRECT_TO
+        );
         this.loginService.logout();
+        localStorage.setItem(LocalStorageEnum.REDIRECT_TO, auxRedirectTo);
         resolve(false);
       }
     });

@@ -7,4 +7,5 @@ export enum LocalStorageEnum {
   USER_TYPE = 'userType',
   VIEWS_MODEL = 'viewsModel',
   PAYU_PROCESO = 'payu_proceso',
+  REDIRECT_TO = 'redirect_to',
 }
