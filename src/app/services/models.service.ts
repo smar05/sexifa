@@ -1,4 +1,8 @@
-import { IpriceModel, TypeOfferEnum } from './../interface/iprice-model';
+import {
+  IpriceModel,
+  PriceTypeLimitEnum,
+  TypeOfferEnum,
+} from './../interface/iprice-model';
 import { environment } from './../../environments/environment';
 import { CategoriesService } from './categories.service';
 import { ModelsDTO } from './../dto/models-dto';
@@ -176,21 +180,38 @@ export class ModelsService {
   ): number | undefined {
     if (
       price.value &&
-      price.value_offer &&
       price.type_offer &&
-      price.date_offer
+      price.type_limit &&
+      price.value_offer &&
+      (price.date_offer || price.sales)
     ) {
-      // Obtener la fecha actual
-      let fechaActual: Date = fechaCompra ?? new Date();
+      switch (price.type_limit) {
+        case PriceTypeLimitEnum.SALES:
+          if (price.sales <= 0) return price.value;
 
-      // Crear una fecha a partir de un string (por ejemplo, "2023-07-27")
-      let fechaComparacion: Date = new Date(price.date_offer?.toString());
-      fechaComparacion.setDate(fechaComparacion.getDate() + 2);
+          break;
 
-      fechaComparacion.setHours(0, 0, 0, 0);
+        case PriceTypeLimitEnum.DATE:
+          // Obtener la fecha actual
+          let fechaActual: Date = fechaCompra ?? new Date();
 
-      // Comparar las fechas
-      if (fechaComparacion < fechaActual) return price.value;
+          // Crear una fecha a partir de un string (por ejemplo, "2023-07-27")
+          let fechaComparacion: Date = new Date(price.date_offer?.toString());
+          fechaComparacion.setDate(fechaComparacion.getDate() + 2);
+
+          fechaComparacion.setHours(0, 0, 0, 0);
+
+          // Comparar las fechas
+          if (
+            price.type_limit === PriceTypeLimitEnum.DATE &&
+            fechaComparacion < fechaActual
+          )
+            return price.value;
+          break;
+
+        default:
+          break;
+      }
 
       switch (price.type_offer) {
         case TypeOfferEnum.DESCUENTO:
