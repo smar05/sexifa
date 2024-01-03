@@ -3,7 +3,7 @@ import { ModelsDTO } from './../../../dto/models-dto';
 import {
   ActiveModelEnum,
   Imodels,
-  ModelsFilterEnum,
+  ModelsAccountEnum,
 } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
 import { IQueryParams } from './../../../interface/i-query-params';
@@ -119,12 +119,14 @@ export class HomeComponent implements OnInit {
       qr = (ref) =>
         ref
           .where('active', '==', ActiveModelEnum.ACTIVO)
+          .where('account', '==', ModelsAccountEnum.PUBLIC)
           .orderBy('name')
           .limit(this.pageSize);
     } else if (consulta == 'plus') {
       qr = (ref) =>
         ref
           .where('active', '==', ActiveModelEnum.ACTIVO)
+          .where('account', '==', ModelsAccountEnum.PUBLIC)
           .orderBy('name')
           .startAfter(this.lastDocument)
           .limit(this.pageSize);
@@ -135,6 +137,7 @@ export class HomeComponent implements OnInit {
       qr = (ref) =>
         ref
           .where('active', '==', ActiveModelEnum.ACTIVO)
+          .where('account', '==', ModelsAccountEnum.PUBLIC)
           .where('name', '>=', this.search)
           .where('name', '<=', this.search + '\uf8ff')
           .orderBy('name')
@@ -145,6 +148,7 @@ export class HomeComponent implements OnInit {
       qr = (ref) =>
         ref
           .where('active', '==', ActiveModelEnum.ACTIVO)
+          .where('account', '==', ModelsAccountEnum.PUBLIC)
           .where('name', '>=', this.search)
           .where('name', '<=', this.search + '\uf8ff')
           .orderBy('name')
@@ -152,7 +156,7 @@ export class HomeComponent implements OnInit {
           .limit(this.pageSize);
     }
 
-    let res: IFireStoreRes[] = null;
+    let res: IFireStoreRes[] = [];
 
     try {
       res = await this.modelsService.getDataFS(qr).toPromise();

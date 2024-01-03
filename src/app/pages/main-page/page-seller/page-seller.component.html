@@ -22,6 +22,26 @@
       <form autocomplete="off" [formGroup]="f" (ngSubmit)="saveModel()">
         <div class="card-body">
           <ng-container>
+            <!--Mostrar cuenta-->
+            <div class="form-group">
+              <div class="row">
+                <div class="col-12">
+                  <div class="icheck-primary">
+                    <label for="inputAccount">
+                      ¿Mostrar la cuenta en la pagina principal?
+                    </label>
+                    <br />
+                    <input
+                      type="checkbox"
+                      id="inputAccount"
+                      name="account"
+                      formControlName="account"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!--Nombre-->
             <div class="form-group">
               <label for="inputName"

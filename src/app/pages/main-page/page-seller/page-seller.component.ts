@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { Icategories } from 'src/app/interface/icategories';
-import { ActiveModelEnum, Imodels } from 'src/app/interface/imodels';
+import {
+  ActiveModelEnum,
+  Imodels,
+  ModelsAccountEnum,
+} from 'src/app/interface/imodels';
 import {
   UntypedFormArray,
   UntypedFormBuilder,
@@ -48,6 +52,7 @@ export class PageSellerComponent {
     description: ['', [Validators.required]],
     price: new UntypedFormArray([]),
     groupId: ['', [Validators.required]],
+    account: [false],
   });
 
   //Validaciones personalizadas
@@ -73,6 +78,10 @@ export class PageSellerComponent {
 
   get price() {
     return this.f.controls.price as any;
+  }
+
+  get account() {
+    return this.f.controls.account;
   }
 
   //Variable para validar el envio del formulario
@@ -257,6 +266,9 @@ export class PageSellerComponent {
       this.category.setValue(this.modelEnDb.categorie);
       this.description.setValue(this.modelEnDb.description);
       this.groupId.setValue(this.modelEnDb.groupId);
+      this.account.setValue(
+        this.modelEnDb.account === ModelsAccountEnum.PUBLIC
+      );
 
       if (this.modelEnDb && this.modelEnDb.price)
         this.modelEnDb.price.forEach((price: IpriceModel, index: number) => {
@@ -441,6 +453,9 @@ export class PageSellerComponent {
           ? this.modelEnDb.active
           : ActiveModelEnum.ACTIVO,
       idUser: this.userModel.id,
+      account: this.f.controls.account.value
+        ? ModelsAccountEnum.PUBLIC
+        : ModelsAccountEnum.PRIVATE,
     };
 
     //Guardar la informacion del producto en base de datos

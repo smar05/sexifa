@@ -10,6 +10,7 @@ export interface Imodels {
   groupId: string | number;
   gallery?: string;
   idUser?: string;
+  account?: string;
 }
 
 export enum ModelsFilterEnum {
@@ -19,4 +20,9 @@ export enum ModelsFilterEnum {
 export enum ActiveModelEnum {
   ACTIVO = 'activo',
   INACTIVO = 'inactivo',
+}
+
+export enum ModelsAccountEnum {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
 }
