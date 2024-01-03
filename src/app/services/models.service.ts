@@ -17,6 +17,9 @@ import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { map } from 'rxjs/operators';
 import { alerts } from '../helpers/alerts';
+import { IFrontLogs } from '../interface/i-front-logs';
+import { FrontLogsService } from './front-logs.service';
+import { LocalStorageEnum } from '../enum/localStorageEnum';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +32,8 @@ export class ModelsService {
     private apiService: ApiService,
     private storageService: StorageService,
     private categoriesService: CategoriesService,
-    private fireStorageService: FireStorageService
+    private fireStorageService: FireStorageService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   /**
@@ -267,6 +271,21 @@ export class ModelsService {
         'Ha ocurrido un error en la obtencion de la imagen',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: models.service.ts: ~ ModelsService ~ getImage ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     if (image) {
@@ -297,6 +316,21 @@ export class ModelsService {
         'Ha ocurrido un error en la obtencion de imagenes',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: models.service.ts: ~ ModelsService ~ getImages ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     if (images) {
@@ -312,6 +346,21 @@ export class ModelsService {
             'Ha ocurrido un error en la obtencion de la imagen',
             'error'
           );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: models.service.ts: ~ ModelsService ~ getImages ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
         }
         imagesUrl.push();
       }
@@ -344,6 +393,21 @@ export class ModelsService {
           'Ha ocurrido un error en la obtencion de las imagenes',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
 
       if (images && images.length > 0) {
@@ -358,6 +422,21 @@ export class ModelsService {
                 'Ha ocurrido un error eliminando la imagen',
                 'error'
               );
+
+              let data: IFrontLogs = {
+                date: new Date(),
+                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+                log: `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
+                  error
+                )}`,
+              };
+
+              this.frontLogsService
+                .postDataFS(data)
+                .then((res) => {})
+                .catch((err) => {
+                  alerts.basicAlert('Error', 'Error', 'error');
+                });
             }
           } else {
             continue;
@@ -367,6 +446,21 @@ export class ModelsService {
     } catch (error) {
       console.error('Error: ', error);
       complete = false;
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     return complete;
@@ -393,6 +487,21 @@ export class ModelsService {
         'Ha ocurrido un error guardando la imagen',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: models.service.ts: ~ ModelsService ~ saveImage ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     return guardarImagen;
@@ -433,6 +542,21 @@ export class ModelsService {
             'Ha ocurrido un error obteniendo la galeria',
             'error'
           );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: models.service.ts: ~ ModelsService ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
         }
 
         modelDTO.gallery?.push(urlImage);
@@ -450,6 +574,21 @@ export class ModelsService {
         'Ha ocurrido un error obteniendo la imagen principal',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: models.service.ts: ~ ModelsService ~ modelInterfaceToDTO ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     //Categoria
     try {
@@ -463,6 +602,21 @@ export class ModelsService {
         'Ha ocurrido un error obteniendo la categoria',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: models.service.ts: ~ ModelsService ~ modelInterfaceToDTO ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     return modelDTO;

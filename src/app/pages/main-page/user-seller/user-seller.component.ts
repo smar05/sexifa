@@ -4,11 +4,13 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { ICities } from 'src/app/interface/icities';
 import { ICountries } from 'src/app/interface/icountries';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { IState } from 'src/app/interface/istate';
 import { Iuser } from 'src/app/interface/iuser';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { LocationService } from 'src/app/services/location.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -100,7 +102,8 @@ export class UserSellerComponent {
   constructor(
     private form: FormBuilder,
     private userService: UserService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -111,6 +114,21 @@ export class UserSellerComponent {
     } catch (error) {
       console.error('Error: ', error);
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     functions.bloquearPantalla(false);
   }
@@ -137,6 +155,22 @@ export class UserSellerComponent {
               'Ha ocurrido un error en la consulta de usuarios',
               'error'
             );
+
+            let data: IFrontLogs = {
+              date: new Date(),
+              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              log: `file: user-seller.component.ts:151 ~ UserSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+                err
+              )}`,
+            };
+
+            this.frontLogsService
+              .postDataFS(data)
+              .then((res) => {})
+              .catch((err) => {
+                alerts.basicAlert('Error', 'Error', 'error');
+              });
+
             resolve(null);
           }
         );
@@ -196,6 +230,21 @@ export class UserSellerComponent {
           'Ha ocurrido un error al guardar la informacion del usuario',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: user-seller.component.ts:226 ~ UserSellerComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
     );
   }
@@ -242,6 +291,22 @@ export class UserSellerComponent {
       this.loading = false;
     } catch (error) {
       console.error('Error: ', error);
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+
       functions.bloquearPantalla(false);
       this.loading = false;
       this.allCountrys = [];
@@ -272,6 +337,21 @@ export class UserSellerComponent {
       this.allStates = [];
       this.state.setValue(null);
       this.city.setValue(null);
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -293,6 +373,21 @@ export class UserSellerComponent {
       );
       this.allCities = [];
       this.city.setValue(null);
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 }

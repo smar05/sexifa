@@ -9,6 +9,8 @@ import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { Router } from '@angular/router';
 import { alerts } from '../helpers/alerts';
+import { IFrontLogs } from '../interface/i-front-logs';
+import { FrontLogsService } from './front-logs.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +19,8 @@ export class LoginService {
   constructor(
     private http: HttpClient,
     private afAuth: AngularFireAuth,
-    private router: Router
+    private router: Router,
+    private frontLogsService: FrontLogsService
   ) {}
 
   /**
@@ -67,6 +70,21 @@ export class LoginService {
           'Ha ocurrido un error en la consulta del token',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: login.service.ts:81 ~ LoginService ~ getAuthToken ~ JSON.stringify(error): ${JSON.stringify(
+            err
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       });
   }
 

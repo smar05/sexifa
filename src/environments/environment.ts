@@ -38,6 +38,7 @@ export const environment = {
     subscriptions: 'subscriptions',
     orders: 'orders',
     views_model: 'views_model',
+    front_logs: 'front_logs',
   },
   urlRefreshToken: `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
   firebaseConfig,

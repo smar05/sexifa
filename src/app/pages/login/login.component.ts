@@ -12,6 +12,8 @@ import { Iuser } from 'src/app/interface/iuser';
 import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
 import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 import { QueryFn } from '@angular/fire/compat/firestore';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 
 @Component({
   selector: 'app-login',
@@ -32,7 +34,8 @@ export class LoginComponent implements OnInit {
     private form: FormBuilder,
     private loginService: LoginService,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   ngOnInit(): void {
@@ -115,6 +118,21 @@ export class LoginComponent implements OnInit {
             'Ha ocurrido un error en la consulta de usuarios',
             'error'
           );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
         }
 
         // Verificar el estado del usuario
@@ -199,6 +217,23 @@ export class LoginComponent implements OnInit {
             alerts.basicAlert('Error', 'Error en el inicio de sesión', 'error');
             break;
         }
+
+        let a;
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: login.component.ts: ~ LoginComponent ~ login ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
 
         functions.bloquearPantalla(false);
         this.loading = false;

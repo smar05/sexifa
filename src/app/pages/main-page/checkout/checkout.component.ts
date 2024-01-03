@@ -27,6 +27,8 @@ import { StatusOrdersEnum } from 'src/app/enum/statusOrdersEnum';
 import { CurrencyConverterService } from 'src/app/services/currency-converter.service';
 import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { CurrencyEnum } from 'src/app/enum/currencyEnum';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 
 declare var paypal: any;
 
@@ -63,7 +65,8 @@ export class CheckoutComponent implements OnInit {
     private telegramLocalService: TelegramLocalService,
     private subscriptionsService: SubscriptionsService,
     private ordersService: OrdersService,
-    private currencyConverterService: CurrencyConverterService
+    private currencyConverterService: CurrencyConverterService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -79,6 +82,21 @@ export class CheckoutComponent implements OnInit {
         'Ha ocurrido un error en la consulta del carrito',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     console.log(
@@ -95,6 +113,21 @@ export class CheckoutComponent implements OnInit {
         'Ha ocurrido un error con el metodo PayU',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     this.paypalData();
@@ -123,6 +156,21 @@ export class CheckoutComponent implements OnInit {
           'Ha ocurrido un error con el proceso de PayU',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: checkout.component.ts: ~ CheckoutComponent ~ ifPayU ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
     }
   }
@@ -147,6 +195,21 @@ export class CheckoutComponent implements OnInit {
         'Ha ocurrido un error en la conversion de la moneda',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     let dataSubscriptions: Isubscriptions[] = [];
@@ -211,6 +274,21 @@ export class CheckoutComponent implements OnInit {
               'Ha ocurrido un error en la consulta de subscripciones',
               'error'
             );
+
+            let data: IFrontLogs = {
+              date: new Date(),
+              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+                error
+              )}`,
+            };
+
+            this.frontLogsService
+              .postDataFS(data)
+              .then((res) => {})
+              .catch((err) => {
+                alerts.basicAlert('Error', 'Error', 'error');
+              });
           }
 
           console.log(
@@ -244,6 +322,21 @@ export class CheckoutComponent implements OnInit {
             'Ha ocurrido un error al guardar la orden',
             'error'
           );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
         }
 
         localStorage.removeItem(LocalStorageEnum.CART);
@@ -262,6 +355,21 @@ export class CheckoutComponent implements OnInit {
             'Ha ocurrido un error en la obtencion de los links de los grupos',
             'error'
           );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
         }
 
         alerts.basicAlert(
@@ -313,6 +421,21 @@ export class CheckoutComponent implements OnInit {
               'Ha ocurrido un error en la captura de la orden',
               'error'
             );
+
+            let data: IFrontLogs = {
+              date: new Date(),
+              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+                error
+              )}`,
+            };
+
+            this.frontLogsService
+              .postDataFS(data)
+              .then((res) => {})
+              .catch((err) => {
+                alerts.basicAlert('Error', 'Error', 'error');
+              });
           }
 
           if (order.status == PayPalStatusEnum.COMPLETED) {
@@ -338,6 +461,21 @@ export class CheckoutComponent implements OnInit {
                 'Ha ocurrido un error en la conversion de la divisa',
                 'error'
               );
+
+              let data: IFrontLogs = {
+                date: new Date(),
+                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+                log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+                  error
+                )}`,
+              };
+
+              this.frontLogsService
+                .postDataFS(data)
+                .then((res) => {})
+                .catch((err) => {
+                  alerts.basicAlert('Error', 'Error', 'error');
+                });
             }
 
             // Se organiza la informacion de las subscripciones compradas
@@ -377,6 +515,21 @@ export class CheckoutComponent implements OnInit {
                   'Ha ocurrido un error guardando la subscripcion',
                   'error'
                 );
+
+                let data: IFrontLogs = {
+                  date: new Date(),
+                  userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+                  log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+                    error
+                  )}`,
+                };
+
+                this.frontLogsService
+                  .postDataFS(data)
+                  .then((res) => {})
+                  .catch((err) => {
+                    alerts.basicAlert('Error', 'Error', 'error');
+                  });
               }
 
               idsSubscriptions.push(res.id);
@@ -405,6 +558,21 @@ export class CheckoutComponent implements OnInit {
                 'Ha ocurrido un errorguardando la orden',
                 'error'
               );
+
+              let data: IFrontLogs = {
+                date: new Date(),
+                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+                log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+                  error
+                )}`,
+              };
+
+              this.frontLogsService
+                .postDataFS(data)
+                .then((res) => {})
+                .catch((err) => {
+                  alerts.basicAlert('Error', 'Error', 'error');
+                });
             }
 
             localStorage.removeItem(LocalStorageEnum.CART);
@@ -423,6 +591,21 @@ export class CheckoutComponent implements OnInit {
                 'Ha ocurrido un error obteniendo los links de los grupos',
                 'error'
               );
+
+              let data: IFrontLogs = {
+                date: new Date(),
+                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+                log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+                  error
+                )}`,
+              };
+
+              this.frontLogsService
+                .postDataFS(data)
+                .then((res) => {})
+                .catch((err) => {
+                  alerts.basicAlert('Error', 'Error', 'error');
+                });
             }
 
             alerts.basicAlert(
@@ -472,6 +655,22 @@ export class CheckoutComponent implements OnInit {
             'Ha ocurrido un error en la consulta de usuarios',
             'error'
           );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: checkout.component.ts: ~ CheckoutComponent ~ getUserData ~ JSON.stringify(error): ${JSON.stringify(
+              err
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
+
           functions.bloquearPantalla(false);
           this.load = false;
         }
@@ -527,6 +726,22 @@ export class CheckoutComponent implements OnInit {
                     'Ha ocurrido un error en la obtencion de la modelo',
                     'error'
                   );
+
+                  let data: IFrontLogs = {
+                    date: new Date(),
+                    userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+                    log: `file: checkout.component.ts: ~ CheckoutComponent ~ getCartData ~ JSON.stringify(error): ${JSON.stringify(
+                      err
+                    )}`,
+                  };
+
+                  this.frontLogsService
+                    .postDataFS(data)
+                    .then((res) => {})
+                    .catch((err) => {
+                      alerts.basicAlert('Error', 'Error', 'error');
+                    });
+
                   resolve(null);
                 }
               );
@@ -601,6 +816,22 @@ export class CheckoutComponent implements OnInit {
         this.load = false;
       } catch (error) {
         console.error('Error: ', error);
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: checkout.component.ts: ~ CheckoutComponent ~ this.cartLocal.forEach ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
+
         functions.bloquearPantalla(false);
         this.load = false;
         throw error;

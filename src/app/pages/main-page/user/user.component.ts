@@ -25,6 +25,8 @@ import {
   trigger,
 } from '@angular/animations';
 import { ModelsService } from 'src/app/services/models.service';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 
 @Component({
   selector: 'app-user',
@@ -162,7 +164,8 @@ export class UserComponent implements OnInit {
     private locationService: LocationService,
     private telegramLocalService: TelegramLocalService,
     private subscriptionsService: SubscriptionsService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -173,6 +176,21 @@ export class UserComponent implements OnInit {
     } catch (error) {
       console.error('Error: ', error);
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user.component.ts: ~ UserComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     functions.bloquearPantalla(false);
   }
@@ -198,6 +216,22 @@ export class UserComponent implements OnInit {
               'Ha ocurrido un error en la consulta de usuarios',
               'error'
             );
+
+            let data: IFrontLogs = {
+              date: new Date(),
+              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              log: `file: user.component.ts: ~ UserComponent ~ JSON.stringify(error): ${JSON.stringify(
+                err
+              )}`,
+            };
+
+            this.frontLogsService
+              .postDataFS(data)
+              .then((res) => {})
+              .catch((err) => {
+                alerts.basicAlert('Error', 'Error', 'error');
+              });
+
             resolve(null);
           }
         );
@@ -258,6 +292,21 @@ export class UserComponent implements OnInit {
           'Ha ocurrido un error al guardar la informacion del usuario',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: user.component.ts: ~ UserComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
     );
   }
@@ -312,6 +361,22 @@ export class UserComponent implements OnInit {
         'Ha ocurrido un error en la consulta de ubicaciones',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user.component.ts: ~ UserComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+
       functions.bloquearPantalla(false);
       this.loading = false;
     }
@@ -334,6 +399,21 @@ export class UserComponent implements OnInit {
         'Ha ocurrido un error en la consulta de ubicaciones',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user.component.ts: ~ UserComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -355,6 +435,21 @@ export class UserComponent implements OnInit {
         'Ha ocurrido un error en la consulta de ubicaciones',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user.component.ts: ~ UserComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -393,6 +488,21 @@ export class UserComponent implements OnInit {
         'Ha ocurrido un error en la consulta de subscripciones',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user.component.ts: ~ UserComponent ~ misSubscripciones ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     let position: number = res.length;
 
