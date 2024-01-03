@@ -17,7 +17,10 @@ import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import { UserService } from 'src/app/services/user.service';
 import { Iuser } from 'src/app/interface/iuser';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
-import { IpriceModel } from 'src/app/interface/iprice-model';
+import {
+  IpriceModel,
+  PriceTypeLimitEnum,
+} from 'src/app/interface/iprice-model';
 import { UrlPagesEnum } from 'src/app/enum/urlPagesEnum';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
@@ -259,6 +262,14 @@ export class PageSellerComponent {
         this.modelEnDb.price.forEach((price: IpriceModel, index: number) => {
           this.price.push(
             this.form.group({
+              sales: [
+                price.sales,
+                [
+                  Validators.min(0),
+                  Validators.max(999),
+                  Validators.pattern(/^[0-9]+$/),
+                ],
+              ],
               time: [
                 price.time,
                 [
@@ -281,6 +292,7 @@ export class PageSellerComponent {
                 [Validators.min(0), Validators.pattern(/^[0-9]+$/)],
               ],
               type_offer: [price.type_offer, []],
+              type_limit: [price.type_limit, []],
               date_offer: [price.date_offer, []],
             })
           );
@@ -361,19 +373,55 @@ export class PageSellerComponent {
       );
       return;
     }
-    // Validacion de las fechas de promociones
-    let fechaInvalida: boolean = false;
-    this.f.controls.price.value.forEach((price: IpriceModel) => {
-      if (!this.validarFechaIngresada(price.date_offer)) fechaInvalida = true;
-    });
+    for (let price of this.f.controls.price.value as IpriceModel[]) {
+      // Validar los datos ingresados
+      if (!price.type_offer) {
+        price.date_offer = null;
+        price.sales = null;
+        price.type_limit = null;
+        price.value_offer = null;
+      }
 
-    if (fechaInvalida) {
-      alerts.basicAlert(
-        'Error',
-        'Ha seleccionado una fecha de la oferta invalida',
-        'error'
-      );
-      return;
+      if (price.type_offer && !price.type_limit) {
+        alerts.basicAlert(
+          'Error',
+          'Hay un problema en el tipo de oferta',
+          'error'
+        );
+        return;
+      }
+
+      switch (price.type_limit) {
+        case PriceTypeLimitEnum.DATE:
+          price.sales = null;
+
+          if (!this.validarFechaIngresada(price.date_offer)) {
+            alerts.basicAlert(
+              'Error',
+              'Ha seleccionado una fecha de la oferta invalida',
+              'error'
+            );
+            return;
+          }
+          break;
+
+        case PriceTypeLimitEnum.SALES:
+          price.date_offer = null;
+
+          if (price.sales < 0 || price.sales > 999) {
+            alerts.basicAlert(
+              'Error',
+              'Ha seleccionado una cantidad de ventas de la oferta invalida',
+              'error'
+            );
+            return;
+          }
+
+          break;
+
+        default:
+          break;
+      }
     }
 
     functions.bloquearPantalla(true);
@@ -824,6 +872,14 @@ export class PageSellerComponent {
       if (this.price.length < 5) {
         this.price.push(
           this.form.group({
+            sales: [
+              0,
+              [
+                Validators.min(0),
+                Validators.max(999),
+                Validators.pattern(/^[0-9]+$/),
+              ],
+            ],
             time: [
               '',
               [
@@ -846,6 +902,7 @@ export class PageSellerComponent {
               [Validators.min(0), Validators.pattern(/^[0-9]+$/)],
             ],
             type_offer: ['', []],
+            type_limit: [PriceTypeLimitEnum.DATE, []],
             date_offer: ['', []],
           })
         );

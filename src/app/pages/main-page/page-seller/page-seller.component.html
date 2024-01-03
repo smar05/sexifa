@@ -362,20 +362,80 @@
                     </div>
                   </div>
 
-                  <!--Fecha de vencimiento-->
+                  <!--tipo de limite-->
                   <div class="col-12 col-lg-6 input-group" [formGroup]="price">
                     <div class="input-group append">
-                      <span class="input-group-text"> Fin de la oferta: </span>
+                      <span class="input-group-text"> Tipo de limite: </span>
                     </div>
-                    <input
-                      type="date"
+                    <select
+                      name=""
+                      id=""
                       class="form-control"
-                      min="0"
-                      step="any"
-                      formControlName="date_offer"
-                      [min]="this.fechaMinima"
-                    />
+                      formControlName="type_limit"
+                      name="type_limit"
+                    >
+                      <option value="">N/A</option>
+                      <option value="date">Fecha</option>
+                      <option value="sales">Cantidad de compras</option>
+                    </select>
                   </div>
+
+                  <ng-container>
+                    <!--Fecha de vencimiento-->
+                    <div
+                      class="col-12 col-lg-6 input-group"
+                      [formGroup]="price"
+                      *ngIf="price.controls.type_limit.value === 'date'"
+                    >
+                      <div class="input-group append">
+                        <span class="input-group-text">
+                          Fin de la oferta:
+                        </span>
+                      </div>
+                      <input
+                        type="date"
+                        class="form-control"
+                        min="0"
+                        step="any"
+                        formControlName="date_offer"
+                        [min]="this.fechaMinima"
+                      />
+                    </div>
+
+                    <!--Cantidad de ventas-->
+                    <div
+                      class="col-12 col-lg-6 input-group"
+                      [formGroup]="price"
+                      *ngIf="price.controls.type_limit.value === 'sales'"
+                    >
+                      <div class="input-group append">
+                        <span class="input-group-text">
+                          Cantidad de ventas
+                        </span>
+                      </div>
+                      <input
+                        type="number"
+                        class="form-control"
+                        min="0"
+                        max="999"
+                        step="any"
+                        formControlName="sales"
+                        [ngClass]="{
+                          'is-invalid': price.controls.sales.invalid
+                        }"
+                      />
+
+                      <div
+                        class="invalid-feedback"
+                        *ngIf="
+                          price.controls.sales.invalid &&
+                          price.controls.sales.errors?.pattern
+                        "
+                      >
+                        Por favor ingrese un valor valido
+                      </div>
+                    </div>
+                  </ng-container>
                 </ng-container>
 
                 <label for=""
