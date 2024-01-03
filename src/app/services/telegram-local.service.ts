@@ -3,6 +3,9 @@ import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { alerts } from '../helpers/alerts';
+import { IFrontLogs } from '../interface/i-front-logs';
+import { LocalStorageEnum } from '../enum/localStorageEnum';
+import { FrontLogsService } from './front-logs.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +13,10 @@ import { alerts } from '../helpers/alerts';
 export class TelegramLocalService {
   private url: string = `${environment.urlServidorLocal}/api/telegram`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private frontLogsService: FrontLogsService
+  ) {}
 
   /**
    * Probar la conexion entre el cliente y el bot de telegram
@@ -55,6 +61,21 @@ export class TelegramLocalService {
         'Ha ocurrido un error probando la conexion con el bot de Telegram',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: telegram-local.service.ts: ~ TelegramLocalService ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     if (res.code == 200) {

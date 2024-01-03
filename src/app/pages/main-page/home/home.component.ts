@@ -14,6 +14,9 @@ import { Component, OnInit } from '@angular/core';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { alerts } from 'src/app/helpers/alerts';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 
 @Component({
   selector: 'app-home',
@@ -30,7 +33,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private categoriesService: CategoriesService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -45,6 +49,21 @@ export class HomeComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     functions.bloquearPantalla(false);
   }
@@ -59,6 +78,21 @@ export class HomeComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos pon nombre',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ clickSearch ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -88,6 +122,21 @@ export class HomeComponent implements OnInit {
             'error'
           );
           console.error(error);
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: home.component.ts: ~ HomeComponent ~ getAllCategories ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
         }
       );
   }
@@ -106,6 +155,21 @@ export class HomeComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos por paginacion',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ nextPagination ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -167,6 +231,21 @@ export class HomeComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ getAllModels ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     // Guardar referencia al último documento de la página actual
     if (res.length > 0) {
@@ -194,6 +273,21 @@ export class HomeComponent implements OnInit {
           'Ha ocurrido un error en la conversion de modelos a DTO',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: home.component.ts:284 ~ HomeComponent ~ imodels.forEach ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
     });
     functions.bloquearPantalla(false);
@@ -212,6 +306,21 @@ export class HomeComponent implements OnInit {
           'Ha ocurrido un error en la consulta de modelos',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: home.component.ts: ~ HomeComponent ~ getModelsWhereSearchByName ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
       return;
     }
@@ -225,6 +334,21 @@ export class HomeComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ getModelsWhereSearchByName ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 

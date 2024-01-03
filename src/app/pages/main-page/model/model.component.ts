@@ -16,6 +16,8 @@ import { alerts } from 'src/app/helpers/alerts';
 import { ViewsModelService } from 'src/app/services/views-model.service';
 import { IviewsModel } from 'src/app/interface/i-views-model';
 import { functions } from 'src/app/helpers/functions';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 
 @Component({
   selector: 'app-model',
@@ -37,7 +39,8 @@ export class ModelComponent implements OnInit {
     private modelsService: ModelsService,
     private router: Router,
     private subscriptionsService: SubscriptionsService,
-    private viewsModelService: ViewsModelService
+    private viewsModelService: ViewsModelService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -56,6 +59,21 @@ export class ModelComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelo',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     if (!this.model || Object.keys(this.model).length === 0) return;
@@ -72,6 +90,21 @@ export class ModelComponent implements OnInit {
         'Ha ocurrido un error al guardar la visita',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     functions.bloquearPantalla(false);
   }
@@ -90,6 +123,21 @@ export class ModelComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     // Si no se encuentra un modelo con el id colocado en la url
@@ -126,6 +174,21 @@ export class ModelComponent implements OnInit {
         'Ha ocurrido un error en la conversion de modelo a DTO',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     this.imgPrincipal = this.model.mainImage || '';
 
@@ -145,6 +208,21 @@ export class ModelComponent implements OnInit {
         'Ha ocurrido un error en la obtencion de la galeria',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ getGaleria ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -211,6 +289,21 @@ export class ModelComponent implements OnInit {
           'Ha ocurrido un error en la consulta de subscripciones',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
 
       if (subscritionsActivas && subscritionsActivas.length > 0) {
@@ -272,9 +365,24 @@ export class ModelComponent implements OnInit {
       this.router.navigateByUrl(`/${UrlPagesEnum.CHECKOUT}`);
     } catch (error) {
       console.error('Error: ', error);
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+
       functions.bloquearPantalla(false);
       this.load = false;
-      console.error(error);
     }
   }
 
@@ -310,6 +418,21 @@ export class ModelComponent implements OnInit {
           'Ha ocurrido un error al guardar la visita',
           'error'
         );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: model.component.ts: ~ ModelComponent ~ setViewsModelData ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       }
     }
   }

@@ -15,6 +15,9 @@ import { ICities } from 'src/app/interface/icities';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
 import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 
 @Component({
   selector: 'app-register',
@@ -123,7 +126,8 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private locationService: LocationService,
-    private telegramLocalService: TelegramLocalService
+    private telegramLocalService: TelegramLocalService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   ngOnInit(): void {
@@ -183,6 +187,21 @@ export class RegisterComponent implements OnInit {
             'Ha ocurrido un error enviando el correo de verificacion',
             'error'
           );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+              err
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+            });
         });
 
       const user: Iuser = {
@@ -234,6 +253,22 @@ export class RegisterComponent implements OnInit {
       }
 
       alerts.basicAlert('Error', errorText, 'error');
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+
       functions.bloquearPantalla(false);
       this.loading = false;
     }
@@ -281,6 +316,21 @@ export class RegisterComponent implements OnInit {
         'error'
       );
       this.allCountries = [];
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ getCountries ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -301,6 +351,21 @@ export class RegisterComponent implements OnInit {
       this.state.setValue(null);
       this.city.setValue(null);
       this.allStatesByCountry = [];
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
@@ -323,6 +388,21 @@ export class RegisterComponent implements OnInit {
       this.state.setValue(null);
       this.city.setValue(null);
       this.allCities = [];
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
   }
 
