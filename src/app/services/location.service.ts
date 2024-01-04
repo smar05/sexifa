@@ -1,6 +1,9 @@
+import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { alerts } from '../helpers/alerts';
+import { IFrontLogs } from '../interface/i-front-logs';
 import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
+import { FrontLogsService } from './front-logs.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +13,7 @@ export class LocationService {
   private apiKeyLocation: string = environment.apiKeyLocation;
   private headers: Headers = new Headers();
 
-  constructor() {
+  constructor(private frontLogsService: FrontLogsService) {
     this.headers.append('X-CSCAPI-KEY', this.apiKeyLocation);
     this.headers.append('Access-Control-Allow-Origin', '*');
   }
@@ -36,7 +39,21 @@ export class LocationService {
           'Ha ocurrido un error en la consulta de paises',
           'error'
         );
-        console.error(err);
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: location.service.ts: ~ LocationService ~ getAllContries ~ JSON.stringify(error): ${JSON.stringify(
+            err
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       });
   }
 
@@ -63,6 +80,21 @@ export class LocationService {
           'error'
         );
         console.error(err);
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: location.service.ts: ~ LocationService ~ getAllStatesByCountry ~ JSON.stringify(error): ${JSON.stringify(
+            err
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       });
   }
 
@@ -96,6 +128,21 @@ export class LocationService {
           'error'
         );
         console.error(err);
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: location.service.ts: ~ LocationService ~ JSON.stringify(error): ${JSON.stringify(
+            err
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
       });
   }
 }

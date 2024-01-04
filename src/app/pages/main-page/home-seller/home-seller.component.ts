@@ -14,8 +14,10 @@ import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Isubscriptions } from 'src/app/interface/i- subscriptions';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { Imodels } from 'src/app/interface/imodels';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
 
@@ -71,13 +73,29 @@ export class HomeSellerComponent implements OnInit {
     } catch (error) {
       console.error('Error: ', error);
       alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
     functions.bloquearPantalla(false);
   }
 
   constructor(
     private subscriptionsService: SubscriptionsService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   public async getMiGroup(): Promise<void> {
@@ -96,6 +114,21 @@ export class HomeSellerComponent implements OnInit {
         'Ha ocurrido un error en la consulta de modelos',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ getMiGroup ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     this.model = res[0].data;
@@ -125,6 +158,21 @@ export class HomeSellerComponent implements OnInit {
         'Ha ocurrido un error en la consulta de subscripciones',
         'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ getSubscriptions ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
     }
 
     this.subscriptions = res.map((r: IFireStoreRes) => {
