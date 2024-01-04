@@ -85,7 +85,8 @@ export class AuthGuard implements CanActivate {
           LocalStorageEnum.REDIRECT_TO
         );
         this.loginService.logout();
-        localStorage.setItem(LocalStorageEnum.REDIRECT_TO, auxRedirectTo);
+        if (auxRedirectTo)
+          localStorage.setItem(LocalStorageEnum.REDIRECT_TO, auxRedirectTo);
         resolve(false);
       }
     });
