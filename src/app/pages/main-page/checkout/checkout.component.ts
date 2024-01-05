@@ -1,5 +1,8 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { IpriceModel } from './../../../interface/iprice-model';
+import {
+  IpriceModel,
+  PriceTypeLimitEnum,
+} from './../../../interface/iprice-model';
 import { Imodels } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
 import { IInfoModelSubscription } from './../../../interface/i-info-model-subscription';
@@ -134,6 +137,13 @@ export class CheckoutComponent implements OnInit {
     functions.bloquearPantalla(false);
   }
 
+  /**
+   * Consulta si el pago se hizo por PayU
+   *
+   * @private
+   * @return {*}  {Promise<void>}
+   * @memberof CheckoutComponent
+   */
   private async ifPayU(): Promise<void> {
     console.log(
       '🚀 ~ file: checkout.component.ts:85 ~ CheckoutComponent ~ ifPayU ~ this.cart:',
@@ -175,6 +185,14 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
+  /**
+   * Guarda la informacion de la compra de las subscripciones por payu
+   *
+   * @private
+   * @param {QParamsPayU} params
+   * @return {*}  {Promise<void>}
+   * @memberof CheckoutComponent
+   */
   private async payUProcess(params: QParamsPayU): Promise<void> {
     const timeNow: Date = new Date();
     let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
@@ -297,6 +315,9 @@ export class CheckoutComponent implements OnInit {
           );
 
           idsSubscriptions.push(res.id);
+
+          // Reducir la compra si esta en promocion
+          await this.reducirComprasPromocion(data);
         }
 
         let dataOrder: Iorders = {
@@ -306,7 +327,7 @@ export class CheckoutComponent implements OnInit {
           status: StatusOrdersEnum.PAGADO,
           payMethod: PayMethodsEnum.PAYU,
           price: Number(params.TX_VALUE),
-          usd_cop: 0,
+          usd_cop,
           idPay: params.transactionId,
           currency: params.currency,
         };
@@ -533,6 +554,9 @@ export class CheckoutComponent implements OnInit {
               }
 
               idsSubscriptions.push(res.id);
+
+              // Reducir la compra si esta en promocion
+              await this.reducirComprasPromocion(data);
             }
 
             let dataOrder: Iorders = {
@@ -633,6 +657,63 @@ export class CheckoutComponent implements OnInit {
         },
       })
       .render(this.paypalElement.nativeElement);
+  }
+
+  /**
+   * Reducir la cantidad de compras del modelo si esta en promocion
+   *
+   * @private
+   * @param {Isubscriptions} subscripcion
+   * @return {*}  {Promise<void>}
+   * @memberof CheckoutComponent
+   */
+  private async reducirComprasPromocion(
+    subscripcion: Isubscriptions
+  ): Promise<void> {
+    let model: Imodels = this.models.find(
+      (m: Imodels) => m.id === subscripcion.modelId
+    );
+    let priceIndex: number = model.price.findIndex(
+      (p: IpriceModel) => subscripcion.time === p.time
+    );
+
+    // Si la oferta es por cantidad de compras, se reduce la compra realizada en la promocion
+    if (
+      model?.price[priceIndex]?.type_limit === PriceTypeLimitEnum.SALES &&
+      model?.price[priceIndex]?.sales > 0
+    ) {
+      try {
+        let dataModelUpdate: Imodels = { ...model };
+        let dataModelId: string = model.id;
+
+        dataModelUpdate.price[priceIndex].sales--;
+        delete dataModelUpdate.id;
+
+        await this.modelsService.patchDataFS(dataModelId, dataModelUpdate);
+      } catch (error) {
+        console.error('Error: ', error);
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error actualizando el modelo',
+          'error'
+        );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
+      }
+    }
   }
 
   public getUserData(): void {
