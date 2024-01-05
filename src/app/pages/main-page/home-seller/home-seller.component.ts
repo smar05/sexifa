@@ -181,20 +181,32 @@ export class HomeSellerComponent implements OnInit {
       return s;
     });
 
-    let position: number = res.length;
+    // Ordena de la más reciente a la más antigua
+    this.subscriptions = this.subscriptions.sort(
+      (a: Isubscriptions, b: Isubscriptions): number => {
+        const fechaA = new Date(a.date_created);
+        const fechaB = new Date(b.date_created);
 
-    let subscriptionsAux: any[] = res.map((r: IFireStoreRes) => {
-      return {
-        position: position--,
-        userId: r.data.userId,
-        fecha: r.data.date_created,
-        statusUser: r.data.status,
-        price: r.data.price,
-        beginTime: r.data.beginTime,
-        endTime: r.data.endTime,
-        modelStatus: r.data.modelStatus,
-      };
-    });
+        return fechaB.getTime() - fechaA.getTime();
+      }
+    );
+
+    let position: number = 1;
+
+    let subscriptionsAux: any[] = this.subscriptions.map(
+      (r: Isubscriptions) => {
+        return {
+          position: position++,
+          userId: r.userId,
+          fecha: r.date_created,
+          statusUser: r.status,
+          price: r.price,
+          beginTime: r.beginTime,
+          endTime: r.endTime,
+          modelStatus: r.modelStatus,
+        };
+      }
+    );
 
     this.dataSource = new MatTableDataSource(subscriptionsAux);
     this.dataSource.paginator = this.paginator;
