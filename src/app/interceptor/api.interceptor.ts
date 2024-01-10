@@ -76,6 +76,7 @@ export class ApiInterceptor implements HttpInterceptor {
       setParams: {
         auth: token,
         userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        date: new Date().toISOString(),
       },
     });
   }
