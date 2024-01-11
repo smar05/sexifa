@@ -512,11 +512,10 @@ export class UserComponent implements OnInit {
           alerts.basicAlert('Error', 'Error', 'error');
         });
     }
-    let position: number = res.length;
+    let position: number = 1;
 
     let subscriptionsAux: any[] = res.map((r: IFireStoreRes) => {
       return {
-        position: position--,
         idGrupo: r.data.modelId,
         fecha: r.data.date_created,
         status: r.data.status,
@@ -524,6 +523,21 @@ export class UserComponent implements OnInit {
         beginTime: r.data.beginTime,
         endTime: r.data.endTime,
         payMethod: r.data.payMethod,
+      };
+    });
+
+    // Ordena de la más reciente a la más antigua
+    subscriptionsAux = subscriptionsAux.sort((a: any, b: any): number => {
+      const fechaA = new Date(a.fecha);
+      const fechaB = new Date(b.fecha);
+
+      return fechaB.getTime() - fechaA.getTime();
+    });
+
+    subscriptionsAux = subscriptionsAux.map((r: any) => {
+      return {
+        position: position++,
+        ...r,
       };
     });
 
