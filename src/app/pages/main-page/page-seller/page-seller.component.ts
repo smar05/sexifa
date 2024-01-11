@@ -450,11 +450,6 @@ export class PageSellerComponent {
       return;
     }
     if (!this.validarPrecios(this.f.controls.price.value)) {
-      alerts.basicAlert(
-        'Error',
-        'El precio final no puede ser 0 o negativo',
-        'error'
-      );
       return;
     }
     if (this.files.length + this.editGallery.length > 4) {
@@ -1233,13 +1228,33 @@ export class PageSellerComponent {
   private validarPrecios(precios: IpriceModel[]): boolean {
     //Que el precio no sea negativo
     let valido: boolean = true;
+    let valoresUnicos = new Set<number>();
 
     for (let precio of precios) {
       if (this.modelService.calculoPrecioSubscripcion(precio) <= 0) {
         valido = false;
+        alerts.basicAlert(
+          'Error',
+          'El precio final no puede ser 0 o negativo',
+          'error'
+        );
+        break;
+      }
+
+      if (valoresUnicos.has(precio.time)) {
+        // Valor repetido encontrado
+        valido = false;
+
+        alerts.basicAlert(
+          'Error',
+          'El tiempo del precio no se puede repetir',
+          'error'
+        );
 
         break;
       }
+
+      valoresUnicos.add(precio.time);
     }
 
     return valido;
