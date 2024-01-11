@@ -987,7 +987,11 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
-  public probarConexionBot(): void {
-    this.telegramLocalService.probarConexionBot(this.user.chatId);
+  public async probarConexionBot(): Promise<void> {
+    functions.bloquearPantalla(true);
+
+    try {
+      await this.telegramLocalService.probarConexionBot(this.user.chatId);
+    } catch (error) {}
   }
 }

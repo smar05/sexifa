@@ -453,8 +453,16 @@ export class UserComponent implements OnInit {
     }
   }
 
-  public probarConexionBot(): void {
-    this.telegramLocalService.probarConexionBot(this.chatId.value);
+  public async probarConexionBot(): Promise<void> {
+    functions.bloquearPantalla(true);
+
+    try {
+      await this.telegramLocalService.probarConexionBot(this.chatId.value);
+    } catch (error) {
+      functions.bloquearPantalla(false);
+    }
+
+    functions.bloquearPantalla(false);
   }
 
   //FIltro de busqueda
