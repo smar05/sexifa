@@ -1,9 +1,12 @@
+import { UrlPagesEnum } from 'src/app/enum/urlPagesEnum';
+
 const apiKey: string = 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8';
 const apiKeyLocation: string =
   'dU1Pc1lYSnBVZDVqcVpSYjhVSkswTGhWTWlRWVZaUHpIdFBuemhINA==';
-const apiKeyCurrencyConverter: string = 'aff02fe93ceafb70b754';
-const urlProd: string = '';
-const urlServidorLocal: string = '';
+const apiKeyCurrencyConverter: string =
+  'b1a887ecd831283337100ac9f2cee83a4baaae56';
+const urlProd: string = 'http://localhost:4200';
+const urlServidorLocal: string = 'http://localhost:8080';
 
 const firebaseConfig: any = {
   apiKey: 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8',
@@ -21,7 +24,8 @@ export const environment = {
   urlLogin: `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
   urlGetUser: `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
   urlLocation: `https://api.countrystatecity.in/v1/`,
-  urlCurrencyConverter: `https://free.currconv.com`,
+  urlCurrencyConverter: `https://api.getgeoapi.com`,
+  urlProd,
   urlServidorLocal,
   urlCollections: {
     categories: 'categories',
@@ -30,21 +34,21 @@ export const environment = {
     subscriptions: 'subscriptions',
     orders: 'orders',
     views_model: 'views_model',
+    front_logs: 'front_logs',
   },
   urlRefreshToken: `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
   firebaseConfig,
   apiKeyLocation,
   apiKeyCurrencyConverter,
   payUCredentials: {
-    merchantId: '',
-    action: '',
+    merchantId: '508029',
+    action: 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/',
     accountId: {
-      col: '',
+      col: '512321',
     },
-    responseUrl: '',
+    responseUrl: `${urlProd}/${UrlPagesEnum.CHECKOUT}`,
     confirmationUrl: 'http://www.test.com/confirmation',
-    apyKey: '',
-    test: 0,
+    apiKey: '4Vj8eK4rloUd272L48hsrarnUA',
+    test: 1,
   },
-  urlProd,
 };
