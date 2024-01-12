@@ -30,6 +30,17 @@ export class TelegramLocalService {
   }
 
   /**
+   * Consultar si un usuario ya pertenece al grupo
+   *
+   * @param {*} params
+   * @return {*}  {Observable<any>}
+   * @memberof TelegramLocalService
+   */
+  public esMiembroDelGrupo(params: any): Observable<any> {
+    return this.http.get(`${this.url}/es-miembro-del-grupo`, { params });
+  }
+
+  /**
    * Enviar los links de acceso a los grupos de la orden
    *
    * @param {*} [params]
