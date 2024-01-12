@@ -18,6 +18,9 @@ import { IviewsModel } from 'src/app/interface/i-views-model';
 import { functions } from 'src/app/helpers/functions';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { TelegramLocalService } from 'src/app/services/telegram-local.service';
+import { UserService } from 'src/app/services/user.service';
+import { Iuser } from 'src/app/interface/iuser';
 
 @Component({
   selector: 'app-model',
@@ -33,6 +36,7 @@ export class ModelComponent implements OnInit {
   public price!: IpriceModel | undefined;
   public load: boolean = false;
   private userId: string = '';
+  private user: Iuser = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -40,7 +44,9 @@ export class ModelComponent implements OnInit {
     private router: Router,
     private subscriptionsService: SubscriptionsService,
     private viewsModelService: ViewsModelService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private telegramService: TelegramLocalService,
+    private userService: UserService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -57,6 +63,32 @@ export class ModelComponent implements OnInit {
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error en la consulta de modelo',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+    }
+
+    try {
+      await this.getUser();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuario',
         'error'
       );
 
@@ -106,6 +138,59 @@ export class ModelComponent implements OnInit {
           alerts.basicAlert('Error', 'Error', 'error');
         });
     }
+    functions.bloquearPantalla(false);
+  }
+
+  public async getUser(): Promise<void> {
+    functions.bloquearPantalla(true);
+
+    let qf: QueryFn = (ref) =>
+      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+
+    let res: IFireStoreRes[] = null;
+
+    try {
+      res = await this.userService.getDataFS(qf).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuario',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ getUser ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+    }
+
+    // Si no se encuentra un usuario
+    if (!res) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+
+      alerts.basicAlert(
+        'Error',
+        'No se ha encontrado la informacion solicitada',
+        'error'
+      );
+
+      return;
+    }
+
+    this.user = res[0].data;
+    this.user.id = res[0].id;
+
     functions.bloquearPantalla(false);
   }
 
@@ -269,6 +354,48 @@ export class ModelComponent implements OnInit {
     this.load = true;
 
     try {
+      // Consular si ya pertenece al grupo
+
+      let res: any = null;
+      try {
+        let params: object = {
+          fromId: this.user.chatId,
+          chatId: this.model.groupId,
+        };
+
+        res = await this.telegramService.esMiembroDelGrupo(params).toPromise();
+      } catch (error) {
+        console.error('Error: ', error);
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de pertenencia al grupo',
+          'error'
+        );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+          });
+      }
+
+      if (!res || res.perteneceAlGrupo) {
+        functions.bloquearPantalla(false);
+        this.load = false;
+        alerts.basicAlert('Error', 'Ya perteneces a este grupo', 'error');
+        return;
+      }
+
+      // COnsultar las subscripciones activas
       let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
       let qf: QueryFn = (ref) =>
         ref
