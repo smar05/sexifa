@@ -2,8 +2,12 @@
 
 # compiled output
 /dist
+/public
 /tmp
 /out-tsc
+/.firebase
+/.angular
+/.github
 # Only exists if Bazel was run
 /bazel-out
 

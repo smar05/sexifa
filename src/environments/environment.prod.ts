@@ -5,7 +5,8 @@ const apiKeyLocation: string =
   'dU1Pc1lYSnBVZDVqcVpSYjhVSkswTGhWTWlRWVZaUHpIdFBuemhINA==';
 const apiKeyCurrencyConverter: string =
   'b1a887ecd831283337100ac9f2cee83a4baaae56';
-const urlProd: string = 'http://localhost:4200';
+const urlProd: string =
+  'https://sexifa-269bf--onlygram-groups-rehu2taa.web.app';
 const urlServidorLocal: string = 'http://localhost:8080';
 
 const firebaseConfig: any = {
@@ -19,7 +20,7 @@ const firebaseConfig: any = {
 };
 
 export const environment = {
-  production: true,
+  production: false,
   urlFirebase: `https://sexifa-269bf-default-rtdb.firebaseio.com/`,
   urlLogin: `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
   urlGetUser: `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
@@ -46,7 +47,7 @@ export const environment = {
     accountId: {
       col: '512321',
     },
-    responseUrl: `${urlProd}/${UrlPagesEnum.CHECKOUT}`,
+    responseUrl: `${urlProd}/#/${UrlPagesEnum.CHECKOUT}`,
     confirmationUrl: 'http://www.test.com/confirmation',
     apiKey: '4Vj8eK4rloUd272L48hsrarnUA',
     test: 1,

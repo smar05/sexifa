@@ -9,7 +9,8 @@ const apiKeyLocation: string =
   'dU1Pc1lYSnBVZDVqcVpSYjhVSkswTGhWTWlRWVZaUHpIdFBuemhINA==';
 const apiKeyCurrencyConverter: string =
   'b1a887ecd831283337100ac9f2cee83a4baaae56';
-const urlProd: string = 'http://localhost:4200';
+const urlProd: string =
+  'https://sexifa-269bf--onlygram-groups-rehu2taa.web.app';
 const urlServidorLocal: string = 'http://localhost:8080';
 
 const firebaseConfig: any = {
@@ -50,7 +51,7 @@ export const environment = {
     accountId: {
       col: '512321',
     },
-    responseUrl: `${urlProd}/${UrlPagesEnum.CHECKOUT}`,
+    responseUrl: `${urlProd}/#/${UrlPagesEnum.CHECKOUT}`,
     confirmationUrl: 'http://www.test.com/confirmation',
     apiKey: '4Vj8eK4rloUd272L48hsrarnUA',
     test: 1,
