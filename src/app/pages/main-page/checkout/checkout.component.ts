@@ -74,7 +74,32 @@ export class CheckoutComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
-    this.getUserData();
+
+    try {
+      await this.getUserData();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta del carrito',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+    }
 
     try {
       await this.getCartData();
@@ -235,22 +260,14 @@ export class CheckoutComponent implements OnInit {
     switch (params.transactionState) {
       // APPROVED
       case '4':
-        console.log(
-          '🚀 ~ file: checkout.component.ts:101 ~ CheckoutComponent ~ payUProcess ~ this.cart:',
-          this.cart[0]
-        );
-        // Se organiza la informacion de las subscripciones compradas
-        for (const cart1 of this.cart) {
-          console.log(
-            '🚀 ~ file: checkout.component.ts:119 ~ CheckoutComponent ~ payUProcess ~ cart1:',
-            cart1
-          );
+        let cart: ICart[] = [...this.cart];
 
+        // Se organiza la informacion de las subscripciones compradas
+        for (const cart1 of cart) {
           let endTime: Date = functions.incrementarMeses(
             timeNow,
             cart1.infoModelSubscription.timeSubscription
           );
-          console.log('AAAAAAAAAA');
 
           let data: Isubscriptions = {
             modelId: cart1.model.id,
@@ -260,23 +277,14 @@ export class CheckoutComponent implements OnInit {
             time: cart1.infoModelSubscription.timeSubscription,
             beginTime: timeNow.toISOString().split('T')[0],
             endTime: endTime.toISOString().split('T')[0],
-            date_created: params.processingDate,
+            date_created: new Date().toISOString(),
             payMethod: PayMethodsEnum.PAYU,
             usd_cop,
             modelStatus: ModelStatusEnum.PENDIENTE_PAGO,
           };
-          console.log(
-            '🚀 ~ file: checkout.component.ts:136 ~ CheckoutComponent ~ payUProcess ~ data:',
-            data
-          );
 
           dataSubscriptions.push(data);
         }
-
-        console.log(
-          '🚀 ~ file: checkout.component.ts:139 ~ CheckoutComponent ~ payUProcess ~ dataSubscriptions:',
-          dataSubscriptions
-        );
 
         // Se guarda la informacion de las subscripciones compradas
         let idsSubscriptions: string[] = [];
@@ -308,11 +316,6 @@ export class CheckoutComponent implements OnInit {
                 alerts.basicAlert('Error', 'Error', 'error');
               });
           }
-
-          console.log(
-            '🚀 ~ file: checkout.component.ts:130 ~ CheckoutComponent ~ payUProcess ~ res:',
-            res
-          );
 
           idsSubscriptions.push(res.id);
 
@@ -363,10 +366,8 @@ export class CheckoutComponent implements OnInit {
         localStorage.removeItem(LocalStorageEnum.CART);
         localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
 
-        let res: any = null;
-
         try {
-          res = await this.telegramLocalService
+          await this.telegramLocalService
             .getLinksOrden({ orderId })
             .toPromise();
         } catch (error) {
@@ -716,46 +717,44 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
-  public getUserData(): void {
+  public async getUserData(): Promise<void> {
     functions.bloquearPantalla(true);
     this.load = true;
     let qf: QueryFn = (ref) =>
       ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
-    this.userService
-      .getDataFS(qf)
-      .toPromise()
-      .then(
-        (data: IFireStoreRes[]) => {
-          this.user = data[0].data;
-          functions.bloquearPantalla(false);
-          this.load = false;
-        },
-        (err: any) => {
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error en la consulta de usuarios',
-            'error'
-          );
+    let data: IFireStoreRes[] = [];
 
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: checkout.component.ts: ~ CheckoutComponent ~ getUserData ~ JSON.stringify(error): ${JSON.stringify(
-              err
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-            });
-
-          functions.bloquearPantalla(false);
-          this.load = false;
-        }
+    try {
+      data = await this.userService.getDataFS(qf).toPromise();
+    } catch (err) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuarios',
+        'error'
       );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ getUserData ~ JSON.stringify(error): ${JSON.stringify(
+          err
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+
+      functions.bloquearPantalla(false);
+      this.load = false;
+    }
+
+    this.user = data[0].data;
+    functions.bloquearPantalla(false);
+    this.load = false;
   }
 
   public async getCartData(): Promise<void> {
