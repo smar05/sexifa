@@ -100,7 +100,13 @@
               </div>
             </div>
             <!--Tipo de subscripcion-->
-            <div class="color-section">
+            <div
+              class="color-section"
+              *ngIf="
+                !this.timeSubscriptionInput &&
+                this.timeSubscriptionInput.length > 0
+              "
+            >
               <div class="left">
                 <p class="label">
                   Seleccione el tiempo de subscripción en meses
