@@ -37,6 +37,7 @@ export class ModelComponent implements OnInit {
   public load: boolean = false;
   private userId: string = '';
   private user: Iuser = {};
+  public precios: Array<number> = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -111,6 +112,32 @@ export class ModelComponent implements OnInit {
     if (!this.model || Object.keys(this.model).length === 0) return;
 
     this.setModelSubscripctionModelValues();
+
+    try {
+      await this.calcularPrecios();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de precios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+    }
 
     // Guardamos la visita del usuario a la pagina
     try {
@@ -342,11 +369,58 @@ export class ModelComponent implements OnInit {
   }
 
   public calculoPrecioSubscripcion(): number | undefined {
-    if (this.price?.value && this.price?.value_offer) {
-      return this.modelsService.calculoPrecioSubscripcion(this.price);
+    if (!this.price) {
+      return undefined;
     }
 
-    return this.price?.value;
+    let indexPrecio: number = this.model.price.findIndex(
+      (p: IpriceModel) =>
+        p.value === this.price.value && p.time === this.price.time
+    );
+
+    if (indexPrecio >= 0) {
+      return this.precios[indexPrecio];
+    }
+
+    return undefined;
+  }
+
+  private async calcularPrecios(): Promise<void> {
+    let prices: IpriceModel[] = this.model.price;
+    let params: object = {
+      prices: JSON.stringify(prices),
+      fechaActual: new Date().toISOString(),
+    };
+
+    this.precios = [];
+
+    try {
+      this.precios = (
+        await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
+      ).preciosCalculados;
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de precios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ calcularPrecios ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+    }
   }
 
   public async clickParticipar(): Promise<void> {

@@ -11,7 +11,7 @@ import { FrontLogsService } from './front-logs.service';
   providedIn: 'root',
 })
 export class TelegramLocalService {
-  private url: string = `${environment.urlServidorLocal}/api/telegram`;
+  private url: string = `${environment.urlServidorLocal}/api/${environment.urlsServidor.urlTelegramApi}`;
 
   constructor(
     private http: HttpClient,
