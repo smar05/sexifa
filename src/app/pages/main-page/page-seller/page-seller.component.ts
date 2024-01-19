@@ -114,6 +114,7 @@ export class PageSellerComponent {
   private userModel!: Iuser;
 
   private userId!: string;
+  private preciosCalculados: number[] = [];
 
   //Configuracion summernote
   config = {
@@ -144,13 +145,16 @@ export class PageSellerComponent {
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
+  public preciosSimulados: Map<number, number> = new Map<number, number>();
+
   constructor(
     private modelService: ModelsService,
     private form: UntypedFormBuilder,
     private categoriesService: CategoriesService,
     private userService: UserService,
     private route: Router,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private modelsService: ModelsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -449,6 +453,9 @@ export class PageSellerComponent {
       );
       return;
     }
+
+    await this.calcularPrecios(this.f.controls.price.value as IpriceModel[]);
+
     if (!this.validarPrecios(this.f.controls.price.value)) {
       return;
     }
@@ -1230,8 +1237,9 @@ export class PageSellerComponent {
     let valido: boolean = true;
     let valoresUnicos = new Set<number>();
 
+    let i: number = 0;
     for (let precio of precios) {
-      if (this.modelService.calculoPrecioSubscripcion(precio) <= 0) {
+      if (this.preciosCalculados[i] <= 0) {
         valido = false;
         alerts.basicAlert(
           'Error',
@@ -1255,9 +1263,48 @@ export class PageSellerComponent {
       }
 
       valoresUnicos.add(precio.time);
+
+      i++;
     }
 
     return valido;
+  }
+
+  private async calcularPrecios(prices: IpriceModel[]): Promise<void> {
+    let params: object = {
+      prices: JSON.stringify(prices),
+      fechaActual: new Date().toISOString(),
+    };
+
+    this.preciosCalculados = [];
+
+    try {
+      this.preciosCalculados = (
+        await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
+      ).preciosCalculados;
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de precios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ calcularPrecios ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+    }
   }
 
   //Eliminar input's dinamicos
@@ -1269,7 +1316,57 @@ export class PageSellerComponent {
     }
   }
 
-  public calcularPrecio(precio: IpriceModel): number | undefined {
-    return this.modelService.calculoPrecioSubscripcion(precio);
+  public async calcularPrecio(
+    price: IpriceModel,
+    index: number
+  ): Promise<void> {
+    functions.bloquearPantalla(true);
+    this.loadData = true;
+
+    this.preciosSimulados.set(index, undefined);
+
+    let params: object = {
+      prices: JSON.stringify([price]),
+      fechaActual: new Date().toISOString(),
+    };
+
+    let precioCalculado: number[] = [];
+    try {
+      precioCalculado = (
+        await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
+      ).preciosCalculados;
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de precios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ calcularPrecio ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+
+      functions.bloquearPantalla(false);
+      this.loadData = false;
+
+      return;
+    }
+
+    this.preciosSimulados.set(index, precioCalculado[0]);
+
+    functions.bloquearPantalla(false);
+    this.loadData = false;
   }
 }

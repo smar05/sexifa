@@ -849,12 +849,9 @@ export class CheckoutComponent implements OnInit {
                     price.time == cartLocalItem.timeSubscription
                 ) || {};
 
-              if (
-                this.modelsService.calculoPrecioSubscripcion(priceModel) !=
-                undefined
-              ) {
+              if (priceModel != undefined) {
                 let precioUnCupo: number =
-                  this.modelsService.calculoPrecioSubscripcion(priceModel) || 0;
+                  (await this.calcularPrecio(priceModel)) || 0;
 
                 price = precioUnCupo;
               }
@@ -917,6 +914,45 @@ export class CheckoutComponent implements OnInit {
         throw error;
       }
     });
+  }
+
+  private async calcularPrecio(price: IpriceModel): Promise<number> {
+    let params: object = {
+      prices: JSON.stringify([price]),
+      fechaActual: new Date().toISOString(),
+    };
+
+    let preciosCalculados: number[] = [];
+    try {
+      preciosCalculados = (
+        await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
+      ).preciosCalculados;
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de precios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ calcularPrecio ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+        });
+      return undefined;
+    }
+
+    return preciosCalculados[0];
   }
 
   public getUrlModel(model: Imodels): string {

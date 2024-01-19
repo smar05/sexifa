@@ -15,11 +15,11 @@ import { Injectable } from '@angular/core';
 import { ImgModelEnum } from '../enum/imgModelEnum';
 import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
-import { map } from 'rxjs/operators';
 import { alerts } from '../helpers/alerts';
 import { IFrontLogs } from '../interface/i-front-logs';
 import { FrontLogsService } from './front-logs.service';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -27,13 +27,15 @@ import { LocalStorageEnum } from '../enum/localStorageEnum';
 export class ModelsService {
   private urlModels: string = environment.urlCollections.models;
   private urlImage: string = `/models`;
+  private urlModelsApi: string = `${environment.urlServidorLocal}/api/${environment.urlsServidor.urlModelsApi}`;
 
   constructor(
     private apiService: ApiService,
     private storageService: StorageService,
     private categoriesService: CategoriesService,
     private fireStorageService: FireStorageService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private http: HttpClient
   ) {}
 
   /**
@@ -168,72 +170,6 @@ export class ModelsService {
   public getRouterLinkUrl(model: ModelsDTO | Imodels): string {
     //let modelArray: string[] | undefined = model.name?.split(' ');
     return `${model.id}`;
-  }
-
-  /**
-   * Obtener el precio del cupo de la modelo
-   *
-   * @param {IpriceModel} price
-   * @param {Date} [fechaCompra=null]
-   * @return {*}  {(number | undefined)}
-   * @memberof ModelsService
-   */
-  public calculoPrecioSubscripcion(
-    price: IpriceModel,
-    fechaCompra: Date = null
-  ): number | undefined {
-    if (
-      price.value &&
-      price.type_offer &&
-      price.type_limit &&
-      price.value_offer &&
-      (price.date_offer || price.sales)
-    ) {
-      switch (price.type_limit) {
-        case PriceTypeLimitEnum.SALES:
-          if (price.sales <= 0) return price.value;
-
-          break;
-
-        case PriceTypeLimitEnum.DATE:
-          // Obtener la fecha actual
-          let fechaActual: Date = fechaCompra ?? new Date();
-
-          // Crear una fecha a partir de un string (por ejemplo, "2023-07-27")
-          let fechaComparacion: Date = new Date(price.date_offer?.toString());
-          fechaComparacion.setDate(fechaComparacion.getDate() + 2);
-
-          fechaComparacion.setHours(0, 0, 0, 0);
-
-          // Comparar las fechas
-          if (
-            price.type_limit === PriceTypeLimitEnum.DATE &&
-            fechaComparacion < fechaActual
-          )
-            return price.value;
-          break;
-
-        default:
-          break;
-      }
-
-      switch (price.type_offer) {
-        case TypeOfferEnum.DESCUENTO:
-          return (
-            Math.floor(price.value * (1 - price.value_offer / 100) * 100) / 100
-          );
-
-        case TypeOfferEnum.FIJO:
-          return price.value - price.value_offer;
-
-        default:
-          return price.value;
-      }
-    } else if (price.value) {
-      return price.value;
-    }
-
-    return undefined;
   }
 
   //-------- Storage -----//
@@ -620,5 +556,16 @@ export class ModelsService {
     }
 
     return modelDTO;
+  }
+
+  /**
+   * Calcular los precios
+   *
+   * @param {*} params Se pasa el precio y la fecha de compra
+   * @return {*}  {Observable<any>}
+   * @memberof ModelsService
+   */
+  public calcularPrecioSubscripcion(params: any): Observable<any> {
+    return this.http.get(`${this.urlModelsApi}/obtener-precios`, { params });
   }
 }

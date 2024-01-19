@@ -457,9 +457,17 @@
                     </div>
                   </ng-container>
                 </ng-container>
-
-                <label for=""
-                  >Precio Final: {{ this.calcularPrecio(price.value) }}
+                <button
+                  type="button"
+                  class="btn btn-secondary btn-sm m-2"
+                  (click)="this.calcularPrecio(price.value, i)"
+                >
+                  Calcular precio
+                </button>
+                <br />
+                <label *ngIf="this.preciosSimulados.get(i)"
+                  >Precio Final:
+                  {{ this.preciosSimulados.get(i) | currency : "USD" }}
                 </label>
               </div>
               <button
@@ -473,7 +481,11 @@
           </ng-container>
         </div>
         <div class="card-footer">
-          <button class="btn btn-secondary" [routerLink]="['/home-seller']">
+          <button
+            class="btn btn-secondary"
+            [routerLink]="['/home-seller']"
+            type="button"
+          >
             Regresar
           </button>
           <button
