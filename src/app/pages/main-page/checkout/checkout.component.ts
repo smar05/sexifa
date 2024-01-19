@@ -914,6 +914,9 @@ export class CheckoutComponent implements OnInit {
         throw error;
       }
     });
+
+    this.load = false;
+    functions.bloquearPantalla(false);
   }
 
   private async calcularPrecio(price: IpriceModel): Promise<number> {
