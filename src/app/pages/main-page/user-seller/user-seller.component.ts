@@ -128,7 +128,10 @@ export class UserSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      functions.bloquearPantalla(false);
+      throw error;
     }
     functions.bloquearPantalla(false);
   }
@@ -169,9 +172,11 @@ export class UserSellerComponent {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
 
             resolve(null);
+            throw err;
           }
         );
     });
@@ -244,7 +249,9 @@ export class UserSellerComponent {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
     );
   }
@@ -305,6 +312,7 @@ export class UserSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
 
       functions.bloquearPantalla(false);
@@ -317,6 +325,8 @@ export class UserSellerComponent {
         'Ha ocurrido un error en la consulta de ubicaciones',
         'error'
       );
+
+      throw error;
     }
   }
 
@@ -351,7 +361,9 @@ export class UserSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -387,7 +399,9 @@ export class UserSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 }

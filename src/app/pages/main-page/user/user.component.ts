@@ -190,7 +190,10 @@ export class UserComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      functions.bloquearPantalla(false);
+      throw error;
     }
     functions.bloquearPantalla(false);
   }
@@ -230,9 +233,12 @@ export class UserComponent implements OnInit {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
 
             resolve(null);
+
+            throw err;
           }
         );
     });
@@ -306,7 +312,9 @@ export class UserComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
     );
   }
@@ -375,10 +383,12 @@ export class UserComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
 
       functions.bloquearPantalla(false);
       this.loading = false;
+      throw error;
     }
   }
 
@@ -413,7 +423,9 @@ export class UserComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -449,7 +461,9 @@ export class UserComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -460,6 +474,7 @@ export class UserComponent implements OnInit {
       await this.telegramLocalService.probarConexionBot(this.chatId.value);
     } catch (error) {
       functions.bloquearPantalla(false);
+      throw error;
     }
 
     functions.bloquearPantalla(false);
@@ -510,7 +525,9 @@ export class UserComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
     let position: number = 1;
 

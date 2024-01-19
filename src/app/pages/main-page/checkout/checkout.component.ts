@@ -98,7 +98,9 @@ export class CheckoutComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     try {
@@ -124,7 +126,9 @@ export class CheckoutComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     console.log(
@@ -155,11 +159,14 @@ export class CheckoutComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     this.paypalData();
     functions.bloquearPantalla(false);
+    this.load = false;
   }
 
   /**
@@ -205,7 +212,9 @@ export class CheckoutComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
     }
   }
@@ -252,7 +261,9 @@ export class CheckoutComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     let dataSubscriptions: Isubscriptions[] = [];
@@ -314,7 +325,9 @@ export class CheckoutComponent implements OnInit {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
+            throw error;
           }
 
           idsSubscriptions.push(res.id);
@@ -360,7 +373,9 @@ export class CheckoutComponent implements OnInit {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
 
         localStorage.removeItem(LocalStorageEnum.CART);
@@ -391,7 +406,9 @@ export class CheckoutComponent implements OnInit {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
 
         alerts.basicAlert(
@@ -457,7 +474,9 @@ export class CheckoutComponent implements OnInit {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
+            throw error;
           }
 
           if (order.status == PayPalStatusEnum.COMPLETED) {
@@ -497,7 +516,9 @@ export class CheckoutComponent implements OnInit {
                 .then((res) => {})
                 .catch((err) => {
                   alerts.basicAlert('Error', 'Error', 'error');
+                  throw err;
                 });
+              throw error;
             }
 
             // Se organiza la informacion de las subscripciones compradas
@@ -551,7 +572,9 @@ export class CheckoutComponent implements OnInit {
                   .then((res) => {})
                   .catch((err) => {
                     alerts.basicAlert('Error', 'Error', 'error');
+                    throw err;
                   });
+                throw error;
               }
 
               idsSubscriptions.push(res.id);
@@ -597,7 +620,9 @@ export class CheckoutComponent implements OnInit {
                 .then((res) => {})
                 .catch((err) => {
                   alerts.basicAlert('Error', 'Error', 'error');
+                  throw err;
                 });
+              throw error;
             }
 
             localStorage.removeItem(LocalStorageEnum.CART);
@@ -630,7 +655,9 @@ export class CheckoutComponent implements OnInit {
                 .then((res) => {})
                 .catch((err) => {
                   alerts.basicAlert('Error', 'Error', 'error');
+                  throw err;
                 });
+              throw error;
             }
 
             alerts.basicAlert(
@@ -712,7 +739,9 @@ export class CheckoutComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
     }
   }
@@ -746,10 +775,12 @@ export class CheckoutComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
 
       functions.bloquearPantalla(false);
       this.load = false;
+      throw err;
     }
 
     this.user = data[0].data;
@@ -761,7 +792,8 @@ export class CheckoutComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.load = true;
 
-    if (!localStorage.getItem(LocalStorageEnum.CART)) return;
+    let aux: string = localStorage.getItem(LocalStorageEnum.CART);
+    if (!aux || !JSON.parse(aux) || JSON.parse(aux).length === 0) return;
 
     this.cartLocal = JSON.parse(
       localStorage.getItem(LocalStorageEnum.CART) || ''
@@ -820,9 +852,11 @@ export class CheckoutComponent implements OnInit {
                     .then((res) => {})
                     .catch((err) => {
                       alerts.basicAlert('Error', 'Error', 'error');
+                      throw err;
                     });
 
                   resolve(null);
+                  throw err;
                 }
               );
           });
@@ -907,6 +941,7 @@ export class CheckoutComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
 
         functions.bloquearPantalla(false);
@@ -951,6 +986,7 @@ export class CheckoutComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
       return undefined;
     }
@@ -1030,6 +1066,8 @@ export class CheckoutComponent implements OnInit {
 
     try {
       await this.telegramLocalService.probarConexionBot(this.user.chatId);
-    } catch (error) {}
+    } catch (error) {
+      throw error;
+    }
   }
 }

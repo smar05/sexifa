@@ -63,7 +63,10 @@ export class HomeComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      functions.bloquearPantalla(false);
+      throw error;
     }
     functions.bloquearPantalla(false);
   }
@@ -92,7 +95,9 @@ export class HomeComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -136,7 +141,9 @@ export class HomeComponent implements OnInit {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
       );
   }
@@ -169,7 +176,9 @@ export class HomeComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -245,7 +254,9 @@ export class HomeComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
     // Guardar referencia al último documento de la página actual
     if (res.length > 0) {
@@ -287,7 +298,9 @@ export class HomeComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
     });
     functions.bloquearPantalla(false);
@@ -320,7 +333,9 @@ export class HomeComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
       return;
     }
@@ -348,7 +363,9 @@ export class HomeComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 

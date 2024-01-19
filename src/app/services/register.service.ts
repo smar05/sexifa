@@ -73,7 +73,9 @@ export class RegisterService {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw err;
       });
   }
 }

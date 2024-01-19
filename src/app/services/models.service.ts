@@ -221,7 +221,9 @@ export class ModelsService {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     if (image) {
@@ -266,7 +268,9 @@ export class ModelsService {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     if (images) {
@@ -296,9 +300,11 @@ export class ModelsService {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
         }
         imagesUrl.push();
+        throw console.error();
       }
       return imagesUrl;
     }
@@ -343,7 +349,9 @@ export class ModelsService {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
 
       if (images && images.length > 0) {
@@ -372,7 +380,9 @@ export class ModelsService {
                 .then((res) => {})
                 .catch((err) => {
                   alerts.basicAlert('Error', 'Error', 'error');
+                  throw err;
                 });
+              throw error;
             }
           } else {
             continue;
@@ -396,7 +406,9 @@ export class ModelsService {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     return complete;
@@ -437,7 +449,9 @@ export class ModelsService {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     return guardarImagen;
@@ -492,7 +506,9 @@ export class ModelsService {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
 
         modelDTO.gallery?.push(urlImage);
@@ -524,7 +540,9 @@ export class ModelsService {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
     //Categoria
     try {
@@ -552,7 +570,9 @@ export class ModelsService {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     return modelDTO;

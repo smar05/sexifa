@@ -53,7 +53,9 @@ export class LocationService {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw err;
       });
   }
 
@@ -94,7 +96,9 @@ export class LocationService {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw err;
       });
   }
 
@@ -142,7 +146,9 @@ export class LocationService {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw err;
       });
   }
 }

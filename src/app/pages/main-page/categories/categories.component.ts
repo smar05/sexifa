@@ -53,7 +53,9 @@ export class CategoriesComponent implements OnInit {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
       );
   }

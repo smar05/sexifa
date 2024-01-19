@@ -87,7 +87,9 @@ export class HomeSellerComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
     functions.bloquearPantalla(false);
   }
@@ -128,7 +130,9 @@ export class HomeSellerComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     this.model = res[0].data;
@@ -172,7 +176,9 @@ export class HomeSellerComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     this.subscriptions = res.map((r: IFireStoreRes) => {

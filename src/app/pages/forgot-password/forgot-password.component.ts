@@ -89,10 +89,12 @@ export class ForgotPasswordComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
 
         functions.bloquearPantalla(false);
         this.loading = false;
+        throw error;
       });
   }
 

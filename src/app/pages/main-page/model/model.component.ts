@@ -80,7 +80,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     try {
@@ -106,7 +108,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     if (!this.model || Object.keys(this.model).length === 0) return;
@@ -136,7 +140,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     // Guardamos la visita del usuario a la pagina
@@ -163,7 +169,10 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      functions.bloquearPantalla(false);
+      throw error;
     }
     functions.bloquearPantalla(false);
   }
@@ -199,7 +208,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     // Si no se encuentra un usuario
@@ -249,7 +260,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
 
     // Si no se encuentra un modelo con el id colocado en la url
@@ -300,7 +313,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
     this.imgPrincipal = this.model.mainImage || '';
 
@@ -334,7 +349,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -419,7 +436,9 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -459,7 +478,9 @@ export class ModelComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
 
       if (!res || res.perteneceAlGrupo) {
@@ -504,7 +525,9 @@ export class ModelComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
 
       if (subscritionsActivas && subscritionsActivas.length > 0) {
@@ -580,10 +603,13 @@ export class ModelComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
 
       functions.bloquearPantalla(false);
       this.load = false;
+
+      throw error;
     }
   }
 
@@ -633,7 +659,9 @@ export class ModelComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw error;
       }
     }
   }

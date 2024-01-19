@@ -185,7 +185,11 @@ export class PageSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+
+      functions.bloquearPantalla(false);
+      throw error;
     }
     functions.bloquearPantalla(false);
   }
@@ -258,9 +262,12 @@ export class PageSellerComponent {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
 
             resolve(null);
+
+            throw err;
           }
         );
     });
@@ -307,9 +314,12 @@ export class PageSellerComponent {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
 
             resolve(null);
+
+            throw err;
           }
         );
     });
@@ -390,7 +400,10 @@ export class PageSellerComponent {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+
+        throw error;
       }
 
       if (this.modelEnDb.gallery) {
@@ -422,7 +435,9 @@ export class PageSellerComponent {
                 .then((res) => {})
                 .catch((err) => {
                   alerts.basicAlert('Error', 'Error', 'error');
+                  throw err;
                 });
+              throw error;
             }
             this.allGallery.push(urlImage);
             this.editGallery.push(urlImage);
@@ -574,7 +589,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw err;
         }
       );
     } else {
@@ -605,7 +622,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw err;
         }
       );
     }
@@ -653,7 +672,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
       }
 
@@ -685,7 +706,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
         nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(nombres);
       }
@@ -729,7 +752,9 @@ export class PageSellerComponent {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
+            throw error;
           }
         });
       }
@@ -764,7 +789,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
       }
 
@@ -810,7 +837,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
       }
 
@@ -844,7 +873,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
         nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(nombres);
       }
@@ -888,7 +919,9 @@ export class PageSellerComponent {
               .then((res) => {})
               .catch((err) => {
                 alerts.basicAlert('Error', 'Error', 'error');
+                throw err;
               });
+            throw error;
           }
         });
       }
@@ -923,7 +956,9 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+          throw error;
         }
       }
 
@@ -967,9 +1002,9 @@ export class PageSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
-          return;
+          throw err;
         });
-      return;
+      throw error;
     }
     if (resp) {
       switch (type) {
@@ -1042,7 +1077,9 @@ export class PageSellerComponent {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
+        throw err;
       });
   }
 
@@ -1086,12 +1123,12 @@ export class PageSellerComponent {
             alerts.basicAlert('Error', 'Error', 'error');
             functions.bloquearPantalla(false);
             this.loadData = false;
-            return;
+            throw err;
           });
 
         functions.bloquearPantalla(false);
         this.loadData = false;
-        return;
+        throw error;
       }
     }
   }
@@ -1137,10 +1174,12 @@ export class PageSellerComponent {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
 
           functions.bloquearPantalla(false);
           this.loadData = false;
+          throw error;
         }
       }
     }
@@ -1303,7 +1342,9 @@ export class PageSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
+      throw error;
     }
   }
 
@@ -1356,12 +1397,13 @@ export class PageSellerComponent {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
         });
 
       functions.bloquearPantalla(false);
       this.loadData = false;
 
-      return;
+      throw error;
     }
 
     this.preciosSimulados.set(index, precioCalculado[0]);

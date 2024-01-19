@@ -132,7 +132,10 @@ export class LoginComponent implements OnInit {
             .then((res) => {})
             .catch((err) => {
               alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
             });
+
+          throw error;
         }
 
         // Verificar el estado del usuario
@@ -233,10 +236,12 @@ export class LoginComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
           });
 
         functions.bloquearPantalla(false);
         this.loading = false;
+        throw error;
       });
   }
 
