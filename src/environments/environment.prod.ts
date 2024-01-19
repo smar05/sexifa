@@ -37,6 +37,10 @@ export const environment = {
     views_model: 'views_model',
     front_logs: 'front_logs',
   },
+  urlsServidor: {
+    urlTelegramApi: 'telegram',
+    urlModelsApi: 'models',
+  },
   urlRefreshToken: `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
   firebaseConfig,
   apiKeyLocation,
