@@ -333,8 +333,12 @@ export class HomeComponent implements OnInit {
           .then((res) => {})
           .catch((err) => {
             alerts.basicAlert('Error', 'Error', 'error');
+            functions.bloquearPantalla(false);
+            this.load = false;
             throw err;
           });
+        functions.bloquearPantalla(false);
+        this.load = false;
         throw error;
       }
       return;
@@ -363,8 +367,12 @@ export class HomeComponent implements OnInit {
         .then((res) => {})
         .catch((err) => {
           alerts.basicAlert('Error', 'Error', 'error');
+          functions.bloquearPantalla(false);
+          this.load = false;
           throw err;
         });
+      functions.bloquearPantalla(false);
+      this.load = false;
       throw error;
     }
   }

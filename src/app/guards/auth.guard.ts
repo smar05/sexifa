@@ -53,7 +53,7 @@ export class AuthGuard implements CanActivate {
                   pathActual.includes(UrlPagesEnum.CHECKOUT);
                 break;
 
-              case UserTypeEnum.VENDEDOR:
+              case UserTypeEnum.CREADOR:
                 usuarioPuedeAcceder =
                   pathActual.includes(UrlPagesEnum.HOME_SELLER) ||
                   pathActual.includes(UrlPagesEnum.PAGE_SELLER) ||

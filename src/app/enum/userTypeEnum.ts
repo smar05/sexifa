@@ -6,5 +6,5 @@
  */
 export enum UserTypeEnum {
   USUARIO = 'usuario',
-  VENDEDOR = 'vendedor',
+  CREADOR = 'creador',
 }

@@ -22,7 +22,7 @@
                 value="{{ tipo }}"
                 *ngFor="let tipo of this.tipoDeUsuarios()"
               >
-                {{ tipo }}
+                {{ tipo.charAt(0).toUpperCase() + tipo.slice(1) }}
               </option>
             </select>
 

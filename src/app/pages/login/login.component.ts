@@ -176,10 +176,10 @@ export class LoginComponent implements OnInit {
             url = `/${UrlPagesEnum.HOME}`;
             break;
 
-          case UserTypeEnum.VENDEDOR:
+          case UserTypeEnum.CREADOR:
             localStorage.setItem(
               LocalStorageEnum.USER_TYPE,
-              UserTypeEnum.VENDEDOR
+              UserTypeEnum.CREADOR
             );
             url = `/${UrlPagesEnum.HOME_SELLER}`;
             break;
