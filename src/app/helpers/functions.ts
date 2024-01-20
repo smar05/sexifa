@@ -240,7 +240,7 @@ export class functions {
     let divBloquear: HTMLElement = document.querySelector('#bloquear');
     let divApp: HTMLElement = document.querySelector('#app');
 
-    divBloquear.style.display = bloquear ? 'flex' : 'none';
-    divApp.style.display = bloquear ? 'none' : 'flex';
+    divBloquear.style.display = bloquear ? 'block' : 'none';
+    divApp.style.display = bloquear ? 'none' : 'block';
   }
 }
