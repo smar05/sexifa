@@ -1067,7 +1067,9 @@ export class CheckoutComponent implements OnInit {
     try {
       await this.telegramLocalService.probarConexionBot(this.user.chatId);
     } catch (error) {
+      functions.bloquearPantalla(false);
       throw error;
     }
+    functions.bloquearPantalla(false);
   }
 }

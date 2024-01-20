@@ -238,7 +238,9 @@ export class functions {
    */
   static bloquearPantalla(bloquear: boolean): void {
     let divBloquear: HTMLElement = document.querySelector('#bloquear');
+    let divApp: HTMLElement = document.querySelector('#app');
 
     divBloquear.style.display = bloquear ? 'flex' : 'none';
+    divApp.style.display = bloquear ? 'none' : 'flex';
   }
 }
