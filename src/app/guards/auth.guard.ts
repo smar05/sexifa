@@ -60,7 +60,7 @@ export class AuthGuard implements CanActivate {
                   pathActual.includes(UrlPagesEnum.LOGIN) ||
                   pathActual.includes(UrlPagesEnum.FORGOT_PASSWORD) ||
                   pathActual.includes(UrlPagesEnum.REGISTER) ||
-                  pathActual.includes(UrlPagesEnum.USER_SELLER);
+                  pathActual.includes(UrlPagesEnum.CREATOR);
                 break;
 
               default:

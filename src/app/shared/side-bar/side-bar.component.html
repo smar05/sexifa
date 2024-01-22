@@ -26,9 +26,7 @@
         <li class="nav-item">
           <a
             class="nav-link"
-            [routerLink]="[
-              this.userType == 'usuario' ? '/user' : '/user-seller'
-            ]"
+            [routerLink]="[this.userType == 'usuario' ? '/user' : '/creator']"
           >
             <i class="nav-icon fas fa-user"></i>
             <p>Mi cuenta</p>
