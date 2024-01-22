@@ -8,6 +8,6 @@ export enum UrlPagesEnum {
   FORGOT_PASSWORD = 'forgot-password',
   //Seller
   HOME_SELLER = 'home-seller',
-  USER_SELLER = 'user-seller',
+  CREATOR = 'creator',
   PAGE_SELLER = 'page-seller',
 }

@@ -32,16 +32,19 @@ const routes: Routes = [
         path: UrlPagesEnum.HOME,
         loadChildren: () =>
           import('./main-page/home/home.module').then((m) => m.HomeModule),
+        canActivate: [AuthGuard],
       },
       {
         path: `${UrlPagesEnum.GROUP}`,
         loadChildren: () =>
           import('./main-page/model/model.module').then((m) => m.ModelModule),
+        canActivate: [AuthGuard],
       },
       {
         path: UrlPagesEnum.USER,
         loadChildren: () =>
           import('./main-page/user/user.module').then((m) => m.UserModule),
+        canActivate: [AuthGuard],
       },
       {
         path: UrlPagesEnum.CHECKOUT,
@@ -49,6 +52,7 @@ const routes: Routes = [
           import('./main-page/checkout/checkout.module').then(
             (m) => m.CheckoutModule
           ),
+        canActivate: [AuthGuard],
       },
       //Seller
       {
@@ -57,13 +61,15 @@ const routes: Routes = [
           import('./main-page/home-seller/home-seller.module').then(
             (m) => m.HomeSellerModule
           ),
+        canActivate: [AuthGuard],
       },
       {
-        path: UrlPagesEnum.USER_SELLER,
+        path: UrlPagesEnum.CREATOR,
         loadChildren: () =>
           import('./main-page/user-seller/user-seller.module').then(
             (m) => m.UserSellerModule
           ),
+        canActivate: [AuthGuard],
       },
       {
         path: UrlPagesEnum.PAGE_SELLER,
@@ -71,6 +77,7 @@ const routes: Routes = [
           import('./main-page/page-seller/page-seller.module').then(
             (m) => m.PageSellerModule
           ),
+        canActivate: [AuthGuard],
       },
       { path: '**', component: Error404Component },
     ],
