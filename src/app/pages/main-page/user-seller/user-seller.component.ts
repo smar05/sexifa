@@ -485,4 +485,64 @@ export class UserSellerComponent {
     functions.bloquearPantalla(false);
     this.loading = false;
   }
+
+  public exportarSaldo(): void {
+    functions.bloquearPantalla(true);
+    this.loading = true;
+    let data: any = this.subscripcionesPendientes.map(
+      (subscripcion: Isubscriptions) => {
+        let r: any = {
+          id: subscripcion.id,
+          userId: subscripcion.userId,
+          time: subscripcion.time,
+          beginTime: subscripcion.beginTime,
+          endTime: subscripcion.endTime,
+          price: subscripcion.price,
+          commission: `${subscripcion.commission * 100}%`,
+          commissionValue:
+            Math.floor(subscripcion.price * subscripcion.commission * 100) /
+            100,
+          total:
+            Math.floor(
+              subscripcion.price * (1 - subscripcion.commission) * 100
+            ) / 100,
+        };
+
+        return r;
+      }
+    );
+
+    let options: any = {
+      title: 'Detalle de las subscripciones',
+      fieldSeparator: ';',
+      quoteString: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      noDownload: false,
+      showTitle: false,
+      useBom: false,
+      headers: [
+        'Id de la subscripción',
+        'Id del usuario',
+        'Tiempo de la subscripción (Meses)',
+        'Inicio de la subscripcion',
+        'Fin de la subscripción',
+        'Precio (USD)',
+        'Comisión (%)',
+        'Comisión (USD)',
+        'Total (USD)',
+      ],
+    };
+
+    functions.getCsv(
+      data,
+      `saldo_pendiente_${new Date().toISOString().split(' ').join('_')}`,
+      options
+    );
+
+    functions.bloquearPantalla(false);
+    this.loading = false;
+
+    alerts.basicAlert('Infromación', 'Archivo generado', 'info');
+  }
 }

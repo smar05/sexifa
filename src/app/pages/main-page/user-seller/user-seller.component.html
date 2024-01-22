@@ -256,14 +256,28 @@
         </div>
 
         <div class="card card-3 mt-3" style="background-color: white">
-          <div class="card-body" (click)="this.onClickSaldoPendiente()">
+          <div class="card-body">
             <h3 class="card-title">Consultar saldo pendiente</h3>
-            <p class="card-text" *ngIf="this.saldoPendiente >= 0; else noSaldo">
-              {{ this.saldoPendiente | currency : "USD" }} | # Subscripciones:
-              {{ this.subscripcionesPendientes.length }}
-            </p>
+            <ng-container *ngIf="this.saldoPendiente >= 0; else noSaldo">
+              <p class="card-text">
+                {{ this.saldoPendiente | currency : "USD" }} | # Subscripciones:
+                {{ this.subscripcionesPendientes.length }}
+              </p>
+              <button
+                class="btn btn-block bg-principal text-white"
+                (click)="this.exportarSaldo()"
+              >
+                <i class="fas fa-table"></i> Exportar
+              </button>
+            </ng-container>
             <ng-template #noSaldo>
-              <p class="card-text">********</p>
+              <p class="card-text">
+                ********
+                <i
+                  class="fas fa-eye"
+                  (click)="this.onClickSaldoPendiente()"
+                ></i>
+              </p>
             </ng-template>
           </div>
         </div>

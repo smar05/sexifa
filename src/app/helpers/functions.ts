@@ -1,3 +1,4 @@
+import { ngxCsv } from 'ngx-csv';
 import { alerts } from './alerts';
 import { FormGroup } from '@angular/forms';
 
@@ -242,5 +243,23 @@ export class functions {
 
     divBloquear.style.display = bloquear ? 'flex' : 'none';
     divApp.style.display = bloquear ? 'none' : 'block';
+  }
+
+  /**
+   * Obtener un archivo CSV
+   *
+   * @static
+   * @param {{[key:string]:any}} data
+   * @param {string} filename
+   * @param {{[key:string]:any}} options
+   * @return {*}  {ngxCsv}
+   * @memberof functions
+   */
+  static getCsv(
+    data: { [key: string]: any },
+    filename: string,
+    options: { [key: string]: any }
+  ): ngxCsv {
+    return new ngxCsv(data, filename, options);
   }
 }
