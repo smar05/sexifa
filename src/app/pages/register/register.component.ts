@@ -222,6 +222,7 @@ export class RegisterComponent implements OnInit {
         city: this.city.value,
         chatId: this.chatId.value,
         type: this.type.value,
+        date_created: new Date().toISOString(),
       };
 
       await this.userService.postDataFS(user);

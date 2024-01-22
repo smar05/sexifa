@@ -32,6 +32,7 @@ import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { CurrencyEnum } from 'src/app/enum/currencyEnum';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { BusinessParamsService } from 'src/app/services/business-params.service';
 
 declare var paypal: any;
 
@@ -69,7 +70,8 @@ export class CheckoutComponent implements OnInit {
     private subscriptionsService: SubscriptionsService,
     private ordersService: OrdersService,
     private currencyConverterService: CurrencyConverterService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private businessParamsService: BusinessParamsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -219,6 +221,42 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
+  private async getCommision(): Promise<number> {
+    let data: IFireStoreRes = null;
+
+    try {
+      data = await this.businessParamsService
+        .getItemFS('commission')
+        .toPromise();
+    } catch (err) {
+      console.error('Error: ', err);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error enviando el correo de verificacion',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ getComission ~ JSON.stringify(error): ${JSON.stringify(
+          err
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw err;
+    }
+
+    return data.data.value;
+  }
+
   /**
    * Guarda la informacion de la compra de las subscripciones por payu
    *
@@ -273,6 +311,8 @@ export class CheckoutComponent implements OnInit {
       case '4':
         let cart: ICart[] = [...this.cart];
 
+        let commission: number = await this.getCommision();
+
         // Se organiza la informacion de las subscripciones compradas
         for (const cart1 of cart) {
           let endTime: Date = functions.incrementarMeses(
@@ -292,6 +332,7 @@ export class CheckoutComponent implements OnInit {
             payMethod: PayMethodsEnum.PAYU,
             usd_cop,
             modelStatus: ModelStatusEnum.PENDIENTE_PAGO,
+            commission,
           };
 
           dataSubscriptions.push(data);
@@ -521,6 +562,8 @@ export class CheckoutComponent implements OnInit {
               throw error;
             }
 
+            let commission: number = await this.getCommision();
+
             // Se organiza la informacion de las subscripciones compradas
             for (const cart1 of this.cart) {
               let endTime: Date = functions.incrementarMeses(
@@ -539,6 +582,7 @@ export class CheckoutComponent implements OnInit {
                 payMethod: PayMethodsEnum.PAYPAL,
                 usd_cop,
                 modelStatus: ModelStatusEnum.PENDIENTE_PAGO,
+                commission,
               };
 
               dataSubscriptions.push(data);

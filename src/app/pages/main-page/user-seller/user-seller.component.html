@@ -254,6 +254,19 @@
             </ng-template>
           </div>
         </div>
+
+        <div class="card card-3 mt-3" style="background-color: white">
+          <div class="card-body" (click)="this.onClickSaldoPendiente()">
+            <h3 class="card-title">Consultar saldo pendiente</h3>
+            <p class="card-text" *ngIf="this.saldoPendiente >= 0; else noSaldo">
+              {{ this.saldoPendiente | currency : "USD" }} | # Subscripciones:
+              {{ this.subscripcionesPendientes.length }}
+            </p>
+            <ng-template #noSaldo>
+              <p class="card-text">********</p>
+            </ng-template>
+          </div>
+        </div>
       </div>
     </div>
   </section>

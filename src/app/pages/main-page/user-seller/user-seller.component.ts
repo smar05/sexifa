@@ -2,8 +2,10 @@ import { Component } from '@angular/core';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { FormBuilder, Validators } from '@angular/forms';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
+import { Isubscriptions } from 'src/app/interface/i- subscriptions';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { ICities } from 'src/app/interface/icities';
 import { ICountries } from 'src/app/interface/icountries';
@@ -12,6 +14,7 @@ import { IState } from 'src/app/interface/istate';
 import { Iuser } from 'src/app/interface/iuser';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { LocationService } from 'src/app/services/location.service';
+import { SubscriptionsService } from 'src/app/services/subscriptions.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -20,6 +23,8 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./user-seller.component.css'],
 })
 export class UserSellerComponent {
+  public subscripcionesPendientes: Isubscriptions[] = null;
+  public saldoPendiente: number = undefined;
   public f: any = this.form.group({
     name: [
       '',
@@ -103,7 +108,8 @@ export class UserSellerComponent {
     private form: FormBuilder,
     private userService: UserService,
     private locationService: LocationService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private subscriptionsService: SubscriptionsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -403,5 +409,80 @@ export class UserSellerComponent {
         });
       throw error;
     }
+  }
+
+  public async onClickSaldoPendiente(): Promise<void> {
+    if (this.saldoPendiente >= 0) {
+      alerts.basicAlert('Información', 'El saldo ya se ha calculado', 'info');
+      return;
+    }
+
+    await this.calcularSaldoModelo();
+  }
+
+  private async calcularSaldoModelo(): Promise<void> {
+    functions.bloquearPantalla(true);
+    this.loading = true;
+
+    this.saldoPendiente = undefined;
+    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+
+    if (!modelId) {
+      return undefined;
+    }
+
+    let data: IFireStoreRes[] = null;
+    try {
+      let qf: QueryFn = (ref) =>
+        ref
+          .where('modelId', '==', modelId)
+          .where('modelStatus', '==', ModelStatusEnum.PENDIENTE_PAGO);
+      data = await this.subscriptionsService.getDataFS(qf).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuarios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ calcularSaldoModelo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          functions.bloquearPantalla(true);
+          this.loading = true;
+          throw err;
+        });
+
+      functions.bloquearPantalla(true);
+      this.loading = true;
+      throw error;
+    }
+
+    if (!data) return undefined;
+
+    this.subscripcionesPendientes = data.map((a: IFireStoreRes) => {
+      return { id: a.id, ...a.data };
+    });
+
+    this.saldoPendiente = this.subscripcionesPendientes.reduce(
+      (pv: number, cv: Isubscriptions) => {
+        return pv + Math.floor(cv.price * (1 - cv.commission) * 100) / 100;
+      },
+      0
+    );
+
+    functions.bloquearPantalla(false);
+    this.loading = false;
   }
 }

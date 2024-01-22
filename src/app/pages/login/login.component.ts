@@ -14,6 +14,9 @@ import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { ModelsService } from 'src/app/services/models.service';
+import { Imodels } from 'src/app/interface/imodels';
+import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 
 @Component({
   selector: 'app-login',
@@ -35,7 +38,8 @@ export class LoginComponent implements OnInit {
     private loginService: LoginService,
     private router: Router,
     private userService: UserService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private modelsService: ModelsService
   ) {}
 
   ngOnInit(): void {
@@ -181,6 +185,57 @@ export class LoginComponent implements OnInit {
               LocalStorageEnum.USER_TYPE,
               UserTypeEnum.CREADOR
             );
+
+            let model: Imodels = null;
+            let data: IFireStoreRes[] = null;
+            try {
+              let qf: QueryFn = (ref) =>
+                ref.where(
+                  'idUser',
+                  '==',
+                  localStorage.getItem(LocalStorageEnum.LOCAL_ID)
+                );
+              data = await this.modelsService.getDataFS(qf).toPromise();
+            } catch (error) {
+              console.error('Error: ', error);
+              alerts.basicAlert(
+                'Error',
+                'Ha ocurrido un error en la consulta de usuarios',
+                'error'
+              );
+
+              let data: IFrontLogs = {
+                date: new Date(),
+                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+                log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+                  error
+                )}`,
+              };
+
+              this.frontLogsService
+                .postDataFS(data)
+                .then((res) => {})
+                .catch((err) => {
+                  alerts.basicAlert('Error', 'Error', 'error');
+                  functions.bloquearPantalla(false);
+                  this.loading = false;
+                  throw err;
+                });
+
+              functions.bloquearPantalla(false);
+              this.loading = false;
+              throw error;
+            }
+
+            if (!data) throw 'Error';
+
+            model = data[0].data;
+            model.id = data[0].id;
+
+            if (model && model.id) {
+              localStorage.setItem(LocalStorageEnum.MODEL_ID, model.id);
+            }
+
             url = `/${UrlPagesEnum.HOME_SELLER}`;
             break;
 

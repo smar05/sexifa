@@ -40,6 +40,7 @@ export const environment = {
     orders: 'orders',
     views_model: 'views_model',
     front_logs: 'front_logs',
+    business_params: 'business_params',
   },
   urlsServidor: {
     urlTelegramApi: 'telegram',
