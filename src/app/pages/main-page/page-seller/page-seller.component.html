@@ -332,6 +332,7 @@
                     class="form-control"
                     formControlName="type_offer"
                     name="type_offer"
+                    (change)="this.onChangeTipoOferta(price.value, i)"
                   >
                     <option value="">N/A</option>
                     <option value="Disccount">Descuento</option>

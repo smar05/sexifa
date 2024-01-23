@@ -1,5 +1,6 @@
 export enum ModelStatusEnum {
   PAGADO = 'pagado',
-  ANULAO = 'anulado',
+  ANULADO = 'anulado',
   PENDIENTE_PAGO = 'pendiente_pago',
+  SALDO_SOLICITADO = 'saldo_solicitado',
 }

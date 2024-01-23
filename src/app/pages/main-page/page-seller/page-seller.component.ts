@@ -1411,4 +1411,18 @@ export class PageSellerComponent {
     functions.bloquearPantalla(false);
     this.loadData = false;
   }
+
+  public onChangeTipoOferta(precio: IpriceModel, index: number): void {
+    if (!precio.type_offer || precio.type_offer === '') {
+      precio.sales = 0;
+      precio.date_offer = '';
+      precio.type_limit = '';
+      precio.value_offer = 0;
+
+      let precios: IpriceModel[] = this.price.value;
+      precios[index] = precio;
+
+      this.price.setValue(precios);
+    }
+  }
 }

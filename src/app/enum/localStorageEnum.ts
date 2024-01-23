@@ -8,4 +8,5 @@ export enum LocalStorageEnum {
   VIEWS_MODEL = 'viewsModel',
   PAYU_PROCESO = 'payu_proceso',
   REDIRECT_TO = 'redirect_to',
+  MODEL_ID = 'model_id',
 }

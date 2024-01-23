@@ -11,4 +11,5 @@ export interface Iuser {
   city?: string;
   chatId?: number;
   type?: string;
+  date_created?: string;
 }

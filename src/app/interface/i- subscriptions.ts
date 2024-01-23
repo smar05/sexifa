@@ -11,4 +11,5 @@ export interface Isubscriptions {
   payMethod: string;
   date_created: string;
   modelStatus: string;
+  commission: number;
 }

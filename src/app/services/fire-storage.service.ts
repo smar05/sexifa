@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, QueryFn } from '@angular/fire/compat/firestore';
+import {
+  AngularFirestore,
+  DocumentReference,
+  QueryFn,
+} from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { IFireStoreRes } from '../interface/ifireStoreRes';
 import { map } from 'rxjs/operators';
@@ -63,7 +67,23 @@ export class FireStorageService {
    * @memberof FireStorageService
    */
   public patch(collection: string, doc: string, data: Object): Promise<any> {
-    return this.firestore.collection(collection).doc(doc).set(data);
+    return this.firestore.collection(collection).doc(doc).update(data);
+  }
+
+  public updateDocuments(
+    collection: string,
+    updates: { doc: string; data: any }[]
+  ): Promise<void> {
+    const batch = this.firestore.firestore.batch();
+
+    updates.forEach((update: { doc: string; data: any }) => {
+      const docRef: DocumentReference<unknown> = this.firestore
+        .collection(collection)
+        .doc(update.doc).ref;
+      batch.update(docRef, update.data);
+    });
+
+    return batch.commit();
   }
 
   /**

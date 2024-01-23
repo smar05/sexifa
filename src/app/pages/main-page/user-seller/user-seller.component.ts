@@ -1,10 +1,23 @@
-import { Component } from '@angular/core';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { Component, ViewChild } from '@angular/core';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { FormBuilder, Validators } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
+import { Isubscriptions } from 'src/app/interface/i- subscriptions';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { EnumSaldosStatus, ISaldos } from 'src/app/interface/i-saldos';
 import { ICities } from 'src/app/interface/icities';
 import { ICountries } from 'src/app/interface/icountries';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
@@ -12,14 +25,43 @@ import { IState } from 'src/app/interface/istate';
 import { Iuser } from 'src/app/interface/iuser';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { LocationService } from 'src/app/services/location.service';
+import { SaldosService } from 'src/app/services/saldos.service';
+import { SubscriptionsService } from 'src/app/services/subscriptions.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-user-seller',
   templateUrl: './user-seller.component.html',
   styleUrls: ['./user-seller.component.css'],
+  animations: [
+    trigger('detailExpand', [
+      state(
+        'collapsed,void',
+        style({ height: '0px', minHeight: '0', display: 'none' })
+      ),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+      transition(
+        'expanded <=> void',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+    ]),
+  ],
 })
 export class UserSellerComponent {
+  public subscripcionesPendientes: Isubscriptions[] = null;
+  public saldoPendiente: number = undefined;
+  public saldosSolicitados: ISaldos[] = null;
+  public dataSource!: MatTableDataSource<any>; //Instancia la data que aparecera en la tabla
+  //Paginador
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  //Orden
+  @ViewChild(MatSort) sort!: MatSort;
+  public expandedElement!: Isubscriptions | null;
+  public displayedColumns: string[] = ['position', 'fecha', 'status', 'price']; //Variable para nombrar las columnas de la tabla
   public f: any = this.form.group({
     name: [
       '',
@@ -103,7 +145,9 @@ export class UserSellerComponent {
     private form: FormBuilder,
     private userService: UserService,
     private locationService: LocationService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private subscriptionsService: SubscriptionsService,
+    private saldosService: SaldosService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -402,6 +446,374 @@ export class UserSellerComponent {
           throw err;
         });
       throw error;
+    }
+  }
+
+  public async onClickSaldoPendiente(): Promise<void> {
+    if (this.saldoPendiente >= 0) {
+      alerts.basicAlert('Información', 'El saldo ya se ha calculado', 'info');
+      return;
+    }
+
+    await this.calcularSaldoModelo();
+  }
+
+  private async calcularSaldoModelo(): Promise<void> {
+    functions.bloquearPantalla(true);
+    this.loading = true;
+
+    this.saldoPendiente = undefined;
+    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+
+    if (!modelId) {
+      return undefined;
+    }
+
+    let data: IFireStoreRes[] = null;
+    try {
+      let qf: QueryFn = (ref) =>
+        ref
+          .where('modelId', '==', modelId)
+          .where('modelStatus', '==', ModelStatusEnum.PENDIENTE_PAGO);
+      data = await this.subscriptionsService.getDataFS(qf).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuarios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ calcularSaldoModelo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          functions.bloquearPantalla(false);
+          this.loading = false;
+          throw err;
+        });
+
+      functions.bloquearPantalla(false);
+      this.loading = false;
+      throw error;
+    }
+
+    if (!data) return undefined;
+
+    this.subscripcionesPendientes = data.map((a: IFireStoreRes) => {
+      return { id: a.id, ...a.data };
+    });
+
+    this.saldoPendiente = this.subscripcionesPendientes.reduce(
+      (pv: number, cv: Isubscriptions) => {
+        return pv + Math.floor(cv.price * (1 - cv.commission) * 100) / 100;
+      },
+      0
+    );
+
+    functions.bloquearPantalla(false);
+    this.loading = false;
+  }
+
+  public exportarSaldo(): void {
+    if (
+      !(this.saldoPendiente > 0 && this.subscripcionesPendientes.length > 0)
+    ) {
+      alerts.basicAlert(
+        'Alerta',
+        'No hay subscripciones por consultar',
+        'warning'
+      );
+      return;
+    }
+
+    functions.bloquearPantalla(true);
+    this.loading = true;
+    let data: any = this.subscripcionesPendientes.map(
+      (subscripcion: Isubscriptions) => {
+        let r: any = {
+          id: subscripcion.id,
+          userId: subscripcion.userId,
+          time: subscripcion.time,
+          beginTime: subscripcion.beginTime,
+          endTime: subscripcion.endTime,
+          price: subscripcion.price,
+          commission: `${subscripcion.commission * 100}%`,
+          commissionValue:
+            Math.floor(subscripcion.price * subscripcion.commission * 100) /
+            100,
+          total:
+            Math.floor(
+              subscripcion.price * (1 - subscripcion.commission) * 100
+            ) / 100,
+        };
+
+        return r;
+      }
+    );
+
+    let options: any = {
+      title: 'Detalle de las subscripciones',
+      fieldSeparator: ';',
+      quoteString: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      noDownload: false,
+      showTitle: false,
+      useBom: false,
+      headers: [
+        'Id de la subscripción',
+        'Id del usuario',
+        'Tiempo de la subscripción (Meses)',
+        'Inicio de la subscripcion',
+        'Fin de la subscripción',
+        'Precio (USD)',
+        'Comisión (%)',
+        'Comisión (USD)',
+        'Total (USD)',
+      ],
+    };
+
+    functions.getCsv(
+      data,
+      `saldo_pendiente_${new Date().toISOString().split(' ').join('_')}`,
+      options
+    );
+
+    functions.bloquearPantalla(false);
+    this.loading = false;
+
+    alerts.basicAlert('Listo', 'Archivo generado', 'success');
+  }
+
+  public async onClickGetSaldosSolicitados(): Promise<void> {
+    await this.getSaldosSolicitados();
+  }
+
+  private async getSaldosSolicitados(): Promise<void> {
+    if (this.saldosSolicitados && this.saldosSolicitados.length > 0) {
+      alerts.basicAlert(
+        'Información',
+        'Los saldos ya han sido consultados',
+        'info'
+      );
+      return;
+    }
+
+    functions.bloquearPantalla(true);
+    this.loading = true;
+
+    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+
+    if (!modelId) {
+      functions.bloquearPantalla(false);
+      this.loading = false;
+      return undefined;
+    }
+
+    let data: IFireStoreRes[] = null;
+    try {
+      let qf: QueryFn = (ref) =>
+        ref.where('modelId', '==', modelId).orderBy('status').limit(50);
+
+      data = await this.saldosService.getDataFS(qf).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuarios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ getSaldosSolicitados ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          functions.bloquearPantalla(false);
+          this.loading = false;
+          throw err;
+        });
+
+      functions.bloquearPantalla(false);
+      this.loading = false;
+      throw error;
+    }
+
+    if (!data || data.length == 0) {
+      alerts.basicAlert(
+        'Información',
+        'No se han encontrado solicitudes de saldos',
+        'info'
+      );
+      return;
+    }
+
+    this.saldosSolicitados = data.map((a: IFireStoreRes) => {
+      return { id: a.id, ...a.data };
+    });
+
+    let position: number = 1;
+
+    let saldosAux: any[] = this.saldosSolicitados.map((r: ISaldos) => {
+      return {
+        position: position++,
+        fecha: r.date_created,
+        status: r.status,
+        price: r.price,
+      };
+    });
+
+    this.dataSource = new MatTableDataSource(saldosAux);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+
+    functions.bloquearPantalla(false);
+    this.loading = false;
+  }
+
+  public async solicitarSaldo(): Promise<void> {
+    functions.bloquearPantalla(true);
+    this.loading = true;
+
+    if (this.saldoPendiente < 100) {
+      alerts.basicAlert(
+        'Alerta',
+        'El saldo minimo para solicitar es de USD100',
+        'warning'
+      );
+      functions.bloquearPantalla(false);
+      this.loading = false;
+      return;
+    }
+
+    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+
+    if (!modelId) {
+      functions.bloquearPantalla(false);
+      this.loading = false;
+      return undefined;
+    }
+
+    let dataUpdate: { doc: string; data: any }[] =
+      this.subscripcionesPendientes.map((sp: Isubscriptions) => {
+        let a: { doc: string; data: any } = {
+          doc: sp.id,
+          data: { ...sp, modelStatus: ModelStatusEnum.SALDO_SOLICITADO },
+        };
+
+        delete a.data.id;
+
+        return a;
+      });
+
+    try {
+      await this.subscriptionsService.updateDocuments(dataUpdate);
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuarios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ solicitarSaldo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          functions.bloquearPantalla(false);
+          this.loading = false;
+          throw err;
+        });
+
+      functions.bloquearPantalla(false);
+      this.loading = false;
+      throw error;
+    }
+
+    let saldoData: ISaldos = {
+      date_created: new Date().toISOString(),
+      modelId,
+      status: EnumSaldosStatus.SOLICITADO,
+      idsSubscriptions: this.subscripcionesPendientes.map(
+        (sp: Isubscriptions) => {
+          return sp.id;
+        }
+      ),
+      price: this.saldoPendiente,
+    };
+
+    try {
+      await this.saldosService.postDataFS(saldoData);
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuarios',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ solicitarSaldo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          functions.bloquearPantalla(false);
+          this.loading = false;
+          throw err;
+        });
+
+      functions.bloquearPantalla(false);
+      this.loading = false;
+      throw error;
+    }
+
+    alerts.basicAlert('Listo', 'El saldo ya ha sido solicitado', 'success');
+
+    functions.bloquearPantalla(false);
+    this.loading = false;
+  }
+
+  //FIltro de busqueda
+  public applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
     }
   }
 }

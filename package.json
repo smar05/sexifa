@@ -24,6 +24,7 @@
     "@angular/router": "^15.2.9",
     "jquery": "^3.7.0",
     "md5-typescript": "^1.0.5",
+    "ngx-csv": "^0.3.2",
     "ngx-dropzone": "^3.1.0",
     "ngx-summernote": "^1.0.0",
     "rxjs": "~7.5.0",
