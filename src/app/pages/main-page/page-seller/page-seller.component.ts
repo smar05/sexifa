@@ -30,6 +30,7 @@ import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 
 @Component({
   selector: 'app-page-seller',
@@ -341,9 +342,11 @@ export class PageSellerComponent {
               sales: [
                 price.sales,
                 [
-                  Validators.min(0),
+                  Validators.min(1),
                   Validators.max(999),
-                  Validators.pattern(/^[0-9]+$/),
+                  Validators.pattern(
+                    EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS
+                  ),
                 ],
               ],
               time: [
@@ -352,20 +355,29 @@ export class PageSellerComponent {
                   Validators.required,
                   Validators.min(1),
                   Validators.max(24),
-                  Validators.pattern(/^[0-9]+$/),
+                  Validators.pattern(
+                    EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS
+                  ),
                 ],
               ],
               value: [
                 price.value,
                 [
                   Validators.required,
-                  Validators.min(0),
-                  Validators.pattern(/^[0-9]+$/),
+                  Validators.min(5),
+                  Validators.pattern(
+                    EnumExpresioncesRegulares.NUMEROS_REALES_POSITIVOS
+                  ),
                 ],
               ],
               value_offer: [
                 price.value_offer,
-                [Validators.min(0), Validators.pattern(/^[0-9]+$/)],
+                [
+                  Validators.min(0),
+                  Validators.pattern(
+                    EnumExpresioncesRegulares.NUMEROS_REALES_POSITIVOS
+                  ),
+                ],
               ],
               type_offer: [price.type_offer, []],
               type_limit: [price.type_limit, []],
@@ -1224,33 +1236,44 @@ export class PageSellerComponent {
         this.price.push(
           this.form.group({
             sales: [
-              0,
+              1,
               [
-                Validators.min(0),
+                Validators.min(1),
                 Validators.max(999),
-                Validators.pattern(/^[0-9]+$/),
+                Validators.pattern(
+                  EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS
+                ),
               ],
             ],
             time: [
-              '',
+              1,
               [
                 Validators.required,
                 Validators.min(1),
                 Validators.max(24),
-                Validators.pattern(/^[0-9]+$/),
+                Validators.pattern(
+                  EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS
+                ),
               ],
             ],
             value: [
               '',
               [
                 Validators.required,
-                Validators.min(0),
-                Validators.pattern(/^[0-9]+$/),
+                Validators.min(5),
+                Validators.pattern(
+                  EnumExpresioncesRegulares.NUMEROS_REALES_POSITIVOS
+                ),
               ],
             ],
             value_offer: [
               '',
-              [Validators.min(0), Validators.pattern(/^[0-9]+$/)],
+              [
+                Validators.min(0),
+                Validators.pattern(
+                  EnumExpresioncesRegulares.NUMEROS_REALES_POSITIVOS
+                ),
+              ],
             ],
             type_offer: ['', []],
             type_limit: [PriceTypeLimitEnum.DATE, []],
@@ -1275,6 +1298,19 @@ export class PageSellerComponent {
     //Que el precio no sea negativo
     let valido: boolean = true;
     let valoresUnicos = new Set<number>();
+
+    let precioMenor: number = this.preciosCalculados.find((p: number) => p < 5);
+
+    if (precioMenor) {
+      alerts.basicAlert(
+        'Error',
+        'Un precio da menor al minimo permitido de USD 5',
+        'error'
+      );
+      valido = false;
+
+      return valido;
+    }
 
     let i: number = 0;
     for (let precio of precios) {
@@ -1359,8 +1395,14 @@ export class PageSellerComponent {
 
   public async calcularPrecio(
     price: IpriceModel,
-    index: number
+    index: number,
+    priceInvalid: boolean
   ): Promise<void> {
+    if (priceInvalid) {
+      alerts.basicAlert('Error', 'Hay un error en el precio', 'error');
+      return;
+    }
+
     functions.bloquearPantalla(true);
     this.loadData = true;
 
@@ -1414,10 +1456,22 @@ export class PageSellerComponent {
 
   public onChangeTipoOferta(precio: IpriceModel, index: number): void {
     if (!precio.type_offer || precio.type_offer === '') {
-      precio.sales = 0;
-      precio.date_offer = '';
-      precio.type_limit = '';
-      precio.value_offer = 0;
+      precio.sales = null;
+      precio.date_offer = null;
+      precio.type_limit = null;
+      precio.value_offer = null;
+
+      let precios: IpriceModel[] = this.price.value;
+      precios[index] = precio;
+
+      this.price.setValue(precios);
+    }
+  }
+
+  public onChangeTipoLimite(precio: IpriceModel, index: number): void {
+    if (!precio.type_limit || precio.type_limit === '') {
+      precio.sales = null;
+      precio.date_offer = null;
 
       let precios: IpriceModel[] = this.price.value;
       precios[index] = precio;

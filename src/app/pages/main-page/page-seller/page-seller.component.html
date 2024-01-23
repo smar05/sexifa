@@ -286,17 +286,24 @@
                     class="form-control py-4"
                     formControlName="time"
                     [ngClass]="{
-                      'is-invalid':
-                        formSubmitted && price.controls.time.errors?.required
+                      'is-invalid': price.controls.time.errors
                     }"
                   />
 
                   <span
-                    *ngIf="
-                      formSubmitted && price.controls.time.errors?.required
-                    "
+                    *ngIf="price.controls.time.errors?.required"
                     class="invalid-feedback"
                     >Por favor inserte un tiempo en meses</span
+                  >
+                  <span
+                    *ngIf="price.controls.time.errors?.min"
+                    class="invalid-feedback"
+                    >Por favor inserte un tiempo mayor a 0</span
+                  >
+                  <span
+                    *ngIf="price.controls.time.errors?.pattern"
+                    class="invalid-feedback"
+                    >Por favor inserte un tiempo valido</span
                   >
                 </div>
                 <!--Valor-->
@@ -309,16 +316,23 @@
                     class="form-control py-4"
                     formControlName="value"
                     [ngClass]="{
-                      'is-invalid':
-                        formSubmitted && price.controls.value.errors?.required
+                      'is-invalid': price.controls.value.errors
                     }"
                   />
                   <span
-                    *ngIf="
-                      formSubmitted && price.controls.value.errors?.required
-                    "
+                    *ngIf="price.controls.value.errors?.required"
                     class="invalid-feedback"
                     >Por favor inserte un valor</span
+                  >
+                  <span
+                    *ngIf="price.controls.value.errors?.min"
+                    class="invalid-feedback"
+                    >Por favor inserte un valor mayor o igual a 5</span
+                  >
+                  <span
+                    *ngIf="price.controls.value.errors?.pattern"
+                    class="invalid-feedback"
+                    >Por favor inserte un valor valido</span
                   >
                 </div>
                 <!--tipo de oferta-->
@@ -358,26 +372,19 @@
                       step="any"
                       formControlName="value_offer"
                       [ngClass]="{
-                        'is-invalid':
-                          formSubmitted && price.controls.value_offer.invalid
+                        'is-invalid': price.controls.value_offer.errors
                       }"
                     />
 
                     <div
                       class="invalid-feedback"
-                      *ngIf="
-                        price.controls.value_offer.invalid &&
-                        price.controls.value_offer.errors?.required
-                      "
+                      *ngIf="price.controls.value_offer.errors?.required"
                     >
                       Por favor ingrese un valor
                     </div>
                     <div
                       class="invalid-feedback"
-                      *ngIf="
-                        price.controls.value_offer.invalid &&
-                        price.controls.value_offer.errors?.pattern
-                      "
+                      *ngIf="price.controls.value_offer.errors?.pattern"
                     >
                       Por favor ingrese un valor valido
                     </div>
@@ -394,6 +401,7 @@
                       class="form-control"
                       formControlName="type_limit"
                       name="type_limit"
+                      (change)="onChangeTipoLimite(price.value, i)"
                     >
                       <option value="">N/A</option>
                       <option value="date">Fecha</option>
@@ -448,20 +456,28 @@
 
                       <div
                         class="invalid-feedback"
-                        *ngIf="
-                          price.controls.sales.invalid &&
-                          price.controls.sales.errors?.pattern
-                        "
+                        *ngIf="price.controls.sales.errors?.pattern"
                       >
                         Por favor ingrese un valor valido
                       </div>
+                      <span
+                        *ngIf="price.controls.sales.errors?.min"
+                        class="invalid-feedback"
+                        >Por favor inserte un valor mayor o igual a 1</span
+                      >
+                      <span
+                        *ngIf="price.controls.sales.errors?.pattern"
+                        class="invalid-feedback"
+                        >Por favor inserte un valor valido</span
+                      >
                     </div>
                   </ng-container>
                 </ng-container>
                 <button
                   type="button"
                   class="btn btn-secondary btn-sm m-2"
-                  (click)="this.calcularPrecio(price.value, i)"
+                  (click)="this.calcularPrecio(price.value, i, price.invalid)"
+                  [disabled]="price.invalid"
                 >
                   Calcular precio
                 </button>
