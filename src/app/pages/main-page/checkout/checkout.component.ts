@@ -33,6 +33,11 @@ import { CurrencyEnum } from 'src/app/enum/currencyEnum';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { BusinessParamsService } from 'src/app/services/business-params.service';
+import { MetodosDePagoService } from 'src/app/services/metodos-de-pago.service';
+import {
+  EnumMetodosDePagoStatus,
+  IMetodosDePago,
+} from 'src/app/interface/i-metodos-de-pago';
 
 declare var paypal: any;
 
@@ -57,6 +62,7 @@ export class CheckoutComponent implements OnInit {
   public payMethod!: string;
   public load: boolean = false;
   public models: Imodels[] = [];
+  public metodosDePago: IMetodosDePago[] = null;
 
   @ViewChild('paypal', { static: true })
   paypalElement!: ElementRef;
@@ -71,7 +77,8 @@ export class CheckoutComponent implements OnInit {
     private ordersService: OrdersService,
     private currencyConverterService: CurrencyConverterService,
     private frontLogsService: FrontLogsService,
-    private businessParamsService: BusinessParamsService
+    private businessParamsService: BusinessParamsService,
+    private metodosDePagoService: MetodosDePagoService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -133,11 +140,6 @@ export class CheckoutComponent implements OnInit {
       throw error;
     }
 
-    console.log(
-      '🚀 ~ file: checkout.component.ts:74 ~ CheckoutComponent ~ ngOnInit ~ this.cart:',
-      this.cart
-    );
-
     try {
       await this.ifPayU();
     } catch (error) {
@@ -165,6 +167,8 @@ export class CheckoutComponent implements OnInit {
         });
       throw error;
     }
+
+    await this.getMetodosDePago();
 
     this.paypalData();
     functions.bloquearPantalla(false);
@@ -1115,5 +1119,53 @@ export class CheckoutComponent implements OnInit {
       throw error;
     }
     functions.bloquearPantalla(false);
+  }
+
+  private async getMetodosDePago(): Promise<void> {
+    let qf: QueryFn = (ref) =>
+      ref.where('status', '==', EnumMetodosDePagoStatus.ACTIVE);
+
+    let res: IFireStoreRes[] = null;
+    try {
+      res = await this.metodosDePagoService.getDataFS(qf).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta del carrito',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: checkout.component.ts: ~ CheckoutComponent ~ getMetodosDePago ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
+    }
+
+    if (!res) return null;
+
+    this.metodosDePago = res.map((r: IFireStoreRes) => {
+      return { id: r.id, ...r.data };
+    });
+  }
+
+  public findMetodoDePago(metodo: PayMethodsEnum | string): boolean {
+    if (!(this.metodosDePago && this.metodosDePago.length > 0)) return false;
+
+    return this.metodosDePago.find((mp: IMetodosDePago) => mp.name === metodo)
+      ? true
+      : false;
   }
 }

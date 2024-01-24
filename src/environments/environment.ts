@@ -42,6 +42,7 @@ export const environment = {
     front_logs: 'front_logs',
     business_params: 'business_params',
     saldos: 'saldos',
+    metodos_de_pago: 'metodos_de_pago',
   },
   urlsServidor: {
     urlTelegramApi: 'telegram',
