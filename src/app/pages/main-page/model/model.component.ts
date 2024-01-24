@@ -21,6 +21,9 @@ import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { UserService } from 'src/app/services/user.service';
 import { Iuser } from 'src/app/interface/iuser';
+import { CategoriesService } from 'src/app/services/categories.service';
+import { Icategories } from 'src/app/interface/icategories';
+import { FontAwesomeIconsService } from 'src/app/shared/font-awesome-icons/font-awesome-icons.service';
 
 @Component({
   selector: 'app-model',
@@ -38,6 +41,7 @@ export class ModelComponent implements OnInit {
   private userId: string = '';
   private user: Iuser = {};
   public precios: Array<number> = [];
+  public category: Icategories = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,7 +51,9 @@ export class ModelComponent implements OnInit {
     private viewsModelService: ViewsModelService,
     private frontLogsService: FrontLogsService,
     private telegramService: TelegramLocalService,
-    private userService: UserService
+    private userService: UserService,
+    private categoriesService: CategoriesService,
+    public fontAwesomeIconsService: FontAwesomeIconsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -84,6 +90,8 @@ export class ModelComponent implements OnInit {
         });
       throw error;
     }
+
+    await this.getCategory(this.model.categorie);
 
     try {
       await this.getUser();
@@ -175,6 +183,41 @@ export class ModelComponent implements OnInit {
       throw error;
     }
     functions.bloquearPantalla(false);
+  }
+
+  private async getCategory(id: string): Promise<void> {
+    let data: IFireStoreRes = null;
+    try {
+      data = await this.categoriesService.getItemFS(id).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de usuario',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ getCategory ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
+    }
+
+    if (!data) return null;
+
+    this.category = { id: data.id, ...data.data };
   }
 
   public async getUser(): Promise<void> {

@@ -476,6 +476,7 @@ export class ModelsService {
     modelDTO.price = imodel.price;
     modelDTO.groupId = imodel.groupId;
     modelDTO.gallery = [];
+    modelDTO.categorie = imodel.categorie;
 
     if (imodel.gallery)
       JSON.parse(imodel.gallery).forEach(async (galleryItem: string) => {
@@ -524,36 +525,6 @@ export class ModelsService {
       alerts.basicAlert(
         'Error',
         'Ha ocurrido un error obteniendo la imagen principal',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: models.service.ts: ~ ModelsService ~ modelInterfaceToDTO ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
-    }
-    //Categoria
-    try {
-      modelDTO.categorie = await this.categoriesService
-        .getItem(imodel.categorie || '')
-        .toPromise();
-    } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error obteniendo la categoria',
         'error'
       );
 

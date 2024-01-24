@@ -28,6 +28,18 @@
           </ng-template>
 
           <!--Categorias-->
+          <div class="single-image-box" *ngFor="let category of categories">
+            <div
+              class="img"
+              (click)="this.getAllModels('category_' + category.id)"
+            >
+              <fa-icon
+                [icon]="this.fontAwesomeIconsService.getIcon(category.icon)"
+              ></fa-icon>
+            </div>
+            <p class="lable">{{ this.category.name }}</p>
+          </div>
+          <!--Categorias-->
         </div>
         <div class="search-box">
           <div class="search-icon" (click)="clickSearch()">
@@ -66,17 +78,17 @@
                   <div class="sub-desc">
                     <p>
                       <span class="font-weight-bold">Categoria: </span
-                      >{{ model.categorie?.name }}
+                      >{{ this.findCategorie(model.categorie).name }}
                     </p>
                   </div>
                   <div class="reting">
-                    <!--<fa-icon
+                    <fa-icon
                       [icon]="
                         this.fontAwesomeIconsService.getIcon(
-                          model.categorie?.icon || ''
+                          this.findCategorie(model.categorie).icon
                         )
                       "
-                    ></fa-icon>-->
+                    ></fa-icon>
                   </div>
                 </div>
               </div>

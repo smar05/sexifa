@@ -6,9 +6,11 @@ import {
   ModelsAccountEnum,
 } from './../../../interface/imodels';
 import { ModelsService } from './../../../services/models.service';
-import { IQueryParams } from './../../../interface/i-query-params';
-//import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
-import { Icategories } from './../../../interface/icategories';
+import { FontAwesomeIconsService } from './../../../shared/font-awesome-icons/font-awesome-icons.service';
+import {
+  EnumCategoriesActive,
+  Icategories,
+} from './../../../interface/icategories';
 import { CategoriesService } from './../../../services/categories.service';
 import { Component, OnInit } from '@angular/core';
 import { QueryFn } from '@angular/fire/compat/firestore';
@@ -27,6 +29,7 @@ export class HomeComponent implements OnInit {
   public categories: Icategories[] | null = [];
   public models: ModelsDTO[] | null = [];
   public search: string = '';
+  public byCategory: string = null;
   public pageSize: number = 10; // Tamaño de página: cantidad de documentos por página
   public lastDocument: string; // Último documento de la página anterior
   public load: boolean = false;
@@ -34,12 +37,13 @@ export class HomeComponent implements OnInit {
   constructor(
     private categoriesService: CategoriesService,
     private modelsService: ModelsService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    public fontAwesomeIconsService: FontAwesomeIconsService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    //this.getAllCategories();
     functions.bloquearPantalla(true);
+    await this.getAllCategories();
     try {
       await this.getAllModels();
     } catch (error) {
@@ -101,57 +105,56 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  public getAllCategories(): void {
-    let queryParams: IQueryParams = {
-      orderBy: '"active"',
-      equalTo: true,
-      print: 'pretty',
-    };
-    this.categoriesService
-      .getData(queryParams)
-      .toPromise()
-      .then(
-        (res: Icategories[]) => {
-          this.categories = Object.keys(res).map((a: any) => {
-            return {
-              id: a,
-              icon: res[a].icon,
-              name: res[a].name,
-            };
-          });
-        },
-        (error) => {
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error en la consulta de categorias',
-            'error'
-          );
-          console.error(error);
+  public async getAllCategories(): Promise<void> {
+    let qf: QueryFn = (ref) =>
+      ref.where('active', '==', EnumCategoriesActive.ACTIVE).orderBy('name');
 
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: home.component.ts: ~ HomeComponent ~ getAllCategories ~ JSON.stringify(error): ${JSON.stringify(
-              error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
-        }
+    let data: IFireStoreRes[] = null;
+    try {
+      data = await this.categoriesService.getDataFS(qf).toPromise();
+    } catch (error) {
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de categorias',
+        'error'
       );
+      console.error(error);
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ getAllCategories ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
+    }
+
+    if (!data) return null;
+
+    this.categories = data.map((d: IFireStoreRes) => {
+      return { id: d.id, ...d.data };
+    });
+  }
+
+  public findCategorie(id: string): Icategories {
+    return this.categories.find((c: Icategories) => c.id === id) || null;
   }
 
   public async nextPagination(): Promise<void> {
     try {
       if (this.search) {
         await this.getAllModels('search_plus');
+      } else if (this.byCategory) {
+        await this.getAllModels(`category_${this.byCategory}_plus`);
       } else {
         await this.getAllModels('plus');
       }
@@ -214,8 +217,6 @@ export class HomeComponent implements OnInit {
           .where('name', '>=', this.search)
           .where('name', '<=', this.search + '\uf8ff')
           .orderBy('name')
-          .orderBy('name')
-          .orderBy('name')
           .limit(this.pageSize);
     } else if (consulta == 'search_plus') {
       qr = (ref) =>
@@ -224,6 +225,28 @@ export class HomeComponent implements OnInit {
           .where('account', '==', ModelsAccountEnum.PUBLIC)
           .where('name', '>=', this.search)
           .where('name', '<=', this.search + '\uf8ff')
+          .orderBy('name')
+          .startAfter(this.lastDocument)
+          .limit(this.pageSize);
+    } else if (consulta.includes('category')) {
+      let idCategoria: string = consulta.split('_')[1];
+      this.byCategory = idCategoria;
+
+      this.models = [];
+      this.lastDocument = '';
+
+      qr = (ref) =>
+        ref
+          .where('active', '==', ActiveModelEnum.ACTIVO)
+          .where('account', '==', ModelsAccountEnum.PUBLIC)
+          .where('categorie', '==', idCategoria)
+          .limit(this.pageSize);
+    } else if (consulta.includes('category') && consulta.includes('plus')) {
+      qr = (ref) =>
+        ref
+          .where('active', '==', ActiveModelEnum.ACTIVO)
+          .where('account', '==', ModelsAccountEnum.PUBLIC)
+          .where('categorie', '==', this.byCategory)
           .orderBy('name')
           .startAfter(this.lastDocument)
           .limit(this.pageSize);

@@ -57,9 +57,14 @@
             <div class="main-heading">
               <div class="left">
                 <h2 class="title">{{ this.model.name }}</h2>
-                <div class="subtitle">
+                <div class="subtitle" *ngIf="this.category">
                   <span class="font-weight-bold">Categoria: </span
-                  >{{ this.model.categorie?.name }}
+                  >{{ this.category.name }}
+                  <fa-icon
+                    [icon]="
+                      this.fontAwesomeIconsService.getIcon(this.category.icon)
+                    "
+                  ></fa-icon>
                 </div>
               </div>
               <div class="right">

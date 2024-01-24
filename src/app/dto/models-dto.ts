@@ -1,8 +1,8 @@
 import { IpriceModel } from '../interface/iprice-model';
-import { Icategories } from './../interface/icategories';
+
 export interface ModelsDTO {
   id?: string;
-  categorie?: Icategories;
+  categorie?: string;
   name?: string;
   description?: string;
   mainImage?: string;
