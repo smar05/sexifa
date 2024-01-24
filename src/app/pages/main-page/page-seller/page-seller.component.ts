@@ -165,7 +165,7 @@ export class PageSellerComponent {
     this.fechaMinima = new Date().toISOString().split('T')[0];
 
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID) || '';
-    this.getCategories();
+    await this.getCategories();
     try {
       await this.getUserModel();
       await this.getData();
@@ -1052,47 +1052,47 @@ export class PageSellerComponent {
     }
   }
 
-  public getCategories(): any {
+  public async getCategories(): Promise<any> {
     functions.bloquearPantalla(true);
     this.loadData = true;
-    this.categoriesService
-      .getData()
-      .toPromise()
-      .then((resp: any) => {
-        functions.bloquearPantalla(false);
-        this.loadData = false;
-        this.categories = Object.keys(resp).map((a: any) => ({
-          id: a,
-          active: resp[a].active,
-          name: resp[a].name,
-          url: resp[a].url,
-        }));
-      })
-      .catch((err: any) => {
-        console.error('Error: ', err);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la consulta de categorias',
-          'error'
-        );
 
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: page-seller.component.ts: ~ PageSellerComponent ~ getCategories ~ JSON.stringify(error): ${JSON.stringify(
-            err
-          )}`,
-        };
+    let resp: IFireStoreRes[] = null;
+    try {
+      resp = await this.categoriesService.getDataFS().toPromise();
+    } catch (err) {
+      console.error('Error: ', err);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de categorias',
+        'error'
+      );
 
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw err;
-      });
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ getCategories ~ JSON.stringify(error): ${JSON.stringify(
+          err
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw err;
+    }
+
+    if (!resp) return null;
+
+    this.categories = resp.map((r: IFireStoreRes) => {
+      return { id: r.id, ...r.data } as Icategories;
+    });
+
+    functions.bloquearPantalla(false);
+    this.loadData = false;
   }
 
   public async saveProductImages(
