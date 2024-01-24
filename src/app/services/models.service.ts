@@ -1,8 +1,3 @@
-import {
-  IpriceModel,
-  PriceTypeLimitEnum,
-  TypeOfferEnum,
-} from './../interface/iprice-model';
 import { environment } from './../../environments/environment';
 import { CategoriesService } from './categories.service';
 import { ModelsDTO } from './../dto/models-dto';
