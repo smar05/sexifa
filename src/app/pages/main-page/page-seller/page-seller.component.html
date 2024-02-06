@@ -53,7 +53,7 @@
                 class="form-control"
                 id="inputName"
                 formControlName="name"
-                maxlength="50"
+                maxlength="30"
                 required
                 [ngClass]="{
                   'is-invalid':
@@ -78,7 +78,41 @@
                 class="invalid-feedback"
                 *ngIf="name.invalid && name.errors?.maxlength"
               >
-                El nombre no puede tener mas de 50 caracteres
+                El nombre no puede tener mas de 30 caracteres
+              </span>
+            </div>
+            <!--Url del modelo-->
+            <div class="form-group">
+              <label for="inputUrl">URL <sup class="text-danger">*</sup></label>
+              <input
+                type="text"
+                placeholder="Url"
+                class="form-control"
+                id="inputUrl"
+                formControlName="url"
+                maxlength="30"
+                required
+                [ngClass]="{
+                  'is-invalid': invalidField('url') || url.invalid
+                }"
+              />
+              <span
+                class="invalid-feedback"
+                *ngIf="url.invalid && url.errors?.required"
+              >
+                Por favor ingrese la url
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="url.invalid && url.errors?.pattern"
+              >
+                Se encontraron caracteres invalidos
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="url.invalid && url.errors?.maxlength"
+              >
+                La url no puede tener mas de 30 caracteres
               </span>
             </div>
             <!--Id del grupo de telegram-->
