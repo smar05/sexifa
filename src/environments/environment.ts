@@ -63,6 +63,13 @@ export const environment = {
     apiKey: '4Vj8eK4rloUd272L48hsrarnUA',
     test: 1,
   },
+  urlRedes: {
+    facebook: 'https://www.facebook.com/',
+    instagram: 'https://www.instagram.com/',
+    x: 'https://twitter.com/',
+    tiktok: 'https://www.tiktok.com/@',
+    threads: 'https://www.threads.net/@',
+  },
 };
 
 /*

@@ -24,6 +24,7 @@ import { Iuser } from 'src/app/interface/iuser';
 import { CategoriesService } from 'src/app/services/categories.service';
 import { Icategories } from 'src/app/interface/icategories';
 import { FontAwesomeIconsService } from 'src/app/shared/font-awesome-icons/font-awesome-icons.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-model',
@@ -762,6 +763,28 @@ export class ModelComponent implements OnInit {
           });
         throw error;
       }
+    }
+  }
+
+  public getUrlPrueba(red: string): string {
+    switch (red) {
+      case 'facebook':
+        return environment.urlRedes.facebook + this.model.redes.facebook;
+
+      case 'instagram':
+        return environment.urlRedes.instagram + this.model.redes.instagram;
+
+      case 'x':
+        return environment.urlRedes.x + this.model.redes.x;
+
+      case 'tiktok':
+        return environment.urlRedes.tiktok + this.model.redes.tiktok;
+
+      case 'threads':
+        return environment.urlRedes.threads + this.model.redes.threads;
+
+      default:
+        return null;
     }
   }
 }

@@ -1,3 +1,4 @@
+import { IModelsRedes } from '../interface/imodels';
 import { IpriceModel } from '../interface/iprice-model';
 
 export interface ModelsDTO {
@@ -10,4 +11,5 @@ export interface ModelsDTO {
   groupId?: string | number;
   gallery?: string[];
   url: string;
+  redes?: IModelsRedes;
 }

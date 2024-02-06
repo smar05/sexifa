@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Icategories } from 'src/app/interface/icategories';
 import {
   ActiveModelEnum,
+  IModelsRedes,
   Imodels,
   ModelsAccountEnum,
 } from 'src/app/interface/imodels';
@@ -31,6 +32,7 @@ import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-page-seller',
@@ -70,11 +72,62 @@ export class PageSellerComponent {
     price: new UntypedFormArray([]),
     groupId: ['', [Validators.required]],
     account: [false],
+    redes: this.form.group({
+      facebook: [
+        '',
+        {
+          validators: [
+            Validators.maxLength(30),
+            Validators.pattern(EnumExpresioncesRegulares.NO_ESPACIO),
+          ],
+        },
+      ],
+      instagram: [
+        '',
+        {
+          validators: [
+            Validators.maxLength(30),
+            Validators.pattern(EnumExpresioncesRegulares.NO_ESPACIO),
+          ],
+        },
+      ],
+      x: [
+        '',
+        {
+          validators: [
+            Validators.maxLength(30),
+            Validators.pattern(EnumExpresioncesRegulares.NO_ESPACIO),
+          ],
+        },
+      ],
+      tiktok: [
+        '',
+        {
+          validators: [
+            Validators.maxLength(30),
+            Validators.pattern(EnumExpresioncesRegulares.NO_ESPACIO),
+          ],
+        },
+      ],
+      threads: [
+        '',
+        {
+          validators: [
+            Validators.maxLength(30),
+            Validators.pattern(EnumExpresioncesRegulares.NO_ESPACIO),
+          ],
+        },
+      ],
+    }),
   });
 
   //Validaciones personalizadas
   get name() {
     return this.f.controls.name;
+  }
+
+  get redes() {
+    return this.f.controls.redes as any;
   }
 
   get url() {
@@ -305,8 +358,7 @@ export class PageSellerComponent {
               resolve(null);
               return;
             }
-            let model: Imodels = res[0].data;
-            model.id = res[0].id;
+            let model: Imodels = { id: res[0].id, ...res[0].data };
             resolve(model);
           },
           (err) => {
@@ -350,6 +402,7 @@ export class PageSellerComponent {
       this.account.setValue(
         this.modelEnDb.account === ModelsAccountEnum.PUBLIC
       );
+      if (this.modelEnDb.redes) this.redes.setValue(this.modelEnDb.redes);
 
       if (this.modelEnDb && this.modelEnDb.price)
         this.modelEnDb.price.forEach((price: IpriceModel, index: number) => {
@@ -582,6 +635,7 @@ export class PageSellerComponent {
         ? ModelsAccountEnum.PUBLIC
         : ModelsAccountEnum.PRIVATE,
       url: this.f.controls.url.value,
+      redes: this.redes.value,
     };
 
     //Guardar la informacion del producto en base de datos
@@ -1494,6 +1548,28 @@ export class PageSellerComponent {
       precios[index] = precio;
 
       this.price.setValue(precios);
+    }
+  }
+
+  public getUrlPrueba(red: string): string {
+    switch (red) {
+      case 'facebook':
+        return environment.urlRedes.facebook + this.redes.value.facebook;
+
+      case 'instagram':
+        return environment.urlRedes.instagram + this.redes.value.instagram;
+
+      case 'x':
+        return environment.urlRedes.x + this.redes.value.x;
+
+      case 'tiktok':
+        return environment.urlRedes.tiktok + this.redes.value.tiktok;
+
+      case 'threads':
+        return environment.urlRedes.threads + this.redes.value.threads;
+
+      default:
+        return null;
     }
   }
 }

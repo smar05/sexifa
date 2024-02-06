@@ -411,6 +411,7 @@ export class ModelsService {
     modelDTO.gallery = [];
     modelDTO.categorie = imodel.categorie;
     modelDTO.url = imodel.url;
+    modelDTO.redes = imodel.redes;
 
     if (imodel.gallery)
       JSON.parse(imodel.gallery).forEach(async (galleryItem: string) => {

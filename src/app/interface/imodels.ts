@@ -12,6 +12,15 @@ export interface Imodels {
   idUser?: string;
   account?: string;
   url: string;
+  redes: IModelsRedes;
+}
+
+export interface IModelsRedes {
+  facebook?: string;
+  instagram?: string;
+  x?: string;
+  tiktok?: string;
+  threads?: string;
 }
 
 export enum ModelsFilterEnum {
