@@ -543,18 +543,14 @@ export class UserSellerComponent {
         let r: any = {
           id: subscripcion.id,
           userId: subscripcion.userId,
+          status: subscripcion.status,
           time: subscripcion.time,
           beginTime: subscripcion.beginTime,
           endTime: subscripcion.endTime,
           price: subscripcion.price,
           commission: `${subscripcion.commission * 100}%`,
-          commissionValue:
-            Math.floor(subscripcion.price * subscripcion.commission * 100) /
-            100,
-          total:
-            Math.floor(
-              subscripcion.price * (1 - subscripcion.commission) * 100
-            ) / 100,
+          commissionValue: subscripcion.price * subscripcion.commission,
+          total: subscripcion.price * (1 - subscripcion.commission),
         };
 
         return r;
@@ -573,8 +569,9 @@ export class UserSellerComponent {
       headers: [
         'Id de la subscripción',
         'Id del usuario',
+        'Estado de la subscripción',
         'Tiempo de la subscripción (Meses)',
-        'Inicio de la subscripcion',
+        'Inicio de la subscripción',
         'Fin de la subscripción',
         'Precio (USD)',
         'Comisión (%)',
