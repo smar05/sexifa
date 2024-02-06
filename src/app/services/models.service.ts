@@ -102,7 +102,7 @@ export class ModelsService {
    */
   public getRouterLinkUrl(model: ModelsDTO | Imodels): string {
     //let modelArray: string[] | undefined = model.name?.split(' ');
-    return `${model.id}`;
+    return model.url ?? model.id;
   }
 
   //-------- Storage -----//
@@ -400,7 +400,7 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public async modelInterfaceToDTO(imodel: Imodels): Promise<ModelsDTO> {
-    let modelDTO: ModelsDTO = {};
+    let modelDTO: ModelsDTO = {} as any;
 
     //Parametros basicos
     modelDTO.id = imodel.id;
@@ -410,6 +410,7 @@ export class ModelsService {
     modelDTO.groupId = imodel.groupId;
     modelDTO.gallery = [];
     modelDTO.categorie = imodel.categorie;
+    modelDTO.url = imodel.url;
 
     if (imodel.gallery)
       JSON.parse(imodel.gallery).forEach(async (galleryItem: string) => {

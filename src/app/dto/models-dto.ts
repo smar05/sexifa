@@ -9,4 +9,5 @@ export interface ModelsDTO {
   price?: IpriceModel[];
   groupId?: string | number;
   gallery?: string[];
+  url: string;
 }

@@ -11,6 +11,7 @@ export interface Imodels {
   gallery?: string;
   idUser?: string;
   account?: string;
+  url: string;
 }
 
 export enum ModelsFilterEnum {

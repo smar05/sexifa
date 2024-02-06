@@ -286,14 +286,8 @@ export class HomeComponent implements OnInit {
       this.lastDocument = res[res.length - 1].data.name;
     }
 
-    let imodels: Imodels[] = Object.keys(res).map((a: any) => {
-      return {
-        id: res[a].id,
-        categorie: res[a].data.categorie,
-        name: res[a].data.name,
-        description: res[a].data.description,
-        groupId: res[a].data.groupId,
-      };
+    let imodels: Imodels[] = res.map((a: IFireStoreRes) => {
+      return { id: a.id, ...a.data };
     });
 
     //Imodel to DTO

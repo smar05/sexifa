@@ -47,7 +47,21 @@ export class PageSellerComponent {
     name: [
       '',
       {
-        validators: [Validators.required, Validators.maxLength(50)],
+        validators: [
+          Validators.required,
+          Validators.maxLength(30),
+          Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        ],
+      },
+    ],
+    url: [
+      '',
+      {
+        validators: [
+          Validators.required,
+          Validators.maxLength(30),
+          Validators.pattern(EnumExpresioncesRegulares.CARACTERES_URL),
+        ],
       },
     ],
     category: ['', [Validators.required]],
@@ -61,6 +75,10 @@ export class PageSellerComponent {
   //Validaciones personalizadas
   get name() {
     return this.f.controls.name;
+  }
+
+  get url() {
+    return this.f.controls.url;
   }
 
   get groupId() {
@@ -92,9 +110,6 @@ export class PageSellerComponent {
 
   //Variable de precarga
   public loadData: boolean = false;
-
-  //Variable global de la url
-  public urlInput: string = '';
 
   //Variable con las categorias
   public categories: Icategories[] = [];
@@ -327,6 +342,7 @@ export class PageSellerComponent {
 
     if (this.modelEnDb && this.modelEnDb.id) {
       this.name.setValue(this.modelEnDb.name);
+      this.url.setValue(this.modelEnDb.url);
       this.categoryName = this.modelEnDb.categorie || '';
       this.category.setValue(this.modelEnDb.categorie);
       this.description.setValue(this.modelEnDb.description);
@@ -565,6 +581,7 @@ export class PageSellerComponent {
       account: this.f.controls.account.value
         ? ModelsAccountEnum.PUBLIC
         : ModelsAccountEnum.PRIVATE,
+      url: this.f.controls.url.value,
     };
 
     //Guardar la informacion del producto en base de datos

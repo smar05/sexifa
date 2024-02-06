@@ -31,7 +31,7 @@ import { FontAwesomeIconsService } from 'src/app/shared/font-awesome-icons/font-
   styleUrls: ['./model.component.css'],
 })
 export class ModelComponent implements OnInit {
-  public model: ModelsDTO = {};
+  public model: ModelsDTO = {} as any;
   public modelId: string = '';
   public galeria: string[] = [];
   public imgPrincipal: string = '';
@@ -278,10 +278,15 @@ export class ModelComponent implements OnInit {
   public async getModel(): Promise<void> {
     functions.bloquearPantalla(true);
     this.load = true;
-    let res1: IFireStoreRes = null;
+    let res1: IFireStoreRes[] = null;
 
     try {
-      res1 = await this.modelsService.getItemFS(this.modelId || '').toPromise();
+      let qf: QueryFn = (ref) =>
+        ref
+          .where('url', '==', this.modelId)
+          .where('active', '==', ActiveModelEnum.ACTIVO);
+
+      res1 = await this.modelsService.getDataFS(qf).toPromise();
     } catch (error) {
       console.error('Error: ', error);
       alerts.basicAlert(
@@ -308,8 +313,44 @@ export class ModelComponent implements OnInit {
       throw error;
     }
 
+    let res2: IFireStoreRes = null;
+
+    if (!res1 || res1.length == 0) {
+      try {
+        let qf: QueryFn = (ref) =>
+          ref.where('active', '==', ActiveModelEnum.ACTIVO);
+        res2 = await this.modelsService
+          .getItemFS(this.modelId || '', qf)
+          .toPromise();
+      } catch (error) {
+        console.error('Error: ', error);
+        alerts.basicAlert(
+          'Error',
+          'Ha ocurrido un error en la consulta de modelos',
+          'error'
+        );
+
+        let data: IFrontLogs = {
+          date: new Date(),
+          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          log: `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`,
+        };
+
+        this.frontLogsService
+          .postDataFS(data)
+          .then((res) => {})
+          .catch((err) => {
+            alerts.basicAlert('Error', 'Error', 'error');
+            throw err;
+          });
+        throw error;
+      }
+    }
+
     // Si no se encuentra un modelo con el id colocado en la url
-    if (!res1) {
+    if ((!res1 || res1.length == 0) && !res2) {
       this.router.navigate([`/${UrlPagesEnum.HOME}`]);
 
       alerts.basicAlert(
@@ -321,8 +362,24 @@ export class ModelComponent implements OnInit {
       return;
     }
 
-    let res: Imodels = res1.data;
-    res.id = res1.id;
+    let res: Imodels =
+      res1 && res1.length > 0
+        ? { id: res1[0].id, ...res1[0].data }
+        : res2
+        ? { id: res2.id, ...res2.data }
+        : null;
+
+    if (!res) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+
+      alerts.basicAlert(
+        'Error',
+        'No se ha encontrado la informacion solicitada',
+        'error'
+      );
+
+      return;
+    }
 
     res.price = res.price.sort(
       (a: IpriceModel, b: IpriceModel) => a.time - b.time
@@ -331,7 +388,6 @@ export class ModelComponent implements OnInit {
     if (res.active != ActiveModelEnum.ACTIVO)
       this.router.navigate([`/${UrlPagesEnum.HOME}`]);
 
-    res.id = this.modelId;
     //Interface to DTO
     try {
       this.model = await this.modelsService.modelInterfaceToDTO(res);
@@ -369,7 +425,7 @@ export class ModelComponent implements OnInit {
   public async getGaleria(): Promise<void> {
     try {
       this.galeria = await this.modelsService.getImages(
-        `${this.modelId}/gallery`
+        `${this.model.id}/gallery`
       );
     } catch (error) {
       console.error('Error: ', error);
@@ -537,7 +593,7 @@ export class ModelComponent implements OnInit {
       let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
       let qf: QueryFn = (ref) =>
         ref
-          .where('modelId', '==', this.modelId)
+          .where('modelId', '==', this.model.id)
           .where('userId', '==', userId)
           .where('status', '==', StatusSubscriptionsEnum.ACTIVO);
 
