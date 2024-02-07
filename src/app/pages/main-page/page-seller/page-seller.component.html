@@ -114,6 +114,12 @@
               >
                 La url no puede tener mas de 30 caracteres
               </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="url.invalid && url.errors?.url"
+              >
+                La URL ya existe
+              </span>
             </div>
             <!--Id del grupo de telegram-->
             <div class="form-group">

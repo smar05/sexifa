@@ -285,7 +285,8 @@ export class ModelComponent implements OnInit {
       let qf: QueryFn = (ref) =>
         ref
           .where('url', '==', this.modelId)
-          .where('active', '==', ActiveModelEnum.ACTIVO);
+          .where('active', '==', ActiveModelEnum.ACTIVO)
+          .limit(1);
 
       res1 = await this.modelsService.getDataFS(qf).toPromise();
     } catch (error) {

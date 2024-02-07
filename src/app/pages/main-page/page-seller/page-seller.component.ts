@@ -7,8 +7,10 @@ import {
   ModelsAccountEnum,
 } from 'src/app/interface/imodels';
 import {
+  AbstractControl,
   UntypedFormArray,
   UntypedFormBuilder,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -64,6 +66,8 @@ export class PageSellerComponent {
           Validators.maxLength(30),
           Validators.pattern(EnumExpresioncesRegulares.CARACTERES_URL),
         ],
+        asyncValidators: [this.isRepeatUrl()],
+        updateOn: 'blur',
       },
     ],
     category: ['', [Validators.required]],
@@ -285,6 +289,75 @@ export class PageSellerComponent {
 
     // Compara las fechas
     return fechaIngresadaObj >= fechaActual;
+  }
+
+  /**
+   * Verificar que la url no exista ya
+   *
+   * @private
+   * @return {*}  {*}
+   * @memberof PageSellerComponent
+   */
+  private isRepeatUrl(): any {
+    functions.bloquearPantalla(true);
+    this.loadData = true;
+
+    return (control: AbstractControl) => {
+      const url: string = control.value;
+      return new Promise(async (resolve) => {
+        try {
+          let qf: QueryFn = (ref) =>
+            ref
+              .where('url', '==', url)
+              .where('active', '==', ActiveModelEnum.ACTIVO)
+              .limit(1);
+
+          let resp: IFireStoreRes[] = await this.modelService
+            .getDataFS(qf)
+            .toPromise();
+
+          if (resp.length > 0) {
+            if (resp[0].id === this.modelEnDb.id) {
+              functions.bloquearPantalla(false);
+              this.loadData = false;
+              resolve(null);
+              return;
+            }
+
+            functions.bloquearPantalla(false);
+            this.loadData = false;
+            resolve({ url: true });
+          } else {
+            functions.bloquearPantalla(false);
+            this.loadData = false;
+            resolve(null);
+          }
+        } catch (error) {
+          console.error('Error: ', error);
+          alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ isRepeatUrl ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
+            });
+
+          functions.bloquearPantalla(false);
+          this.loadData = false;
+          throw error;
+        }
+      });
+    };
   }
 
   /**
