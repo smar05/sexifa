@@ -504,6 +504,9 @@ export class ModelComponent implements OnInit {
   }
 
   private async calcularPrecios(): Promise<void> {
+    functions.bloquearPantalla(true);
+    this.load = true;
+
     let prices: IpriceModel[] = this.model.price;
     let params: object = {
       prices: JSON.stringify(prices),
@@ -539,8 +542,14 @@ export class ModelComponent implements OnInit {
           alerts.basicAlert('Error', 'Error', 'error');
           throw err;
         });
+
+      functions.bloquearPantalla(false);
+      this.load = false;
       throw error;
     }
+
+    functions.bloquearPantalla(false);
+    this.load = false;
   }
 
   public async clickParticipar(): Promise<void> {
