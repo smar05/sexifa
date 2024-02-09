@@ -358,10 +358,10 @@
               placeholder="Contraseña"
               formControlName="password"
               required
+              minlength="8"
+              maxlength="128"
               [ngClass]="{
-                'is-invalid':
-                  invalidField('password') ||
-                  f.controls.password.errors?.minlength
+                'is-invalid': f.controls.password.errors
               }"
             />
             <div class="input-group-append">
@@ -379,9 +379,16 @@
             </span>
             <span
               class="invalid-feedback"
+              *ngIf="f.controls.password.errors?.pattern"
+            >
+              La contraseña debe tener al menos una letra Mayuscula, minuscula y
+              un digito
+            </span>
+            <span
+              class="invalid-feedback"
               *ngIf="f.controls.password.errors?.minlength"
             >
-              La contraseña debe tener minimo 6 caracteres
+              La contraseña debe tener minimo 8 caracteres
             </span>
           </div>
           <!--Contraseña verificar-->

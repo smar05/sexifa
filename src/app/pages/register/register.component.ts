@@ -18,6 +18,7 @@ import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 
 @Component({
   selector: 'app-register',
@@ -36,28 +37,42 @@ export class RegisterComponent implements OnInit {
       [
         Validators.required,
         Validators.maxLength(50),
-        Validators.pattern(/[.\\,\\0-9a-zA-ZáéíóúñÁÉÍÓÚ ]{1,50}/),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
       ],
     ],
-    email: ['', [Validators.required, Validators.email]],
+    email: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(320)],
+    ],
     celphone: [
       '',
       [
         Validators.required,
         Validators.max(9999999999),
-        Validators.pattern(/^[0-9]+$/),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
       ],
     ],
     chatId: [
       '',
-      [Validators.max(99999999999999999999), Validators.pattern(/^[0-9]+$/)],
+      [
+        Validators.max(99999999999999999999),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
+      ],
     ],
     bornDate: ['', [Validators.required]],
     country: ['', [Validators.required]],
     state: ['', [Validators.required]],
     city: ['', [Validators.required]],
     sex: ['', [Validators.required]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(128),
+        Validators.pattern(EnumExpresioncesRegulares.PASSWORD),
+      ],
+    ],
     repeatPassword: ['', [Validators.required]],
     terms: ['', [Validators.required]],
     type: ['', [Validators.required]],

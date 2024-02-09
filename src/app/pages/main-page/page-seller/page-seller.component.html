@@ -133,7 +133,7 @@
                 class="form-control"
                 id="groupId"
                 formControlName="groupId"
-                maxlength="50"
+                maxlength="20"
                 required
                 [ngClass]="{
                   'is-invalid': invalidField('groupId')
@@ -149,7 +149,7 @@
                 class="invalid-feedback"
                 *ngIf="name.invalid && name.errors?.maxlength"
               >
-                El Id de Telegram no puede tener mas de 50 caracteres
+                El Id de Telegram no puede tener mas de 20 caracteres
               </span>
             </div>
             <!--Categoria-->
@@ -800,7 +800,7 @@
           </button>
           <button
             type="submit"
-            [disabled]="f.pending"
+            [disabled]="f.invalid"
             class="btn btn-warning float-right"
           >
             Guardar

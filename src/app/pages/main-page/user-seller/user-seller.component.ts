@@ -11,6 +11,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { alerts } from 'src/app/helpers/alerts';
@@ -68,16 +69,19 @@ export class UserSellerComponent {
       [
         Validators.required,
         Validators.maxLength(50),
-        Validators.pattern(/[.\\,\\0-9a-zA-ZáéíóúñÁÉÍÓÚ ]{1,50}/),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
       ],
     ],
-    email: ['', [Validators.required, Validators.email]],
+    email: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(320)],
+    ],
     celphone: [
       '',
       [
         Validators.required,
         Validators.max(9999999999),
-        Validators.pattern(/^[0-9]+$/),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
       ],
     ],
     bornDate: ['', [Validators.required]],
