@@ -72,9 +72,9 @@ export class PageSellerComponent {
     ],
     category: ['', [Validators.required]],
     image: ['', []], //No se guarda en base de datos
-    description: ['', [Validators.required]],
+    description: ['', [Validators.required, Validators.maxLength(2048)]],
     price: new UntypedFormArray([]),
-    groupId: ['', [Validators.required]],
+    groupId: ['', [Validators.required, Validators.maxLength(20)]],
     account: [false],
     redes: this.form.group({
       facebook: [

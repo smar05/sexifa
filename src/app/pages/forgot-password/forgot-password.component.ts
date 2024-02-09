@@ -17,7 +17,10 @@ import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 export class ForgotPasswordComponent implements OnInit {
   //Grupo de controles
   public f: any = this.form.group({
-    email: ['', [Validators.required, Validators.email]],
+    email: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(320)],
+    ],
   });
 
   //Validaciones personalizadas

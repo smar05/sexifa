@@ -27,6 +27,7 @@ import {
 import { ModelsService } from 'src/app/services/models.service';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 
 @Component({
   selector: 'app-user',
@@ -73,16 +74,19 @@ export class UserComponent implements OnInit {
       [
         Validators.required,
         Validators.maxLength(50),
-        Validators.pattern(/[.\\,\\0-9a-zA-ZáéíóúñÁÉÍÓÚ ]{1,50}/),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
       ],
     ],
-    email: ['', [Validators.required, Validators.email]],
+    email: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(320)],
+    ],
     celphone: [
       '',
       [
         Validators.required,
         Validators.max(9999999999),
-        Validators.pattern(/^[0-9]+$/),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
       ],
     ],
     chatId: [
@@ -90,7 +94,7 @@ export class UserComponent implements OnInit {
       [
         Validators.required,
         Validators.max(99999999999999999999),
-        Validators.pattern(/^[0-9]+$/),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
       ],
     ],
     bornDate: ['', [Validators.required]],

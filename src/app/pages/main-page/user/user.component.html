@@ -108,6 +108,7 @@
                     placeholder="No. Id de Telegram"
                     formControlName="chatId"
                     required
+                    maxlength="20"
                     [ngClass]="{
                       'is-invalid':
                         invalidField('chatId') ||
@@ -131,6 +132,12 @@
                     *ngIf="f.controls.chatId.errors?.pattern"
                   >
                     Se encontraron caracteres invalidos
+                  </span>
+                  <span
+                    class="invalid-feedback"
+                    *ngIf="f.controls.chatId.errors?.maxLegth"
+                  >
+                    El id de Telegram no puede tener mas de 20 caracteres
                   </span>
                   <span
                     class="invalid-feedback"

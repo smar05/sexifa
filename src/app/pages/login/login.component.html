@@ -23,6 +23,7 @@
                 class="form-control"
                 placeholder="Correo"
                 formControlName="email"
+                maxlength="320"
                 [ngClass]="{ 'is-invalid': invalidField('email') }"
               />
               <div class="input-group-append">
@@ -40,6 +41,14 @@
               </div>
               <div
                 class="invalid-feedback"
+                *ngIf="
+                  invalidField('email') && f.controls.email.errors.maxLength
+                "
+              >
+                El correo no puede tener mas de 320 caracteres
+              </div>
+              <div
+                class="invalid-feedback"
                 *ngIf="invalidField('email') && f.controls.email.errors.email"
               >
                 Por favor ingrese un correo valido
@@ -51,6 +60,8 @@
                 class="form-control"
                 placeholder="Contraseña"
                 formControlName="password"
+                maxlength="128"
+                minlength="8"
                 [ngClass]="{ 'is-invalid': invalidField('password') }"
               />
               <div class="input-group-append">
@@ -60,6 +71,24 @@
               </div>
               <div class="invalid-feedback" *ngIf="invalidField('password')">
                 Por favor llene este campo
+              </div>
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  invalidField('password') &&
+                  f.controls.password.errors.maxlegth
+                "
+              >
+                La constraseña no puede tener mas de 128 caracteres
+              </div>
+              <div
+                class="invalid-feedback"
+                *ngIf="
+                  invalidField('password') &&
+                  f.controls.password.errors.minlegth
+                "
+              >
+                La constraseña no puede tener menos de 8 caracteres
               </div>
             </div>
             <div class="row">

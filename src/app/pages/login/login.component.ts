@@ -17,6 +17,7 @@ import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { Imodels } from 'src/app/interface/imodels';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
+import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 
 @Component({
   selector: 'app-login',
@@ -26,8 +27,19 @@ import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 export class LoginComponent implements OnInit {
   //Grupo de controles
   public f: any = this.form.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
+    email: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(320)],
+    ],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(128),
+        Validators.minLength(8),
+        Validators.pattern(EnumExpresioncesRegulares.PASSWORD),
+      ],
+    ],
   });
 
   public loading: boolean = false;
