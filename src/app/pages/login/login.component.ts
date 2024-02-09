@@ -124,9 +124,14 @@ export class LoginComponent implements OnInit {
           );
 
         let user: Iuser = {};
+        let userIdDoc: string = null;
 
         try {
-          user = (await this.userService.getDataFS(qf).toPromise())[0].data;
+          let data: IFireStoreRes[] = await this.userService
+            .getDataFS(qf)
+            .toPromise();
+          user = { ...data[0].data };
+          userIdDoc = data[0].id;
         } catch (error) {
           console.error('Error: ', error);
           alerts.basicAlert(
@@ -254,6 +259,42 @@ export class LoginComponent implements OnInit {
           default:
             url = `/${UrlPagesEnum.LOGIN}`;
             break;
+        }
+
+        try {
+          user.last_login = new Date().toISOString();
+
+          let data: Iuser = user;
+          await this.userService.patchDataFS(userIdDoc, data);
+        } catch (error) {
+          console.error('Error: ', error);
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error guardando al usuario',
+            'error'
+          );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+              functions.bloquearPantalla(false);
+              this.loading = false;
+              throw err;
+            });
+
+          functions.bloquearPantalla(false);
+          this.loading = false;
+          throw error;
         }
 
         this.router.navigateByUrl(url);

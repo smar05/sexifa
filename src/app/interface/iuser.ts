@@ -12,4 +12,5 @@ export interface Iuser {
   chatId?: number;
   type?: string;
   date_created?: string;
+  last_login?: string;
 }
