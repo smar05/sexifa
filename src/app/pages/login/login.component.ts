@@ -117,11 +117,9 @@ export class LoginComponent implements OnInit {
         );
 
         let qf: QueryFn = (ref) =>
-          ref.where(
-            'id',
-            '==',
-            localStorage.getItem(LocalStorageEnum.LOCAL_ID)
-          );
+          ref
+            .where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID))
+            .limit(1);
 
         let user: Iuser = {};
         let userIdDoc: string = null;
