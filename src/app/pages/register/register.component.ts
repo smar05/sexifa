@@ -19,6 +19,7 @@ import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -29,6 +30,7 @@ export class RegisterComponent implements OnInit {
   public allCountries: ICountries[] = [];
   public allStatesByCountry: IState[] = [];
   public allCities: ICities[] = [];
+  public urlBotChatId: string = environment.urlBotChatId;
 
   //Grupo de controles
   public f: any = this.form.group({
@@ -442,5 +444,13 @@ export class RegisterComponent implements OnInit {
 
   public tipoDeUsuarios(): string[] {
     return Object.values(UserTypeEnum);
+  }
+
+  public infoClik(): void {
+    alerts.basicAlert(
+      'Consultar ID',
+      `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
+      'info'
+    );
   }
 }

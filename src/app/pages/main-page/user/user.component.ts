@@ -28,6 +28,7 @@ import { ModelsService } from 'src/app/services/models.service';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-user',
@@ -53,6 +54,7 @@ import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares
 })
 export class UserComponent implements OnInit {
   public showSubscripciones: boolean = false;
+  public urlBotChatId: string = environment.urlBotChatId;
 
   public dataSource!: MatTableDataSource<Isubscriptions>; //Instancia la data que aparecera en la tabla
   public expandedElement!: Isubscriptions | null;
@@ -568,5 +570,13 @@ export class UserComponent implements OnInit {
 
     functions.bloquearPantalla(false);
     this.loading = false;
+  }
+
+  public infoClik(): void {
+    alerts.basicAlert(
+      'Consultar ID',
+      `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
+      'info'
+    );
   }
 }
