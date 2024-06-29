@@ -436,7 +436,10 @@ export class RegisterComponent implements OnInit {
 
   public probarConexionBot(): void {
     if (this.chatId.value) {
-      this.telegramLocalService.probarConexionBot(this.chatId.value);
+      this.telegramLocalService.probarConexionBot(
+        this.chatId.value,
+        UrlPagesEnum.REGISTER
+      );
     } else {
       alerts.basicAlert('Error', 'Ingrese un Id valido de Telegram', 'error');
     }

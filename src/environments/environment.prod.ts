@@ -20,7 +20,7 @@ const firebaseConfig: any = {
 };
 
 export const environment = {
-  production: false,
+  production: true,
   urlFirebase: `https://sexifa-269bf-default-rtdb.firebaseio.com/`,
   urlLogin: `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
   urlGetUser: `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,

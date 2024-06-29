@@ -12,6 +12,7 @@ import { IFrontLogs } from '../interface/i-front-logs';
 import { FrontLogsService } from './front-logs.service';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { HttpClient } from '@angular/common/http';
+import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 
 @Injectable({
   providedIn: 'root',
@@ -492,6 +493,9 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public calcularPrecioSubscripcion(params: any): Observable<any> {
-    return this.http.get(`${this.urlModelsApi}/obtener-precios`, { params });
+    return this.http.get(
+      `${this.urlModelsApi}/${EnumEndpointsBack.MODELS.OBTENER_PRECIOS}`,
+      { params }
+    );
   }
 }

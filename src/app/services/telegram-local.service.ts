@@ -6,6 +6,7 @@ import { alerts } from '../helpers/alerts';
 import { IFrontLogs } from '../interface/i-front-logs';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { FrontLogsService } from './front-logs.service';
+import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +27,10 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public getPruebaBotCliente(params: any = {}): Observable<any> {
-    return this.http.get(`${this.url}/comunicar-bot-cliente`, { params });
+    return this.http.get(
+      `${this.url}/${EnumEndpointsBack.TELEGRAM.COMUNICAR_BOT_CLIENTE}`,
+      { params }
+    );
   }
 
   /**
@@ -37,7 +41,10 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public esMiembroDelGrupo(params: any): Observable<any> {
-    return this.http.get(`${this.url}/es-miembro-del-grupo`, { params });
+    return this.http.get(
+      `${this.url}/${EnumEndpointsBack.TELEGRAM.ES_MIEMBRO_DEL_GRUPO}`,
+      { params }
+    );
   }
 
   /**
@@ -48,9 +55,12 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public botEsAdminDelGrupo(params: { chatId: number }): Observable<boolean> {
-    return this.http.get(`${this.url}/bot-es-admin-del-grupo`, {
-      params,
-    }) as Observable<boolean>;
+    return this.http.get(
+      `${this.url}/${EnumEndpointsBack.TELEGRAM.BOT_ES_ADMIN_DEL_GRUPO}`,
+      {
+        params,
+      }
+    ) as Observable<boolean>;
   }
 
   /**
@@ -61,7 +71,10 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public getLinksOrden(params: any): Observable<any> {
-    return this.http.get(`${this.url}/enviar-link`, { params });
+    return this.http.get(
+      `${this.url}/${EnumEndpointsBack.TELEGRAM.ENVIAR_LINK}`,
+      { params }
+    );
   }
 
   // Servicios
@@ -73,11 +86,14 @@ export class TelegramLocalService {
    * @return {*}  {Promise<void>}
    * @memberof TelegramLocalService
    */
-  public async probarConexionBot(fromId: number = 0): Promise<void> {
+  public async probarConexionBot(
+    fromId: number,
+    url: string = undefined
+  ): Promise<void> {
     let res: any = null;
 
     try {
-      res = await this.getPruebaBotCliente({ fromId }).toPromise();
+      res = await this.getPruebaBotCliente({ fromId, url }).toPromise();
     } catch (error) {
       console.error('Error: ', error);
       alerts.basicAlert(

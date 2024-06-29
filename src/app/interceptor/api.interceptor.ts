@@ -10,6 +10,8 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
+import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
+import { UrlPagesEnum } from '../enum/urlPagesEnum';
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
@@ -29,7 +31,9 @@ export class ApiInterceptor implements HttpInterceptor {
       (request.url.includes(environment.urlCollections.users) &&
         request.method == 'POST') || //Para registrar un nuevo usuario
       request.url.includes(environment.urlLocation) ||
-      request.url.includes(environment.apiKeyCurrencyConverter)
+      request.url.includes(environment.apiKeyCurrencyConverter) ||
+      (request.url.includes(EnumEndpointsBack.TELEGRAM.COMUNICAR_BOT_CLIENTE) &&
+        request.url.includes(UrlPagesEnum.REGISTER))
     )
       return next.handle(request);
     this.token = localStorage.getItem(LocalStorageEnum.TOKEN);
