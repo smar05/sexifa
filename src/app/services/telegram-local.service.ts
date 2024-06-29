@@ -41,6 +41,19 @@ export class TelegramLocalService {
   }
 
   /**
+   * Consulta si el bot pertenece a un grupo y es admin
+   *
+   * @param {{chatId:number}} params
+   * @return {*}  {Observable<boolean>}
+   * @memberof TelegramLocalService
+   */
+  public botEsAdminDelGrupo(params: { chatId: number }): Observable<boolean> {
+    return this.http.get(`${this.url}/bot-es-admin-del-grupo`, {
+      params,
+    }) as Observable<boolean>;
+  }
+
+  /**
    * Enviar los links de acceso a los grupos de la orden
    *
    * @param {*} [params]

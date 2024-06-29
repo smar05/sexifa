@@ -152,6 +152,20 @@
                 El Id de Telegram no puede tener mas de 20 caracteres
               </span>
             </div>
+            <button
+              class="btn btn-primary btn-block bg-principal mb-2"
+              (click)="this.probarConexionBot()"
+            >
+              Probar conexion con el bot
+            </button>
+            <div class="alert alert-info" role="alert">
+              <small
+                >No olvides añadir como administrador de tu grupo a nuestro BOT:
+                <a target="_blank" href="{{ this.urlBot }}"
+                  >@OnlyGramGroup_BOT</a
+                ></small
+              >
+            </div>
             <!--Categoria-->
             <div class="form-group">
               <label for="inputCategory"

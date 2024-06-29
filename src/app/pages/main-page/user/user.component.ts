@@ -54,7 +54,7 @@ import { environment } from 'src/environments/environment';
 })
 export class UserComponent implements OnInit {
   public showSubscripciones: boolean = false;
-  public urlBotChatId: string = environment.urlBotChatId;
+  public urlBotChatId: string = `${environment.urlBot}?start=mi_id`;
 
   public dataSource!: MatTableDataSource<Isubscriptions>; //Instancia la data que aparecera en la tabla
   public expandedElement!: Isubscriptions | null;

@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit {
   public allCountries: ICountries[] = [];
   public allStatesByCountry: IState[] = [];
   public allCities: ICities[] = [];
-  public urlBotChatId: string = environment.urlBotChatId;
+  public urlBotChatId: string = `${environment.urlBot}?start=mi_id`;
 
   //Grupo de controles
   public f: any = this.form.group({

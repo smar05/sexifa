@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <div class="row mt-2" [hidden]="!(this.cart.length > 0 && this.total)">
+    <div class="row mt-2" [hidden]="this.hiddenPayMethods()">
       <div class="col-lg-6">
         <div class="card">
           <div class="card-body">

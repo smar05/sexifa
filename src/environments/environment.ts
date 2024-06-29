@@ -32,7 +32,7 @@ export const environment = {
   urlCurrencyConverter: `https://api.getgeoapi.com`,
   urlProd,
   urlServidorLocal,
-  urlBotChatId: 'https://t.me/OnlyGramGroup_BOT?start=mi_id',
+  urlBot: 'https://t.me/OnlyGramGroup_BOT',
   urlCollections: {
     categories: 'categories',
     models: 'models',

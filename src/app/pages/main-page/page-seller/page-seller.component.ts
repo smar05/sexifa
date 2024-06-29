@@ -35,6 +35,7 @@ import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
+import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 
 @Component({
   selector: 'app-page-seller',
@@ -46,6 +47,7 @@ export class PageSellerComponent {
   public galeriaValores: Map<string, string> = new Map(); // <url,nombre>
   public imagenesABorrarGaleria: string[] = [];
   public fechaMinima: string = '';
+  public urlBot: string = `${environment.urlBot}`;
 
   public f = this.form.group({
     name: [
@@ -227,7 +229,8 @@ export class PageSellerComponent {
     private userService: UserService,
     private route: Router,
     private frontLogsService: FrontLogsService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private telegramService: TelegramLocalService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -618,6 +621,16 @@ export class PageSellerComponent {
       alerts.basicAlert(
         'Error',
         'Se encontro un error en el formulario',
+        'error'
+      );
+      return;
+    }
+
+    let botAdmin: boolean = await this.probarConexionBot();
+    if (!botAdmin) {
+      alerts.basicAlert(
+        'Error',
+        'El BOT no es administrador del grupo o no pertenece a este',
         'error'
       );
       return;
@@ -1644,5 +1657,64 @@ export class PageSellerComponent {
       default:
         return null;
     }
+  }
+
+  public async probarConexionBot(): Promise<boolean> {
+    functions.bloquearPantalla(true);
+    this.loadData = true;
+
+    let res: any = null;
+    try {
+      let params: { chatId: number } = {
+        chatId: this.groupId.value as number,
+      };
+
+      res = await this.telegramService.botEsAdminDelGrupo(params).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de pertenencia al grupo del bot',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
+    }
+
+    if (!res?.perteneceAlGrupo) {
+      functions.bloquearPantalla(false);
+      this.loadData = false;
+      alerts.basicAlert(
+        'Error',
+        'El BOT no pertenece al grupo, asugurate de agregarlo como administrador y que el id del grupo corresponda a tu grupo',
+        'error'
+      );
+      return false;
+    }
+
+    alerts.basicAlert(
+      'OK',
+      'El BOT pertenece al grupo y es administrador',
+      'success'
+    );
+
+    functions.bloquearPantalla(false);
+    this.loadData = false;
+    return true;
   }
 }

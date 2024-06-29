@@ -124,6 +124,8 @@ export class ModelComponent implements OnInit {
 
     if (!this.model || Object.keys(this.model).length === 0) return;
 
+    await this.botEsAdminDelGrupo();
+
     this.setModelSubscripctionModelValues();
 
     try {
@@ -721,6 +723,55 @@ export class ModelComponent implements OnInit {
 
       throw error;
     }
+  }
+
+  private async botEsAdminDelGrupo(): Promise<void> {
+    functions.bloquearPantalla(true);
+    this.load = true;
+
+    let res: any = null;
+    try {
+      let params: { chatId: number } = {
+        chatId: this.model.groupId as number,
+      };
+
+      res = await this.telegramService.botEsAdminDelGrupo(params).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de pertenencia al grupo del bot',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: model.component.ts: ~ ModelComponent ~ botEsAdminDelGrupo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
+    }
+
+    if (!res?.perteneceAlGrupo) {
+      functions.bloquearPantalla(false);
+      this.load = false;
+      alerts.basicAlert('Error', 'Ha ocurrido un error con el grupo', 'error');
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      return;
+    }
+
+    functions.bloquearPantalla(false);
+    this.load = false;
   }
 
   public async setViewsModelData(): Promise<void> {

@@ -1168,4 +1168,8 @@ export class CheckoutComponent implements OnInit {
       ? true
       : false;
   }
+
+  public hiddenPayMethods(): boolean {
+    return !(this.cart.length > 0 && this.total && this.user.chatId);
+  }
 }
