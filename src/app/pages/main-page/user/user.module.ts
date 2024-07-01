@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { UserRoutingModule } from './user-routing.module';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [UserComponent],
@@ -15,6 +17,8 @@ import { UserRoutingModule } from './user-routing.module';
     /*FontAwesomeModule,*/
     SharedModule,
     ReactiveFormsModule,
+    MatTableModule,
+    MatPaginatorModule,
   ],
 })
 export class UserModule {}

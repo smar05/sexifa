@@ -1,3 +1,4 @@
+import { ngxCsv } from 'ngx-csv';
 import { alerts } from './alerts';
 import { FormGroup } from '@angular/forms';
 
@@ -192,5 +193,73 @@ export class functions {
     const dataArr = new Set(array);
 
     return [...dataArr];
+  }
+
+  /**
+   * En mayuscula la primera letra de cada palabra del texto
+   *
+   * @static
+   * @param {string} text
+   * @return {*}  {string}
+   * @memberof functions
+   */
+  static capitalizeFirstLetters(text: string): string {
+    return text
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  /**
+   * Incrementar la fecha x cantidad de meses
+   *
+   * @static
+   * @param {Date} fecha
+   * @param {number} meses
+   * @return {*}  {Date}
+   * @memberof functions
+   */
+  static incrementarMeses(fecha: Date, meses: number): Date {
+    // Clonamos la fecha original para evitar modificarla directamente
+    const fechaClonada = new Date(fecha);
+
+    // Obtenemos el mes actual y lo incrementamos según la cantidad de meses
+    const mesActual = fechaClonada.getMonth();
+    fechaClonada.setMonth(mesActual + meses);
+
+    return fechaClonada;
+  }
+
+  /**
+   * Bloquear o desbloquear la pantalla
+   *
+   * @static
+   * @param {boolean} bloquear
+   * @memberof functions
+   */
+  static bloquearPantalla(bloquear: boolean): void {
+    let divBloquear: HTMLElement = document.querySelector('#bloquear');
+    let divApp: HTMLElement = document.querySelector('#app');
+
+    divBloquear.style.display = bloquear ? 'flex' : 'none';
+    divApp.style.display = bloquear ? 'none' : 'block';
+  }
+
+  /**
+   * Obtener un archivo CSV
+   *
+   * @static
+   * @param {{[key:string]:any}} data
+   * @param {string} filename
+   * @param {{[key:string]:any}} options
+   * @return {*}  {ngxCsv}
+   * @memberof functions
+   */
+  static getCsv(
+    data: { [key: string]: any },
+    filename: string,
+    options: { [key: string]: any }
+  ): ngxCsv {
+    return new ngxCsv(data, filename, options);
   }
 }

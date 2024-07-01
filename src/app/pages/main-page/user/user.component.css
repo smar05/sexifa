@@ -101,8 +101,6 @@ fieldset {
 
 button {
   outline: none;
-  background: none;
-  border: none;
 }
 
 /* ==========================================================================
@@ -186,7 +184,7 @@ h6 {
   padding: 0 33px;
   font-family: Poppins, Arial, "Helvetica Neue", sans-serif;
   cursor: pointer;
-  color: #fff;
+  color: var(--paleta-1);
   -webkit-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -228,7 +226,7 @@ input {
 .input-icon {
   position: absolute;
   font-size: 18px;
-  color: #ccc;
+  color: var(--paleta-1);
   right: 8px;
   top: 50%;
   -webkit-transform: translateY(-50%);
@@ -248,42 +246,42 @@ input {
 .input--style-3 {
   padding: 5px 0;
   font-size: 16px;
-  color: #ccc;
+  color: var(--paleta-1);
   background: transparent;
 }
 
 label {
   padding: 5px 0;
   font-size: 18px;
-  color: #ccc;
+  color: var(--paleta-1);
   background: transparent;
 }
 
 .input--style-3::-webkit-input-placeholder {
   /* WebKit, Blink, Edge */
-  color: #ccc;
+  color: var(--paleta-1);
 }
 
 .input--style-3:-moz-placeholder {
   /* Mozilla Firefox 4 to 18 */
-  color: #ccc;
+  color: var(--paleta-1);
   opacity: 1;
 }
 
 .input--style-3::-moz-placeholder {
   /* Mozilla Firefox 19+ */
-  color: #ccc;
+  color: var(--paleta-1);
   opacity: 1;
 }
 
 .input--style-3:-ms-input-placeholder {
   /* Internet Explorer 10-11 */
-  color: #ccc;
+  color: var(--paleta-1);
 }
 
 .input--style-3:-ms-input-placeholder {
   /* Microsoft Edge */
-  color: #ccc;
+  color: var(--paleta-1);
 }
 
 /* ==========================================================================
@@ -311,7 +309,7 @@ label {
   .select2-selection__rendered {
   line-height: 36px;
   padding-left: 0;
-  color: #ccc;
+  color: var(--paleta-1);
   font-size: 16px;
   font-family: inherit;
 }
@@ -354,7 +352,7 @@ label {
   font-family: "Material-Design-Iconic-Font";
   content: "\f2f9";
   font-size: 18px;
-  color: #ccc;
+  color: var(--paleta-1);
   -webkit-transition: all 0.4s ease;
   -o-transition: all 0.4s ease;
   -moz-transition: all 0.4s ease;
@@ -390,7 +388,7 @@ label {
      ========================================================================== */
 .title {
   font-size: 24px;
-  color: #fff;
+  color: var(--paleta-1);
   font-weight: 400;
   margin-bottom: 36px;
 }

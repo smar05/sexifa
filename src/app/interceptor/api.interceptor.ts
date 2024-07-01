@@ -10,12 +10,15 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
+import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
+import { UrlPagesEnum } from '../enum/urlPagesEnum';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
-  token: any = '';
+  private token: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   intercept(
     request: HttpRequest<unknown>,
@@ -23,12 +26,17 @@ export class ApiInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     //Que nose agregen token a las peticiones de login
     //ni de refrescar token
+    let urlActual: string = this.router.url;
+
     if (
       request.url == environment.urlLogin ||
       request.url == environment.urlRefreshToken ||
       (request.url.includes(environment.urlCollections.users) &&
         request.method == 'POST') || //Para registrar un nuevo usuario
-      request.url.includes(environment.urlLocation)
+      request.url.includes(environment.urlLocation) ||
+      request.url.includes(environment.apiKeyCurrencyConverter) ||
+      (request.url.includes(EnumEndpointsBack.TELEGRAM.COMUNICAR_BOT_CLIENTE) &&
+        urlActual.includes(UrlPagesEnum.REGISTER))
     )
       return next.handle(request);
     this.token = localStorage.getItem(LocalStorageEnum.TOKEN);
@@ -74,6 +82,8 @@ export class ApiInterceptor implements HttpInterceptor {
     return request.clone({
       setParams: {
         auth: token,
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        date: new Date().toISOString(),
       },
     });
   }

@@ -41,4 +41,26 @@ export class alerts {
       confirmButtonText: confirmButtonText,
     });
   }
+
+  /**
+   *
+   *
+   * @static
+   * @param {string} title
+   * @param {SweetAlertIcon} icon
+   * @param {string} html
+   * @return {*}  {Promise<any>}
+   * @memberof alerts
+   */
+  static html(title: string, icon: SweetAlertIcon, html: string): Promise<any> {
+    return Swal.fire({
+      title: title,
+      icon: 'info',
+      html: html,
+      showConfirmButton: false,
+      showCancelButton: true,
+      cancelButtonColor: '#d33',
+      allowOutsideClick: false,
+    });
+  }
 }

@@ -2,5 +2,10 @@ export interface Icategories {
   id?: string;
   icon?: string;
   name?: string;
-  active?: boolean;
+  active?: string;
+}
+
+export enum EnumCategoriesActive {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }

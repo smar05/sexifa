@@ -1,10 +1,9 @@
 import { environment } from './../../environments/environment';
-import { IQueryParams } from './../interface/i-query-params';
-import { functions } from 'src/app/helpers/functions';
-import { ApiService } from './api.service';
 import { Icategories } from './../interface/icategories';
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { FireStorageService } from './fire-storage.service';
+import { QueryFn } from '@angular/fire/compat/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -12,62 +11,70 @@ import { Injectable } from '@angular/core';
 export class CategoriesService {
   private urlCategories: string = environment.urlCollections.categories;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private fireStorageService: FireStorageService) {}
 
+  //------------ FireStorage---------------//
   /**
-   * Se toma la informacion de la coleccion de Categorias en Firebase
+   * Se toma la informacion de la coleccion de front_logs en Firebase
    *
-   * @param {IQueryParams} [queryParams={}]
+   *
+   * @param {QueryFn} [qf=null]
    * @return {*}  {Observable<any>}
    * @memberof CategoriesService
    */
-  public getData(queryParams: IQueryParams = {}): Observable<any> {
-    return this.apiService.get(`${this.urlCategories}.json`, queryParams);
+  public getDataFS(qf: QueryFn = null): Observable<any> {
+    return this.fireStorageService
+      .getData(this.urlCategories, qf)
+      .pipe(this.fireStorageService.mapForPipe('many'));
   }
 
   /**
-   * Tomar un item de categorias
+   * Tomar un documento de frontLogs
    *
-   * @param {string} id
-   * @param {IQueryParams} [queryParams={}]
+   * @param {string} doc
+   * @param {QueryFn} [qf=null]
    * @return {*}  {Observable<any>}
    * @memberof CategoriesService
    */
-  public getItem(id: string, queryParams: IQueryParams = {}): Observable<any> {
-    return this.apiService.get(`${this.urlCategories}/${id}.json`, queryParams);
+  public getItemFS(doc: string, qf: QueryFn = null): Observable<any> {
+    return this.fireStorageService
+      .getItem(this.urlCategories, doc, qf)
+      .pipe(this.fireStorageService.mapForPipe('one'));
   }
 
   /**
-   * Guardar informacion de la categoria
+   * Guardar informacion del frontLogs
    *
    * @param {Icategories} data
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Promise<any>}
    * @memberof CategoriesService
    */
-  public postData(data: Icategories): Observable<any> {
-    return this.apiService.post(`${this.urlCategories}.json`, data);
+  public postDataFS(data: Icategories): Promise<any> {
+    return this.fireStorageService.post(this.urlCategories, data);
   }
 
   /**
-   * Actualizar categoria
+   * Actualizar front_logs
    *
-   * @param {string} id
-   * @param {object} data
-   * @return {*}  {Observable<any>}
+   * @param {string} doc
+   * @param {Icategories} data
+   * @return {*}  {Promise<any>}
    * @memberof CategoriesService
    */
-  public patchData(id: string, data: object): Observable<any> {
-    return this.apiService.patch(`${this.urlCategories}/${id}.json`, data);
+  public patchDataFS(doc: string, data: Icategories): Promise<any> {
+    return this.fireStorageService.patch(this.urlCategories, doc, data);
   }
 
   /**
-   * Eliminar categoria
+   * Eliminar FrontLogs
    *
-   * @param {string} id
-   * @return {*}  {Observable<any>}
+   * @param {string} doc
+   * @return {*}  {Promise<any>}
    * @memberof CategoriesService
    */
-  public deleteData(id: string): Observable<any> {
-    return this.apiService.delete(`${this.urlCategories}/${id}.json`);
+  public deleteDataFS(doc: string): Promise<any> {
+    return this.fireStorageService.delete(this.urlCategories, doc);
   }
+
+  //------------ FireStorage---------------//
 }

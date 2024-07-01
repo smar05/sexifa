@@ -1,5 +1,6 @@
 //import { FontAwesomeIconsService } from './../font-awesome-icons/font-awesome-icons.service';
 import { Component, OnInit } from '@angular/core';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-bottom-nav',
@@ -7,7 +8,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./bottom-nav.component.css'],
 })
 export class BottomNavComponent implements OnInit {
-  constructor(/*public fontAwesomeIconsService: FontAwesomeIconsService*/) {}
+  public userType: string = '';
 
-  ngOnInit(): void {}
+  constructor() {}
+
+  ngOnInit(): void {
+    this.userType = localStorage.getItem(LocalStorageEnum.USER_TYPE) || '';
+  }
 }

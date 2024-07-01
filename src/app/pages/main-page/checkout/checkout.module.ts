@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CheckoutRoutingModule } from './checkout-routing.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [CheckoutComponent],
@@ -13,6 +14,7 @@ import { CheckoutRoutingModule } from './checkout-routing.module';
     CheckoutRoutingModule,
     //FontAwesomeModule,
     SharedModule,
+    FormsModule,
   ],
 })
 export class CheckoutModule {}

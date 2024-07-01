@@ -1,8 +1,19 @@
 <div class="bottom-nav">
-  <i class="fas fa-user" [routerLink]="['/user']"></i>
-  <i class="fas fa-home" [routerLink]="['/']"></i>
+  <ng-container *ngIf="this.userType == 'usuario'">
+    <i class="fas fa-user" [routerLink]="['/user']"></i>
+    <i class="fas fa-home" [routerLink]="['/']"></i>
+    <i class="fas fa-shopping-cart" [routerLink]="['/checkout']"></i>
+  </ng-container>
+
+  <ng-container *ngIf="this.userType == 'creador'">
+    <i class="fas fa-user" [routerLink]="['/creator']"></i>
+    <i class="fas fa-home" [routerLink]="['/home-seller']"></i>
+    <span class="material-symbols-outlined" [routerLink]="['/page-seller']">
+      web
+    </span>
+  </ng-container>
   <!--<fa-icon
-    class="color-red"
+    class="color-primario"
     [routerLink]="['/checkout']"
     [icon]="this.fontAwesomeIconsService.getIcon('faCartShopping' || '')"
   ></fa-icon>-->

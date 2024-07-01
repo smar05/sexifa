@@ -12,6 +12,14 @@ import { Iuser } from 'src/app/interface/iuser';
 import { ICountries } from 'src/app/interface/icountries';
 import { IState } from 'src/app/interface/istate';
 import { ICities } from 'src/app/interface/icities';
+import { TelegramLocalService } from 'src/app/services/telegram-local.service';
+import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
+import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
+import { IFrontLogs } from 'src/app/interface/i-front-logs';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -22,6 +30,7 @@ export class RegisterComponent implements OnInit {
   public allCountries: ICountries[] = [];
   public allStatesByCountry: IState[] = [];
   public allCities: ICities[] = [];
+  public urlBotChatId: string = `${environment.urlBot}?start=mi_id`;
 
   //Grupo de controles
   public f: any = this.form.group({
@@ -30,16 +39,26 @@ export class RegisterComponent implements OnInit {
       [
         Validators.required,
         Validators.maxLength(50),
-        Validators.pattern(/[.\\,\\0-9a-zA-ZáéíóúñÁÉÍÓÚ ]{1,50}/),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
       ],
     ],
-    email: ['', [Validators.required, Validators.email]],
+    email: [
+      '',
+      [Validators.required, Validators.email, Validators.maxLength(320)],
+    ],
     celphone: [
       '',
       [
         Validators.required,
         Validators.max(9999999999),
-        Validators.pattern(/^[0-9]+$/),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
+      ],
+    ],
+    chatId: [
+      '',
+      [
+        Validators.max(99999999999999999999),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
       ],
     ],
     bornDate: ['', [Validators.required]],
@@ -47,9 +66,18 @@ export class RegisterComponent implements OnInit {
     state: ['', [Validators.required]],
     city: ['', [Validators.required]],
     sex: ['', [Validators.required]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(128),
+        Validators.pattern(EnumExpresioncesRegulares.PASSWORD),
+      ],
+    ],
     repeatPassword: ['', [Validators.required]],
     terms: ['', [Validators.required]],
+    type: ['', [Validators.required]],
   });
 
   //Validaciones personalizadas
@@ -63,6 +91,10 @@ export class RegisterComponent implements OnInit {
 
   get celphone() {
     return this.f.controls.celphone;
+  }
+
+  get chatId() {
+    return this.f.controls.chatId;
   }
 
   get bornDate() {
@@ -97,19 +129,41 @@ export class RegisterComponent implements OnInit {
     return this.f.controls.terms;
   }
 
+  get type() {
+    return this.f.controls.type;
+  }
+
   public formSubmitted: boolean = false;
   public loading: boolean = false;
+  public fechaMinimaEdad: string = null;
 
   constructor(
     private form: FormBuilder,
     private registerService: RegisterService,
     private router: Router,
     private userService: UserService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private telegramLocalService: TelegramLocalService,
+    private frontLogsService: FrontLogsService
   ) {}
 
   ngOnInit(): void {
+    functions.bloquearPantalla(true);
+    localStorage.clear();
+    // Fecha minima para escoger la edad
+    let fechaActual: Date = new Date();
+    this.fechaMinimaEdad = new Date(
+      fechaActual.getFullYear() - 18,
+      fechaActual.getMonth(),
+      fechaActual.getDate()
+    )
+      .toISOString()
+      .split('T')[0];
+
+    this.tipoDeUsuarios();
+    this.f.controls.type.value = UserTypeEnum.USUARIO;
     this.getCountries();
+    functions.bloquearPantalla(false);
   }
 
   public async onSubmit(f: any): Promise<void> {
@@ -127,40 +181,75 @@ export class RegisterComponent implements OnInit {
       password: this.f.controls.password.value,
     };
 
+    functions.bloquearPantalla(true);
     this.loading = true;
 
     try {
       let resp: any = await this.registerService.registerAuth(data);
       const uid: string = resp.user.uid;
 
-      this.registerService.verificEmail().then((res: any) => {
-        alerts.basicAlert(
-          'Correo enviado',
-          'Se te ha enviado un correo para verificacion',
-          'info'
-        );
-      });
+      this.registerService
+        .verificEmail()
+        .then((res: any) => {
+          alerts.basicAlert(
+            'Correo enviado',
+            'Se te ha enviado un correo para verificacion',
+            'info'
+          );
+        })
+        .catch((err: any) => {
+          console.error('Error: ', err);
+          alerts.basicAlert(
+            'Error',
+            'Ha ocurrido un error enviando el correo de verificacion',
+            'error'
+          );
+
+          let data: IFrontLogs = {
+            date: new Date(),
+            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+              err
+            )}`,
+          };
+
+          this.frontLogsService
+            .postDataFS(data)
+            .then((res) => {})
+            .catch((err) => {
+              alerts.basicAlert('Error', 'Error', 'error');
+              throw err;
+            });
+          throw err;
+        });
 
       const user: Iuser = {
         id: uid,
         name: this.name.value,
         email: this.email.value,
         celphone: this.celphone.value,
-        bornDate: new Date(this.bornDate.value),
+        bornDate: this.bornDate.value,
         sex: this.sex.value,
-        active: true,
+        status:
+          this.type == UserTypeEnum.USUARIO
+            ? UserStatusEnum.ACTIVO
+            : UserStatusEnum.PENDIENTE_CONFIRMAR,
         country: this.country.value,
         state: this.state.value,
         city: this.city.value,
+        chatId: this.chatId.value,
+        type: this.type.value,
+        date_created: new Date().toISOString(),
       };
 
-      await this.userService.postData(user).toPromise();
+      await this.userService.postDataFS(user);
 
+      functions.bloquearPantalla(false);
       this.loading = false;
 
       this.router.navigateByUrl(`/${UrlPagesEnum.LOGIN}`);
     } catch (error: any) {
-      console.error(error);
+      console.error('Error: ', error);
 
       let code: string = error.code;
       let errorText: string = '';
@@ -184,7 +273,26 @@ export class RegisterComponent implements OnInit {
       }
 
       alerts.basicAlert('Error', errorText, 'error');
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+
+      functions.bloquearPantalla(false);
       this.loading = false;
+      throw error;
     }
   }
 
@@ -223,7 +331,30 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllContries()
       );
     } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.allCountries = [];
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ getCountries ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
     }
   }
 
@@ -235,9 +366,32 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allStatesByCountry = [];
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
     }
   }
 
@@ -251,9 +405,55 @@ export class RegisterComponent implements OnInit {
         )
       );
     } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de ubicaciones',
+        'error'
+      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allCities = [];
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: register.component.ts: ~ RegisterComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
     }
+  }
+
+  public probarConexionBot(): void {
+    if (this.chatId.value) {
+      this.telegramLocalService.probarConexionBot(
+        this.chatId.value,
+        UrlPagesEnum.REGISTER
+      );
+    } else {
+      alerts.basicAlert('Error', 'Ingrese un Id valido de Telegram', 'error');
+    }
+  }
+
+  public tipoDeUsuarios(): string[] {
+    return Object.values(UserTypeEnum);
+  }
+
+  public infoClik(): void {
+    alerts.basicAlert(
+      'Consultar ID',
+      `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
+      'info'
+    );
   }
 }

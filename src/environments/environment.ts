@@ -2,9 +2,16 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { UrlPagesEnum } from 'src/app/enum/urlPagesEnum';
+
 const apiKey: string = 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8';
 const apiKeyLocation: string =
   'dU1Pc1lYSnBVZDVqcVpSYjhVSkswTGhWTWlRWVZaUHpIdFBuemhINA==';
+const apiKeyCurrencyConverter: string =
+  'b1a887ecd831283337100ac9f2cee83a4baaae56';
+const urlProd: string =
+  'https://sexifa-269bf--onlygram-groups-rehu2taa.web.app';
+const urlServidorLocal: string = 'http://localhost:8080';
 
 const firebaseConfig: any = {
   apiKey: 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8',
@@ -22,16 +29,48 @@ export const environment = {
   urlLogin: `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
   urlGetUser: `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
   urlLocation: `https://api.countrystatecity.in/v1/`,
+  urlCurrencyConverter: `https://api.getgeoapi.com`,
+  urlProd,
+  urlServidorLocal,
+  urlBot: 'https://t.me/OnlyGramGroup_BOT',
   urlCollections: {
     categories: 'categories',
     models: 'models',
-    pages: 'pages',
     users: 'users',
-    rifas: 'rifas',
+    subscriptions: 'subscriptions',
+    orders: 'orders',
+    views_model: 'views_model',
+    front_logs: 'front_logs',
+    business_params: 'business_params',
+    saldos: 'saldos',
+    metodos_de_pago: 'metodos_de_pago',
+  },
+  urlsServidor: {
+    urlTelegramApi: 'telegram',
+    urlModelsApi: 'models',
   },
   urlRefreshToken: `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
   firebaseConfig,
   apiKeyLocation,
+  apiKeyCurrencyConverter,
+  payUCredentials: {
+    merchantId: '508029',
+    action: 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/',
+    accountId: {
+      col: '512321',
+    },
+    responseUrl: `${urlProd}/#/${UrlPagesEnum.CHECKOUT}`,
+    confirmationUrl: 'http://www.test.com/confirmation',
+    apiKey: '4Vj8eK4rloUd272L48hsrarnUA',
+    test: 1,
+  },
+  urlRedes: {
+    facebook: 'https://www.facebook.com/',
+    instagram: 'https://www.instagram.com/',
+    x: 'https://twitter.com/',
+    tiktok: 'https://www.tiktok.com/@',
+    threads: 'https://www.threads.net/@',
+  },
 };
 
 /*
