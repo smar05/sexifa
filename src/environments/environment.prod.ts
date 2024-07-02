@@ -7,7 +7,7 @@ const apiKeyCurrencyConverter: string =
   'b1a887ecd831283337100ac9f2cee83a4baaae56';
 const urlProd: string =
   'https://sexifa-269bf--onlygram-groups-rehu2taa.web.app';
-const urlServidorLocal: string = 'http://localhost:8080';
+const urlServidorLocal: string = 'https://sexifa-back.onrender.com'; //'http://localhost:8080';
 
 const firebaseConfig: any = {
   apiKey: 'AIzaSyBoulcYFTuxoou3_vBztY0TWBvhcemg4n8',
