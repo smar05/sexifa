@@ -9,8 +9,7 @@ const apiKeyLocation: string =
   'dU1Pc1lYSnBVZDVqcVpSYjhVSkswTGhWTWlRWVZaUHpIdFBuemhINA==';
 const apiKeyCurrencyConverter: string =
   'b1a887ecd831283337100ac9f2cee83a4baaae56';
-const urlProd: string =
-  'https://sexifa-269bf--onlygram-groups-rehu2taa.web.app';
+const urlProd: string = 'https://sexifa-269bf.web.app/';
 const urlServidorLocal: string = 'https://sexifa-back.onrender.com'; //'http://localhost:8080';
 
 const firebaseConfig: any = {
@@ -71,6 +70,10 @@ export const environment = {
     x: 'https://twitter.com/',
     tiktok: 'https://www.tiktok.com/@',
     threads: 'https://www.threads.net/@',
+  },
+  epayco: {
+    key: '3ee3536f1a43c9102dd1f97b491a1a4d',
+    app_id: '1462767',
   },
 };
 

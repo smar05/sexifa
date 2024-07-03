@@ -13,6 +13,7 @@ export interface Imodels {
   account?: string;
   url: string;
   redes: IModelsRedes;
+  id_epayco: string;
 }
 
 export interface IModelsRedes {

@@ -722,6 +722,7 @@ export class PageSellerComponent {
         : ModelsAccountEnum.PRIVATE,
       url: this.f.controls.url.value,
       redes: this.redes.value,
+      id_epayco: this.modelEnDb.id_epayco,
     };
 
     //Guardar la informacion del producto en base de datos

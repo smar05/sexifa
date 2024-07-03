@@ -40,6 +40,7 @@ import {
 } from 'src/app/interface/i-metodos-de-pago';
 
 declare var paypal: any;
+declare const ePayco: any;
 
 type QParamsPayU = {
   transactionState: string;
@@ -63,6 +64,7 @@ export class CheckoutComponent implements OnInit {
   public load: boolean = false;
   public models: Imodels[] = [];
   public metodosDePago: IMetodosDePago[] = null;
+  private ePayco: any = ePayco;
 
   @ViewChild('paypal', { static: true })
   paypalElement!: ElementRef;
@@ -1171,5 +1173,61 @@ export class CheckoutComponent implements OnInit {
 
   public hiddenPayMethods(): boolean {
     return !(this.cart.length > 0 && this.total && this.user.chatId);
+  }
+
+  public payEpayco(): void {
+    let handler = ePayco.checkout.configure({
+      key: environment.epayco.key,
+      test: !environment.production,
+    });
+    let date: number = new Date().getTime();
+    const dataEpayco: object = {
+      name: 'OnlyGram',
+      description: 'Pago de subscripciones de OnlyGram',
+      invoice: date + 126351321,
+      currency: 'usd',
+      amount: this.total,
+      tax_base: '0',
+      tax: '0',
+      country: this.user.country.toLowerCase(),
+      lang: 'en',
+      split_app_id: environment.epayco.app_id,
+      split_merchant_id: environment.epayco.app_id,
+      split_type: '02',
+      split_primary_receiver: environment.epayco.app_id,
+      split_primary_receiver_fee: '0',
+      splitpayment: 'true',
+      split_rule: 'multiple',
+      split_receivers: this.cart.map((c: ICart) => {
+        return {
+          id: c.model.id_epayco,
+          total: c.price.toString(),
+          iva: '',
+          base_iva: '',
+          fee: '20',
+        };
+      }),
+      external: 'false',
+      //Los parámetros extras deben ser enviados como un string
+      // Auth token
+      extra1: localStorage.getItem(LocalStorageEnum.TOKEN),
+      // Date
+      extra2: date,
+      confirmation: `${environment.urlServidorLocal}/api/epayco-trans/confirmacion`,
+      response: `${environment.urlProd}/#/checkout`,
+      //Atributos cliente
+      name_billing: this.user.name,
+      address_billing: '',
+      type_doc_billing: '', //cc
+      mobilephone_billing: this.user.celphone.toString(),
+      number_doc_billing: '',
+    };
+
+    console.log(
+      "🚀 ~ CheckoutComponent ~ payEpayco ~ dataEpayco['split_receivers']:",
+      dataEpayco['split_receivers']
+    );
+
+    handler.open(dataEpayco);
   }
 }
