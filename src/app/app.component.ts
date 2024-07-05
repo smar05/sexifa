@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LocalStorageEnum } from './enum/localStorageEnum';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'OnlyGram';
+
+  constructor() {
+    localStorage.setItem(LocalStorageEnum.SEARCH_ORDER, 'true');
+  }
 }

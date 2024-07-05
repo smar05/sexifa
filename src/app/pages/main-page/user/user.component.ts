@@ -24,7 +24,6 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { ModelsService } from 'src/app/services/models.service';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
@@ -170,7 +169,6 @@ export class UserComponent implements OnInit {
     private locationService: LocationService,
     private telegramLocalService: TelegramLocalService,
     private subscriptionsService: SubscriptionsService,
-    private modelsService: ModelsService,
     private frontLogsService: FrontLogsService
   ) {}
 

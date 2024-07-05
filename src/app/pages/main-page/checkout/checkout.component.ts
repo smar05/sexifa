@@ -38,6 +38,7 @@ import {
   EnumMetodosDePagoStatus,
   IMetodosDePago,
 } from 'src/app/interface/i-metodos-de-pago';
+import { EnumEndpointsBack } from 'src/app/enum/enum-endpoints-back';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -185,10 +186,6 @@ export class CheckoutComponent implements OnInit {
    * @memberof CheckoutComponent
    */
   private async ifPayU(): Promise<void> {
-    console.log(
-      '🚀 ~ file: checkout.component.ts:85 ~ CheckoutComponent ~ ifPayU ~ this.cart:',
-      this.cart
-    );
     let params: QParamsPayU = this.activatedRoute.snapshot.queryParams as any;
 
     let payProceso: Date = new Date(
@@ -1224,8 +1221,8 @@ export class CheckoutComponent implements OnInit {
           } as ICart;
         })
       ),
-      confirmation: `${environment.urlServidorLocal}/api/epayco-trans/confirmacion`,
-      response: `${environment.urlProd}/#/checkout`,
+      confirmation: `${environment.urlServidorLocal}/api/epayco-trans/${EnumEndpointsBack.EPAYCO.CONFIRMACION}`,
+      response: `${environment.urlProd}/#/${UrlPagesEnum.HOME}`,
       //Atributos cliente
       name_billing: this.user.name,
       address_billing: '',
