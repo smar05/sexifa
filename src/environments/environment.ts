@@ -32,7 +32,7 @@ export const environment = {
   urlProd,
   urlServidorLocal,
   urlBot: 'https://t.me/OnlyGramGroup_BOT',
-  urlBotGetId: 'https://t.me/getidsbot',
+  urlBotGetId: 'https://t.me/username_to_id_bot',
   urlCollections: {
     categories: 'categories',
     models: 'models',
@@ -44,6 +44,7 @@ export const environment = {
     business_params: 'business_params',
     saldos: 'saldos',
     metodos_de_pago: 'metodos_de_pago',
+    epayco_trans: 'epayco_trans',
   },
   urlsServidor: {
     urlTelegramApi: 'telegram',

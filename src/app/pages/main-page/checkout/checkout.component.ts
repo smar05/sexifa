@@ -1176,15 +1176,16 @@ export class CheckoutComponent implements OnInit {
   }
 
   public payEpayco(): void {
-    let handler = ePayco.checkout.configure({
+    const handler = ePayco.checkout.configure({
       key: environment.epayco.key,
       test: !environment.production,
     });
-    let date: number = new Date().getTime();
+    const date: Date = new Date();
+    let dateNumber: number = date.getTime();
     const dataEpayco: object = {
       name: 'OnlyGram',
       description: 'Pago de subscripciones de OnlyGram',
-      invoice: date + 126351321,
+      invoice: dateNumber + 126351321,
       currency: 'usd',
       amount: this.total,
       tax_base: '0',
@@ -1193,7 +1194,7 @@ export class CheckoutComponent implements OnInit {
       lang: 'en',
       split_app_id: environment.epayco.app_id,
       split_merchant_id: environment.epayco.app_id,
-      split_type: '02',
+      split_type: '02', // Porcentaje
       split_primary_receiver: environment.epayco.app_id,
       split_primary_receiver_fee: '0',
       splitpayment: 'true',
@@ -1204,7 +1205,7 @@ export class CheckoutComponent implements OnInit {
           total: c.price.toString(),
           iva: '',
           base_iva: '',
-          fee: '20',
+          fee: '20', // 20% comision
         };
       }),
       external: 'false',
@@ -1213,6 +1214,16 @@ export class CheckoutComponent implements OnInit {
       extra1: localStorage.getItem(LocalStorageEnum.TOKEN),
       // Date
       extra2: date,
+      // Carrito
+      extra3: JSON.stringify(
+        this.cart.map((c: ICart) => {
+          // Se envia todo menos Imodel
+          return {
+            infoModelSubscription: c.infoModelSubscription,
+            price: c.price,
+          } as ICart;
+        })
+      ),
       confirmation: `${environment.urlServidorLocal}/api/epayco-trans/confirmacion`,
       response: `${environment.urlProd}/#/checkout`,
       //Atributos cliente
@@ -1222,11 +1233,6 @@ export class CheckoutComponent implements OnInit {
       mobilephone_billing: this.user.celphone.toString(),
       number_doc_billing: '',
     };
-
-    console.log(
-      "🚀 ~ CheckoutComponent ~ payEpayco ~ dataEpayco['split_receivers']:",
-      dataEpayco['split_receivers']
-    );
 
     handler.open(dataEpayco);
   }
