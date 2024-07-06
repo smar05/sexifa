@@ -42,6 +42,59 @@
               </div>
             </div>
 
+            <!--id_epayco-->
+
+            <div class="alert alert-info" role="alert">
+              <small
+                >No olvides añadir tu Cliente ID de tu cuenta Epayco validada,
+                la cual encontraras en el dashboard en el siguiente link:
+                <a target="_blank" href="{{ this.urlDashboardEpayco() }}"
+                  >Dashboard Epayco</a
+                ></small
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="inputid_epayco"
+                >Cliente ID de la cuenta Epayco
+                <sup class="text-danger">*</sup></label
+              >
+              <input
+                type="text"
+                placeholder="Cliente ID Epayco"
+                class="form-control"
+                id="inputid_epayco"
+                formControlName="id_epayco"
+                maxlength="7"
+                minlength="7"
+                required
+                [ngClass]="{
+                  'is-invalid': id_epayco.invalid
+                }"
+              />
+              <span
+                class="invalid-feedback"
+                *ngIf="id_epayco.invalid && id_epayco.errors?.required"
+              >
+                Por favor ingrese el Cliente ID de su cuenta Epayco
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="id_epayco.invalid && id_epayco.errors?.pattern"
+              >
+                Se encontraron caracteres invalidos
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="
+                  id_epayco.errors?.maxlength || id_epayco.errors?.minlength
+                "
+              >
+                El Cliente ID de su cuenta Epayco debe ser de 7 digitos
+                numericos
+              </span>
+            </div>
+
             <!--Nombre-->
             <div class="form-group">
               <label for="inputName"

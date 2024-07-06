@@ -125,6 +125,15 @@ export class PageSellerComponent {
         },
       ],
     }),
+    id_epayco: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(7),
+        Validators.maxLength(7),
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS),
+      ],
+    ],
   });
 
   //Validaciones personalizadas
@@ -162,6 +171,10 @@ export class PageSellerComponent {
 
   get account() {
     return this.f.controls.account;
+  }
+
+  get id_epayco() {
+    return this.f.controls.id_epayco;
   }
 
   //Variable para validar el envio del formulario
@@ -469,6 +482,7 @@ export class PageSellerComponent {
     });
 
     if (this.modelEnDb && this.modelEnDb.id) {
+      this.id_epayco.setValue(this.modelEnDb.id_epayco);
       this.name.setValue(this.modelEnDb.name);
       this.url.setValue(this.modelEnDb.url);
       this.categoryName = this.modelEnDb.categorie || '';
@@ -1717,5 +1731,11 @@ export class PageSellerComponent {
     functions.bloquearPantalla(false);
     this.loadData = false;
     return true;
+  }
+
+  public urlDashboardEpayco(): string {
+    return `${environment.epayco.url_dashboard}${
+      this.id_epayco.valid ? 'login' : 'register'
+    }`;
   }
 }

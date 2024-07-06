@@ -75,6 +75,7 @@ export const environment = {
   epayco: {
     key: '3ee3536f1a43c9102dd1f97b491a1a4d',
     app_id: '1462767',
+    url_dashboard: 'https://dashboard.epayco.com/',
   },
 };
 
