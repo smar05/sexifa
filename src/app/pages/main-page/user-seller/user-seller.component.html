@@ -255,162 +255,173 @@
           </div>
         </div>
 
-        <div class="card card-3 mt-3" style="background-color: white">
-          <div class="card-body">
-            <h3 class="card-title">Consultar saldo pendiente</h3>
-            <ng-container *ngIf="this.saldoPendiente >= 0; else noSaldo">
-              <p class="card-text">
-                {{ this.saldoPendiente | currency : "USD" }} | # Subscripciones:
-                {{ this.subscripcionesPendientes.length }}
-              </p>
-              <button
-                class="btn btn-block bg-principal text-white"
-                (click)="this.exportarSaldo()"
-                [disabled]="
-                  !(
-                    this.saldoPendiente > 0 &&
-                    this.subscripcionesPendientes.length > 0
-                  )
-                "
-              >
-                <i class="fas fa-table"></i> Exportar
-              </button>
-              <button
-                class="btn btn-block bg-secundario text-white"
-                (click)="this.solicitarSaldo()"
-              >
-                <i class="fas fa-money-bill"></i> Solicitar saldo
-              </button>
-            </ng-container>
-            <ng-template #noSaldo>
-              <p class="card-text">
-                ********
-                <i
-                  class="fas fa-eye"
-                  (click)="this.onClickSaldoPendiente()"
-                ></i>
-              </p>
-            </ng-template>
-          </div>
-        </div>
-
-        <div class="card card-3 mt-3">
-          <ng-container>
-            <div class="card-body bg-secundario">
-              <h3
-                class="card-title"
-                (click)="this.onClickGetSaldosSolicitados()"
-              >
-                Consultar saldos solicitados
-                <i
-                  class="fas fa-eye"
-                  (click)="this.onClickGetSaldosSolicitados()"
-                  *ngIf="
+        <ng-container *ngIf="false">
+          }
+          <div class="card card-3 mt-3" style="background-color: white">
+            <div class="card-body">
+              <h3 class="card-title">Consultar saldo pendiente</h3>
+              <ng-container *ngIf="this.saldoPendiente >= 0; else noSaldo">
+                <p class="card-text">
+                  {{ this.saldoPendiente | currency : "USD" }} | #
+                  Subscripciones:
+                  {{ this.subscripcionesPendientes.length }}
+                </p>
+                <button
+                  class="btn btn-block bg-principal text-white"
+                  (click)="this.exportarSaldo()"
+                  [disabled]="
                     !(
-                      this.saldosSolicitados &&
-                      this.saldosSolicitados.length > 0
+                      this.saldoPendiente > 0 &&
+                      this.subscripcionesPendientes.length > 0
                     )
                   "
-                ></i>
-              </h3>
-              <ng-container
-                *ngIf="this.dataSource?.data && this.dataSource.data.length > 0"
-              >
-                <br />
-                <br />
-                <div [hidden]="loading" class="row mb-2">
-                  <div class="col-12 col-sm-6 col-xl-3 ml-auto">
-                    <input
-                      class="form-control"
-                      placeholder="Buscar"
-                      (keyup)="applyFilter($event)"
-                    />
-                  </div>
-                </div>
-                <div class="mat-table-container">
-                  <table
-                    [hidden]="loading"
-                    mat-table
-                    matSort
-                    matSortActive="position"
-                    matSortDirection="asc"
-                    [dataSource]="dataSource"
-                    class="mat-elevation-z8 matTable-table"
-                    multiTemplateDataRows
-                  >
-                    <!-- Position Column -->
-                    <ng-container matColumnDef="position">
-                      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                        No.
-                      </th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.position }}
-                      </td>
-                    </ng-container>
-
-                    <!-- Fecha Column -->
-                    <ng-container matColumnDef="fecha">
-                      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                        Fecha
-                      </th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.fecha.split("T")[0] }}
-                      </td>
-                    </ng-container>
-
-                    <!-- Estado Column -->
-                    <ng-container matColumnDef="status">
-                      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                        Estado
-                      </th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.status }}
-                      </td>
-                    </ng-container>
-
-                    <!-- precio Column -->
-                    <ng-container matColumnDef="price">
-                      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                        Precio
-                      </th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.price | currency : "USD" }}
-                      </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr
-                      mat-row
-                      *matRowDef="let element; columns: displayedColumns"
-                      class="example-element-row"
-                      [class.example-expanded-row]="expandedElement === element"
-                    ></tr>
-                    <!-- Row shown when there is no matching data. -->
-                    <tr class="mat-row" *matNoDataRow>
-                      <td
-                        class="mat-cell text-center"
-                        [attr.colspan]="displayedColumns.length"
-                      >
-                        No data matching the filter
-                      </td>
-                    </tr>
-                  </table>
-                </div>
+                >
+                  <i class="fas fa-table"></i> Exportar
+                </button>
+                <button
+                  class="btn btn-block bg-secundario text-white"
+                  (click)="this.solicitarSaldo()"
+                >
+                  <i class="fas fa-money-bill"></i> Solicitar saldo
+                </button>
               </ng-container>
+              <ng-template #noSaldo>
+                <p class="card-text">
+                  ********
+                  <i
+                    class="fas fa-eye"
+                    (click)="this.onClickSaldoPendiente()"
+                  ></i>
+                </p>
+              </ng-template>
             </div>
-            <!-- /.card-body -->
-            <div class="card-footer">
-              <mat-paginator
-                [hidden]="loading"
-                [pageSize]="10"
-                [pageSizeOptions]="[10, 25, 50, 100]"
-                showFirstLastButtons
-                aria-label="Select page of periodic elements"
-              >
-              </mat-paginator>
-            </div>
-          </ng-container>
-        </div>
+          </div>
+
+          <div class="card card-3 mt-3">
+            <ng-container>
+              <div class="card-body bg-secundario">
+                <h3
+                  class="card-title"
+                  (click)="this.onClickGetSaldosSolicitados()"
+                >
+                  Consultar saldos solicitados
+                  <i
+                    class="fas fa-eye"
+                    (click)="this.onClickGetSaldosSolicitados()"
+                    *ngIf="
+                      !(
+                        this.saldosSolicitados &&
+                        this.saldosSolicitados.length > 0
+                      )
+                    "
+                  ></i>
+                </h3>
+                <ng-container
+                  *ngIf="
+                    this.dataSource?.data && this.dataSource.data.length > 0
+                  "
+                >
+                  <br />
+                  <br />
+                  <div [hidden]="loading" class="row mb-2">
+                    <div class="col-12 col-sm-6 col-xl-3 ml-auto">
+                      <input
+                        class="form-control"
+                        placeholder="Buscar"
+                        (keyup)="applyFilter($event)"
+                      />
+                    </div>
+                  </div>
+                  <div class="mat-table-container">
+                    <table
+                      [hidden]="loading"
+                      mat-table
+                      matSort
+                      matSortActive="position"
+                      matSortDirection="asc"
+                      [dataSource]="dataSource"
+                      class="mat-elevation-z8 matTable-table"
+                      multiTemplateDataRows
+                    >
+                      <!-- Position Column -->
+                      <ng-container matColumnDef="position">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                          No.
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                          {{ element.position }}
+                        </td>
+                      </ng-container>
+
+                      <!-- Fecha Column -->
+                      <ng-container matColumnDef="fecha">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                          Fecha
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                          {{ element.fecha.split("T")[0] }}
+                        </td>
+                      </ng-container>
+
+                      <!-- Estado Column -->
+                      <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                          Estado
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                          {{ element.status }}
+                        </td>
+                      </ng-container>
+
+                      <!-- precio Column -->
+                      <ng-container matColumnDef="price">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                          Precio
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                          {{ element.price | currency : "USD" }}
+                        </td>
+                      </ng-container>
+
+                      <tr
+                        mat-header-row
+                        *matHeaderRowDef="displayedColumns"
+                      ></tr>
+                      <tr
+                        mat-row
+                        *matRowDef="let element; columns: displayedColumns"
+                        class="example-element-row"
+                        [class.example-expanded-row]="
+                          expandedElement === element
+                        "
+                      ></tr>
+                      <!-- Row shown when there is no matching data. -->
+                      <tr class="mat-row" *matNoDataRow>
+                        <td
+                          class="mat-cell text-center"
+                          [attr.colspan]="displayedColumns.length"
+                        >
+                          No data matching the filter
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </ng-container>
+              </div>
+              <!-- /.card-body -->
+              <div class="card-footer">
+                <mat-paginator
+                  [hidden]="loading"
+                  [pageSize]="10"
+                  [pageSizeOptions]="[10, 25, 50, 100]"
+                  showFirstLastButtons
+                  aria-label="Select page of periodic elements"
+                >
+                </mat-paginator>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
       </div>
     </div>
   </section>
