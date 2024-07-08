@@ -168,6 +168,47 @@
                   </button>
                 </div>
               </ng-container>
+
+              <ng-container *ngIf="this.findMetodoDePago('epayco')">
+                <div class="form-group">
+                  <div class="ps-radio">
+                    <input
+                      class="form-control"
+                      type="radio"
+                      id="pay-epayco"
+                      name="payment-method"
+                      value="epayco"
+                      [(ngModel)]="payMethod"
+                    />
+
+                    <label for="pay-epayco"
+                      >Pagar con Tarjetas, Paypal, PSE, Nequi
+                      <img
+                        src="https://epayco.com/wp-content/uploads/2023/01/epayco_pago_seguro.jpg"
+                        class="w-100"
+                    /></label>
+                  </div>
+                </div>
+
+                <div class="row" [hidden]="payMethod != 'epayco'">
+                  <button
+                    style="
+                      padding: 0;
+                      background: none;
+                      border: none;
+                      cursor: pointer;
+                    "
+                    id="epayco-btn"
+                    class="epayco-button-render btn btn-block"
+                    (click)="this.payEpayco()"
+                  >
+                    <img
+                      src="https://multimedia.epayco.co/dashboard/btns/btn2.png"
+                      alt=""
+                    />
+                  </button>
+                </div>
+              </ng-container>
             </form>
           </div>
         </div>

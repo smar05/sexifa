@@ -19,6 +19,9 @@ import { alerts } from 'src/app/helpers/alerts';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { ActivatedRoute } from '@angular/router';
+import { OrdersService } from 'src/app/services/orders.service';
+import { Iorders } from 'src/app/interface/i-orders';
 
 @Component({
   selector: 'app-home',
@@ -38,11 +41,22 @@ export class HomeComponent implements OnInit {
     private categoriesService: CategoriesService,
     private modelsService: ModelsService,
     private frontLogsService: FrontLogsService,
-    public fontAwesomeIconsService: FontAwesomeIconsService
+    public fontAwesomeIconsService: FontAwesomeIconsService,
+    private route: ActivatedRoute,
+    private ordersService: OrdersService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    let refEpayco: string = null;
+    let searchOrder: boolean =
+      localStorage.getItem(LocalStorageEnum.SEARCH_ORDER) === 'true';
+
+    // Parametros de la url
+    this.route.queryParams.subscribe((params) => {
+      refEpayco = params['ref_epayco'];
+    });
+
     await this.getAllCategories();
     try {
       await this.getAllModels();
@@ -72,7 +86,92 @@ export class HomeComponent implements OnInit {
       functions.bloquearPantalla(false);
       throw error;
     }
+
+    // Consultar la orden generada en la transaccion epayco
+    if (refEpayco || searchOrder) {
+      localStorage.removeItem(LocalStorageEnum.SEARCH_ORDER);
+
+      await this.consultarOrden();
+    }
+
     functions.bloquearPantalla(false);
+  }
+
+  private async consultarOrden(): Promise<void> {
+    let qf: QueryFn = (ref) => ref.where('user_view', '==', false).limit(1);
+
+    let res: IFireStoreRes[] = null;
+    try {
+      res = await this.ordersService.getDataFS(qf).toPromise();
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de la orden',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ consultarOrden ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
+    }
+
+    if (!res || res.length === 0) return;
+
+    let order: Iorders = { id: res[0].id, ...res[0].data };
+    order.user_view = true;
+
+    try {
+      await this.ordersService.patchDataFS(order.id, order);
+    } catch (error) {
+      console.error('Error: ', error);
+      alerts.basicAlert(
+        'Error',
+        'Ha ocurrido un error en la consulta de la orden',
+        'error'
+      );
+
+      let data: IFrontLogs = {
+        date: new Date(),
+        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        log: `file: home.component.ts: ~ HomeComponent ~ consultarOrden ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`,
+      };
+
+      this.frontLogsService
+        .postDataFS(data)
+        .then((res) => {})
+        .catch((err) => {
+          alerts.basicAlert('Error', 'Error', 'error');
+          throw err;
+        });
+      throw error;
+    }
+
+    // Limpiar el localStorage
+    localStorage.removeItem(LocalStorageEnum.CART);
+    localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
+    localStorage.removeItem(LocalStorageEnum.VIEWS_MODEL);
+
+    alerts.basicAlert(
+      'Listo',
+      `Numero de orden: ${order.id}.\nDentro de unos minutos, nuestro BOT te enviara los links de acceso de los grupos a tu Telegram.`,
+      'success'
+    );
   }
 
   public async clickSearch(): Promise<void> {

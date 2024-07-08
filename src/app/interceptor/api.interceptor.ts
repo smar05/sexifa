@@ -13,12 +13,17 @@ import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { Router } from '@angular/router';
+import { TokenService } from '../services/token.service';
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
   private token: string = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private tokenService: TokenService
+  ) {}
 
   intercept(
     request: HttpRequest<unknown>,
@@ -50,21 +55,9 @@ export class ApiInterceptor implements HttpInterceptor {
     //Calcular 15 min despues del tiempo actual
     now.setTime(now.getTime() + 15 * 60 * 1000);
     if (tokenExp.getTime() < now.getTime()) {
-      const body = {
-        grant_type: 'refresh_token',
-        refresh_token: localStorage.getItem(LocalStorageEnum.REFRESH_TOKEN),
-      };
-      this.http
-        .post(environment.urlRefreshToken, body)
-        .subscribe((resp: any) => {
-          //Se captura el idToken y refreshToken
-          localStorage.setItem(LocalStorageEnum.TOKEN, resp.id_token);
-          localStorage.setItem(
-            LocalStorageEnum.REFRESH_TOKEN,
-            resp.refresh_token
-          );
-          this.token = resp.id_token;
-        });
+      this.tokenService.actualizarToken(
+        localStorage.getItem(LocalStorageEnum.REFRESH_TOKEN)
+      );
     }
 
     return next.handle(this.cloneToken(request, this.token)).pipe(

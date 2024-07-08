@@ -9,4 +9,7 @@ export const EnumEndpointsBack = {
   MODELS: {
     OBTENER_PRECIOS: 'obtener-precios',
   },
+  EPAYCO: {
+    CONFIRMACION: 'confirmacion',
+  },
 };

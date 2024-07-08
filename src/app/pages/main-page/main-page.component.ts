@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-main-page',
@@ -8,5 +9,7 @@ import { Component, OnInit } from '@angular/core';
 export class MainPageComponent implements OnInit {
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    localStorage.setItem(LocalStorageEnum.SEARCH_ORDER, 'true');
+  }
 }

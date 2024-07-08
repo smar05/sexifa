@@ -38,8 +38,11 @@ import {
   EnumMetodosDePagoStatus,
   IMetodosDePago,
 } from 'src/app/interface/i-metodos-de-pago';
+import { EnumEndpointsBack } from 'src/app/enum/enum-endpoints-back';
+import { TokenService } from 'src/app/services/token.service';
 
 declare var paypal: any;
+declare const ePayco: any;
 
 type QParamsPayU = {
   transactionState: string;
@@ -63,6 +66,7 @@ export class CheckoutComponent implements OnInit {
   public load: boolean = false;
   public models: Imodels[] = [];
   public metodosDePago: IMetodosDePago[] = null;
+  private ePayco: any = ePayco;
 
   @ViewChild('paypal', { static: true })
   paypalElement!: ElementRef;
@@ -78,7 +82,8 @@ export class CheckoutComponent implements OnInit {
     private currencyConverterService: CurrencyConverterService,
     private frontLogsService: FrontLogsService,
     private businessParamsService: BusinessParamsService,
-    private metodosDePagoService: MetodosDePagoService
+    private metodosDePagoService: MetodosDePagoService,
+    private tokenService: TokenService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -183,10 +188,6 @@ export class CheckoutComponent implements OnInit {
    * @memberof CheckoutComponent
    */
   private async ifPayU(): Promise<void> {
-    console.log(
-      '🚀 ~ file: checkout.component.ts:85 ~ CheckoutComponent ~ ifPayU ~ this.cart:',
-      this.cart
-    );
     let params: QParamsPayU = this.activatedRoute.snapshot.queryParams as any;
 
     let payProceso: Date = new Date(
@@ -1171,5 +1172,71 @@ export class CheckoutComponent implements OnInit {
 
   public hiddenPayMethods(): boolean {
     return !(this.cart.length > 0 && this.total && this.user.chatId);
+  }
+
+  public payEpayco(): void {
+    this.tokenService.actualizarToken(
+      localStorage.getItem(LocalStorageEnum.REFRESH_TOKEN)
+    );
+
+    const handler = ePayco.checkout.configure({
+      key: environment.epayco.key,
+      test: !environment.production,
+    });
+    const date: Date = new Date();
+    let dateNumber: number = date.getTime();
+    const dataEpayco: object = {
+      name: 'OnlyGram',
+      description: 'Pago de subscripciones de OnlyGram',
+      invoice: dateNumber + 126351321,
+      currency: 'usd',
+      amount: this.total,
+      tax_base: '0',
+      tax: '0',
+      country: this.user.country.toLowerCase(),
+      lang: 'en',
+      split_app_id: environment.epayco.app_id,
+      split_merchant_id: environment.epayco.app_id,
+      split_type: '02', // Porcentaje
+      split_primary_receiver: environment.epayco.app_id,
+      split_primary_receiver_fee: '0',
+      splitpayment: 'true',
+      split_rule: 'multiple',
+      split_receivers: this.cart.map((c: ICart) => {
+        return {
+          id: c.model.id_epayco,
+          total: c.price.toString(),
+          iva: '',
+          base_iva: '',
+          fee: '20', // 20% comision
+        };
+      }),
+      external: 'false',
+      //Los parámetros extras deben ser enviados como un string
+      // Auth token
+      extra1: localStorage.getItem(LocalStorageEnum.TOKEN),
+      // Date
+      extra2: date,
+      // Carrito
+      extra3: JSON.stringify(
+        this.cart.map((c: ICart) => {
+          // Se envia todo menos Imodel
+          return {
+            infoModelSubscription: c.infoModelSubscription,
+            price: c.price,
+          } as ICart;
+        })
+      ),
+      confirmation: `${environment.urlServidorLocal}/api/epayco-trans/${EnumEndpointsBack.EPAYCO.CONFIRMACION}`,
+      response: `${environment.urlProd}/#/${UrlPagesEnum.HOME}`,
+      //Atributos cliente
+      name_billing: this.user.name,
+      address_billing: '',
+      type_doc_billing: '', //cc
+      mobilephone_billing: this.user.celphone.toString(),
+      number_doc_billing: '',
+    };
+
+    handler.open(dataEpayco);
   }
 }
