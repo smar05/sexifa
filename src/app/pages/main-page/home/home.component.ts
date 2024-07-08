@@ -129,7 +129,7 @@ export class HomeComponent implements OnInit {
       throw error;
     }
 
-    if (!res) return;
+    if (!res || res.length === 0) return;
 
     let order: Iorders = { id: res[0].id, ...res[0].data };
     order.user_view = true;

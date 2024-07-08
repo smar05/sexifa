@@ -39,6 +39,7 @@ import {
   IMetodosDePago,
 } from 'src/app/interface/i-metodos-de-pago';
 import { EnumEndpointsBack } from 'src/app/enum/enum-endpoints-back';
+import { TokenService } from 'src/app/services/token.service';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -81,7 +82,8 @@ export class CheckoutComponent implements OnInit {
     private currencyConverterService: CurrencyConverterService,
     private frontLogsService: FrontLogsService,
     private businessParamsService: BusinessParamsService,
-    private metodosDePagoService: MetodosDePagoService
+    private metodosDePagoService: MetodosDePagoService,
+    private tokenService: TokenService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -1173,6 +1175,10 @@ export class CheckoutComponent implements OnInit {
   }
 
   public payEpayco(): void {
+    this.tokenService.actualizarToken(
+      localStorage.getItem(LocalStorageEnum.REFRESH_TOKEN)
+    );
+
     const handler = ePayco.checkout.configure({
       key: environment.epayco.key,
       test: !environment.production,
