@@ -9,4 +9,5 @@ export enum LocalStorageEnum {
   PAYU_PROCESO = 'payu_proceso',
   REDIRECT_TO = 'redirect_to',
   MODEL_ID = 'model_id',
+  SEARCH_ORDER = 'search_order',
 }
