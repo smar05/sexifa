@@ -842,7 +842,12 @@ export class CheckoutComponent implements OnInit {
     this.load = true;
 
     let aux: string = localStorage.getItem(LocalStorageEnum.CART);
-    if (!aux || !JSON.parse(aux) || JSON.parse(aux).length === 0) return;
+    if (!aux || !JSON.parse(aux) || JSON.parse(aux).length === 0) {
+      this.cart = [];
+      functions.bloquearPantalla(false);
+      this.load = false;
+      return;
+    }
 
     this.cartLocal = JSON.parse(
       localStorage.getItem(LocalStorageEnum.CART) || ''
@@ -900,10 +905,14 @@ export class CheckoutComponent implements OnInit {
                     .postDataFS(data)
                     .then((res) => {})
                     .catch((err) => {
+                      functions.bloquearPantalla(false);
+                      this.load = false;
                       alerts.basicAlert('Error', 'Error', 'error');
                       throw err;
                     });
 
+                  functions.bloquearPantalla(false);
+                  this.load = false;
                   resolve(null);
                   throw err;
                 }
