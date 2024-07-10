@@ -228,7 +228,12 @@
               style="border-radius: 50%; background-color: azure"
               (click)="this.infoClik()"
             ></i>
-            <a [href]="this.urlBotChatId" target="_blank">Consultar id</a>
+            <a
+              [href]="this.urlBotChatId"
+              target="_blank"
+              *ngIf="this.type.value == 'usuario'"
+              >Consultar id</a
+            >
           </div>
           <div class="input-group mb-3" *ngIf="this.type.value == 'usuario'">
             <input
