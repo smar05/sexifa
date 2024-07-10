@@ -1,4 +1,4 @@
-<div class="hold-transition login-page">
+<div class="hold-transition login-page" style="height: 100%">
   <div class="register-box">
     <div class="card">
       <div class="card-body">
@@ -72,6 +72,76 @@
               *ngIf="f.controls.name.errors?.maxlength"
             >
               El nombre no puede tener mas de 50 caracteres
+            </span>
+          </div>
+          <!--Tipo de documento-->
+          <div class="input-group mb-3">
+            <select
+              type="text"
+              class="form-control"
+              placeholder="Tipo de documento"
+              formControlName="document_type"
+              required
+              minlength="2"
+              maxlength="3"
+              [ngClass]="{
+                'is-invalid': invalidField('document_type')
+              }"
+            >
+              <option value="" disabled selected>Tipo de documento</option>
+              <option
+                value="{{ documentType.value }}"
+                *ngFor="let documentType of this.documentsType"
+              >
+                {{ documentType.label }}
+              </option>
+            </select>
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('document_type') &&
+                f.controls.document_type.errors?.required
+              "
+            >
+              Por favor ingrese su tipo de documento
+            </span>
+          </div>
+          <!--Numero de documento-->
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="No. de documento"
+              formControlName="document_value"
+              required
+              minlength="6"
+              maxlength="10"
+              [ngClass]="{
+                'is-invalid':
+                  invalidField('document_value') ||
+                  f.controls.document_value.invalid
+              }"
+            />
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('document_value') &&
+                f.controls.document_value.errors?.required
+              "
+            >
+              Por favor ingrese su numero de documento
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.document_value.errors?.minlength"
+            >
+              El numero de documento no puede tener menos de 6 digitos
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.document_value.errors?.maxlength"
+            >
+              El numero de documento no puede tener mas de 10 digitos
             </span>
           </div>
           <!--Correo-->

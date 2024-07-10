@@ -89,6 +89,14 @@ export class UserSellerComponent {
     state: ['', [Validators.required]],
     city: ['', [Validators.required]],
     sex: ['', [Validators.required]],
+    document_type: [
+      '',
+      [Validators.required, Validators.minLength(2), Validators.maxLength(3)],
+    ],
+    document_value: [
+      '',
+      [Validators.required, Validators.minLength(6), Validators.maxLength(10)],
+    ],
   });
 
   //Validaciones personalizadas
@@ -134,6 +142,14 @@ export class UserSellerComponent {
 
   get terms() {
     return this.f.controls.terms;
+  }
+
+  get document_type() {
+    return this.f.controls.document_type;
+  }
+
+  get document_value() {
+    return this.f.controls.document_value;
   }
 
   public formSubmitted: boolean = false;
@@ -237,6 +253,8 @@ export class UserSellerComponent {
     this.country.setValue(this.user.country);
     this.state.setValue(this.user.state);
     this.city.setValue(this.user.city);
+    this.document_type.setValue(this.user.document_type || '');
+    this.document_value.setValue(this.user.document_value);
 
     functions.bloquearPantalla(false);
     this.loading = false;
@@ -265,6 +283,8 @@ export class UserSellerComponent {
       city: this.city.value,
       chatId: this.user.chatId,
       type: this.user.type,
+      document_type: this.user.document_type,
+      document_value: this.user.document_value,
     };
 
     this.userService.patchDataFS(this.nameUserId, data).then(

@@ -40,7 +40,7 @@ export class ModelComponent implements OnInit {
   public price!: IpriceModel | undefined;
   public load: boolean = false;
   private userId: string = '';
-  private user: Iuser = {};
+  private user: Iuser = {} as any;
   public precios: Array<number> = [];
   public category: Icategories = null;
 

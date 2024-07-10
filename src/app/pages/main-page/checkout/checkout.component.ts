@@ -58,7 +58,7 @@ type QParamsPayU = {
   styleUrls: ['./checkout.component.css'],
 })
 export class CheckoutComponent implements OnInit {
-  public user: Iuser = {};
+  public user: Iuser = {} as any;
   public cartLocal: IInfoModelSubscription[] = []; // Carrito de localstorage en local
   public cart: ICart[] = []; // Objeto que se muestra en pantalla
   public total: number = 0;
@@ -1241,9 +1241,9 @@ export class CheckoutComponent implements OnInit {
       //Atributos cliente
       name_billing: this.user.name,
       address_billing: '',
-      type_doc_billing: '', //cc
+      type_doc_billing: this.user.document_type,
       mobilephone_billing: this.user.celphone.toString(),
-      number_doc_billing: '',
+      number_doc_billing: this.user.document_value,
     };
 
     handler.open(dataEpayco);

@@ -121,7 +121,7 @@ export class LoginComponent implements OnInit {
             .where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID))
             .limit(1);
 
-        let user: Iuser = {};
+        let user: Iuser = {} as any;
         let userIdDoc: string = null;
 
         try {

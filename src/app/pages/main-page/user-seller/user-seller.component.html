@@ -48,6 +48,28 @@
                     El nombre no puede tener mas de 50 caracteres
                   </span>
                 </div>
+                <!--Tipo de documento-->
+                <div class="input-group mb-3">
+                  <div class="grid">
+                    <div class="row">
+                      <label for="">Tipo de documento</label>
+                    </div>
+                    <div class="row">
+                      <p class="text-white">{{ document_type.value }}</p>
+                    </div>
+                  </div>
+                </div>
+                <!--Numero de documento-->
+                <div class="input-group mb-3">
+                  <div class="grid">
+                    <div class="row">
+                      <label for="">Número de documento</label>
+                    </div>
+                    <div class="row">
+                      <p class="text-white">{{ document_value.value }}</p>
+                    </div>
+                  </div>
+                </div>
                 <!--Correo-->
                 <div class="input-group mb-3">
                   <div class="grid">
@@ -256,7 +278,6 @@
         </div>
 
         <ng-container *ngIf="false">
-          }
           <div class="card card-3 mt-3" style="background-color: white">
             <div class="card-body">
               <h3 class="card-title">Consultar saldo pendiente</h3>

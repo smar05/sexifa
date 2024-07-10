@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, NgForm, Validators } from '@angular/forms';
 import { Iregister } from 'src/app/interface/iregister';
 import { Router } from '@angular/router';
-import { Iuser } from 'src/app/interface/iuser';
+import { EnumUserDocumentType, Iuser } from 'src/app/interface/iuser';
 import { ICountries } from 'src/app/interface/icountries';
 import { IState } from 'src/app/interface/istate';
 import { ICities } from 'src/app/interface/icities';
@@ -31,6 +31,7 @@ export class RegisterComponent implements OnInit {
   public allStatesByCountry: IState[] = [];
   public allCities: ICities[] = [];
   public urlBotChatId: string = `${environment.urlBotGetId}?start=start`;
+  public documentsType: { value: string; label: string }[] = [];
 
   //Grupo de controles
   public f: any = this.form.group({
@@ -78,6 +79,14 @@ export class RegisterComponent implements OnInit {
     repeatPassword: ['', [Validators.required]],
     terms: ['', [Validators.required]],
     type: ['', [Validators.required]],
+    document_type: [
+      '',
+      [Validators.required, Validators.minLength(2), Validators.maxLength(3)],
+    ],
+    document_value: [
+      '',
+      [Validators.required, Validators.minLength(6), Validators.maxLength(10)],
+    ],
   });
 
   //Validaciones personalizadas
@@ -133,6 +142,14 @@ export class RegisterComponent implements OnInit {
     return this.f.controls.type;
   }
 
+  get document_type() {
+    return this.f.controls.document_type;
+  }
+
+  get document_value() {
+    return this.f.controls.document_value;
+  }
+
   public formSubmitted: boolean = false;
   public loading: boolean = false;
   public fechaMinimaEdad: string = null;
@@ -150,6 +167,7 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {
     functions.bloquearPantalla(true);
     localStorage.clear();
+    this.documentsType = this.getUserDocumentTypes();
     // Fecha minima para escoger la edad
     let fechaActual: Date = new Date();
     this.fechaMinimaEdad = new Date(
@@ -240,6 +258,8 @@ export class RegisterComponent implements OnInit {
         chatId: this.chatId.value,
         type: this.type.value,
         date_created: new Date().toISOString(),
+        document_type: this.document_type.value,
+        document_value: this.document_value.value,
       };
 
       await this.userService.postDataFS(user);
@@ -455,5 +475,24 @@ export class RegisterComponent implements OnInit {
       `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
       'info'
     );
+  }
+
+  private getUserDocumentTypes(): { value: string; label: string }[] {
+    let pairKeyDocumentType: { value: string; label: string }[] = [];
+
+    pairKeyDocumentType.push({
+      value: EnumUserDocumentType.CC,
+      label: 'Documento Nacional',
+    });
+    pairKeyDocumentType.push({
+      value: EnumUserDocumentType.CE,
+      label: 'Identificación Extrangera',
+    });
+    pairKeyDocumentType.push({
+      value: EnumUserDocumentType.PPN,
+      label: 'Pasaporte',
+    });
+
+    return pairKeyDocumentType;
   }
 }
