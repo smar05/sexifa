@@ -22,6 +22,7 @@ import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ActivatedRoute } from '@angular/router';
 import { OrdersService } from 'src/app/services/orders.service';
 import { Iorders } from 'src/app/interface/i-orders';
+import { StatusOrdersEnum } from 'src/app/enum/statusOrdersEnum';
 
 @Component({
   selector: 'app-home',
@@ -98,7 +99,7 @@ export class HomeComponent implements OnInit {
   }
 
   private async consultarOrden(): Promise<void> {
-    let qf: QueryFn = (ref) => ref.where('user_view', '==', false).limit(1);
+    let qf: QueryFn = (ref) => ref.where('user_view', '==', false).limit(10);
 
     let res: IFireStoreRes[] = null;
     try {
@@ -131,11 +132,27 @@ export class HomeComponent implements OnInit {
 
     if (!res || res.length === 0) return;
 
-    let order: Iorders = { id: res[0].id, ...res[0].data };
-    order.user_view = true;
+    let orders: Iorders[] = res.map((r: IFireStoreRes) => {
+      let order: Iorders = { id: r.id, ...r.data };
+      order.user_view = true;
+      return order;
+    });
 
+    let idsProblem: string[] = [];
     try {
-      await this.ordersService.patchDataFS(order.id, order);
+      orders.forEach(async (order: Iorders) => {
+        if (
+          !(
+            order.status === StatusOrdersEnum.PAGADO ||
+            order.status === StatusOrdersEnum.CERRADO
+          )
+        )
+          idsProblem.push(order.id);
+
+        let orderId: string = order.id;
+        delete order.id;
+        await this.ordersService.patchDataFS(orderId, order);
+      });
     } catch (error) {
       console.error('Error: ', error);
       alerts.basicAlert(
@@ -167,9 +184,17 @@ export class HomeComponent implements OnInit {
     localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
     localStorage.removeItem(LocalStorageEnum.VIEWS_MODEL);
 
+    if (idsProblem?.length > 0) {
+      alerts.basicAlert(
+        'Error',
+        `Ha ocurrido un error con la orden con id: ${idsProblem.join(' - ')}`,
+        'error'
+      );
+    }
+
     alerts.basicAlert(
       'Listo',
-      `Numero de orden: ${order.id}.\nDentro de unos minutos, nuestro BOT te enviara los links de acceso de los grupos a tu Telegram.`,
+      `Consulte el estado de la transaccion en 'Mi cuenta - Mis subscripciones'`,
       'success'
     );
   }
