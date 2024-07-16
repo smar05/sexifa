@@ -2,7 +2,7 @@ import { UrlPagesEnum } from './../enum/urlPagesEnum';
 import { environment } from './../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
+
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { UserTypeEnum } from '../enum/userTypeEnum';
 import { LoginService } from '../services/login.service';
@@ -10,7 +10,7 @@ import { LoginService } from '../services/login.service';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard  {
   constructor(private http: HttpClient, private loginService: LoginService) {}
 
   canActivate(): Promise<boolean> {
