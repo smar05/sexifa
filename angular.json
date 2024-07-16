@@ -1,8 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "node-v": "16.16.0",
-  "angular-v": "15.2.9",
+  "node-v": "20.0.0",
+  "angular-v": "16.2.14",
   "newProjectRoot": "projects",
   "projects": {
     "sexifa": {
