@@ -1,6 +1,7 @@
 import { ngxCsv } from 'ngx-csv';
 import { alerts } from './alerts';
 import { FormGroup } from '@angular/forms';
+import * as watermark from 'watermarkjs';
 
 export class functions {
   /**
@@ -261,5 +262,59 @@ export class functions {
     options: { [key: string]: any }
   ): ngxCsv {
     return new ngxCsv(data, filename, options);
+  }
+
+  /**
+   * Colocar marca de agua a una imagen
+   *
+   * @static
+   * @param {string} imageUrl
+   * @param {string} text
+   * @param {{ color: string; opacity: number }} style
+   * @return {*}  {Promise<string>}
+   * @memberof functions
+   */
+  static addWatermark(
+    imageUrl: string,
+    text: string,
+    style: { color: string; opacity: number }
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.src = imageUrl;
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (ctx) {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          // Establecer el estilo de la marca de agua
+          const fontSize: number = Math.max(16, canvas.width / 30);
+          ctx.font = `${fontSize}px Arial`;
+          ctx.fillStyle = style.color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // Calcular las coordenadas del centro
+          const x = canvas.width / 2;
+          const y = canvas.height / 2;
+
+          // Agregar la marca de agua en el centro
+          ctx.fillText(text, x, y);
+
+          resolve(canvas.toDataURL());
+        } else {
+          reject(null);
+        }
+      };
+      img.onerror = (error) => {
+        console.error('Error loading image:', error);
+        reject(null);
+      };
+    });
   }
 }
