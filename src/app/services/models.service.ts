@@ -13,6 +13,8 @@ import { FrontLogsService } from './front-logs.service';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { HttpClient } from '@angular/common/http';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
+import { functions } from '../helpers/functions';
+import { UrlPagesEnum } from '../enum/urlPagesEnum';
 
 @Injectable({
   providedIn: 'root',
@@ -453,9 +455,17 @@ export class ModelsService {
 
     //Imagen principal
     try {
-      modelDTO.mainImage = await this.getImage(
+      let imageUrl: string = await this.getImage(
         `${imodel.id}/${ImgModelEnum.MAIN}`
       );
+      let texto: string = `${environment.urlFirebase.split('://')[1]}/${
+        UrlPagesEnum.GROUP
+      }/${modelDTO.url}`;
+
+      modelDTO.mainImage = await functions.addWatermark(imageUrl, texto, {
+        color: '#87796c',
+        opacity: 1,
+      });
     } catch (error) {
       console.error('Error: ', error);
       alerts.basicAlert(

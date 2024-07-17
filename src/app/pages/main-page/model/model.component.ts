@@ -43,6 +43,7 @@ export class ModelComponent implements OnInit {
   private user: Iuser = {} as any;
   public precios: Array<number> = [];
   public category: Icategories = null;
+  private watermark: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -91,6 +92,10 @@ export class ModelComponent implements OnInit {
         });
       throw error;
     }
+
+    this.watermark = `${environment.urlFirebase.split('://')[1]}/${
+      UrlPagesEnum.GROUP
+    }/${this.model.url}`;
 
     await this.getCategory(this.model.categorie);
 
@@ -426,6 +431,13 @@ export class ModelComponent implements OnInit {
     this.load = false;
   }
 
+  private async addWatermark(imageUrl: string, text: string): Promise<void> {
+    this.imgPrincipal = await functions.addWatermark(imageUrl, text, {
+      color: '#87796c',
+      opacity: 1,
+    });
+  }
+
   public async getGaleria(): Promise<void> {
     try {
       this.galeria = await this.modelsService.getImages(
@@ -459,7 +471,7 @@ export class ModelComponent implements OnInit {
   }
 
   public setImgPrincipal(img: string): void {
-    this.imgPrincipal = img;
+    this.addWatermark(img, this.watermark);
   }
 
   public setModelSubscripctionModelValues(): void {
