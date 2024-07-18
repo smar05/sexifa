@@ -194,26 +194,17 @@ export class UserComponent implements OnInit {
       await this.getUserData();
       await this.getLocationData();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      functions.bloquearPantalla(false);
-      throw error;
+        )}`
+      );
     }
     functions.bloquearPantalla(false);
   }
@@ -388,31 +379,20 @@ export class UserComponent implements OnInit {
       this.allCountrys = [];
       this.allStates = [];
       this.allCities = [];
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
+
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
   }
 
@@ -428,28 +408,18 @@ export class UserComponent implements OnInit {
       this.allStates = [];
       this.state.setValue(null);
       this.city.setValue(null);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -466,28 +436,17 @@ export class UserComponent implements OnInit {
       console.error('Error: ', error);
       this.allCities = [];
       this.city.setValue(null);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -529,29 +488,17 @@ export class UserComponent implements OnInit {
     try {
       res = await this.subscriptionsService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de subscripciones',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ misSubscripciones ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de subscripciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ misSubscripciones ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
     let position: number = 1;
 

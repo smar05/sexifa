@@ -4,6 +4,10 @@ import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { IFrontLogs } from '../interface/i-front-logs';
+import { alerts } from '../helpers/alerts';
+import { SweetAlertIcon } from 'sweetalert2';
+import { LocalStorageEnum } from '../enum/localStorageEnum';
+import { functions } from '../helpers/functions';
 
 @Injectable({
   providedIn: 'root',
@@ -77,4 +81,38 @@ export class FrontLogsService {
   }
 
   //------------ FireStorage---------------//
+
+  /**
+   * Metodo comun para procesar la informacion de los catch
+   *
+   * @param {*} error
+   * @param {{ title: string; text: string; icon: SweetAlertIcon }} alertData
+   * @param {string} log
+   * @memberof FrontLogsService
+   */
+  public catchProcessError(
+    error: any,
+    alertData: { title: string; text: string; icon: SweetAlertIcon },
+    log: string
+  ): void {
+    console.error('Error: ', error);
+    alerts.basicAlert(alertData.title, alertData.text, alertData.icon);
+
+    let data: IFrontLogs = {
+      date: new Date(),
+      userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+      log,
+    };
+
+    this.postDataFS(data)
+      .then((res) => {})
+      .catch((err) => {
+        alerts.basicAlert('Error', 'Error', 'error');
+        throw err;
+      });
+
+    functions.bloquearPantalla(false);
+
+    throw error;
+  }
 }

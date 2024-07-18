@@ -16,7 +16,6 @@ import { Component, OnInit } from '@angular/core';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { alerts } from 'src/app/helpers/alerts';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ActivatedRoute } from '@angular/router';
@@ -62,30 +61,17 @@ export class HomeComponent implements OnInit {
     try {
       await this.getAllModels();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de modelos',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de modelos',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      functions.bloquearPantalla(false);
-      throw error;
+        )}`
+      );
     }
 
     // Consultar la orden generada en la transaccion epayco
@@ -105,29 +91,17 @@ export class HomeComponent implements OnInit {
     try {
       res = await this.ordersService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de la orden',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ consultarOrden ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de la orden',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ consultarOrden ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (!res || res.length === 0) return;
@@ -154,29 +128,17 @@ export class HomeComponent implements OnInit {
         await this.ordersService.patchDataFS(orderId, order);
       });
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de la orden',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ consultarOrden ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de la orden',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ consultarOrden ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     // Limpiar el localStorage
@@ -203,29 +165,17 @@ export class HomeComponent implements OnInit {
     try {
       await this.getModelsWhereSearchByName();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de modelos pon nombre',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ clickSearch ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de modelos pon nombre',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ clickSearch ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -237,29 +187,17 @@ export class HomeComponent implements OnInit {
     try {
       data = await this.categoriesService.getDataFS(qf).toPromise();
     } catch (error) {
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de categorias',
-        'error'
-      );
-      console.error(error);
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ getAllCategories ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de categorias',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ getAllCategories ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (!data) return null;
@@ -283,29 +221,17 @@ export class HomeComponent implements OnInit {
         await this.getAllModels('plus');
       }
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de modelos por paginacion',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ nextPagination ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de modelos por paginacion',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ nextPagination ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -381,29 +307,17 @@ export class HomeComponent implements OnInit {
     try {
       res = await this.modelsService.getDataFS(qr).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de modelos',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ getAllModels ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de modelos',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ getAllModels ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
     // Guardar referencia al último documento de la página actual
     if (res.length > 0) {
@@ -419,29 +333,17 @@ export class HomeComponent implements OnInit {
       try {
         this.models?.push(await this.modelsService.modelInterfaceToDTO(imodel));
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la conversion de modelos a DTO',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: home.component.ts:284 ~ HomeComponent ~ imodels.forEach ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la conversion de modelos a DTO',
+            icon: 'error',
+          },
+          `file: home.component.ts:284 ~ HomeComponent ~ imodels.forEach ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
     });
     functions.bloquearPantalla(false);
@@ -454,33 +356,17 @@ export class HomeComponent implements OnInit {
       try {
         await this.getAllModels();
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la consulta de modelos',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: home.component.ts: ~ HomeComponent ~ getModelsWhereSearchByName ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la consulta de modelos',
+            icon: 'error',
+          },
+          `file: home.component.ts: ~ HomeComponent ~ getModelsWhereSearchByName ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            functions.bloquearPantalla(false);
-            this.load = false;
-            throw err;
-          });
-        functions.bloquearPantalla(false);
-        this.load = false;
-        throw error;
+          )}`
+        );
       }
       return;
     }
@@ -488,33 +374,19 @@ export class HomeComponent implements OnInit {
     try {
       await this.getAllModels('search');
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de modelos',
-        'error'
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de modelos',
+          icon: 'error',
+        },
+        `file: home.component.ts: ~ HomeComponent ~ getModelsWhereSearchByName ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: home.component.ts: ~ HomeComponent ~ getModelsWhereSearchByName ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          functions.bloquearPantalla(false);
-          this.load = false;
-          throw err;
-        });
-      functions.bloquearPantalla(false);
       this.load = false;
-      throw error;
     }
   }
 

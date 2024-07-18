@@ -5,7 +5,7 @@ import { alerts } from 'src/app/helpers/alerts';
 import { RegisterService } from './../../services/register.service';
 import { functions } from 'src/app/helpers/functions';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Iregister } from 'src/app/interface/iregister';
 import { Router } from '@angular/router';
 import { EnumUserDocumentType, Iuser } from 'src/app/interface/iuser';
@@ -15,8 +15,6 @@ import { ICities } from 'src/app/interface/icities';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
 import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
@@ -216,29 +214,17 @@ export class RegisterComponent implements OnInit {
           );
         })
         .catch((err: any) => {
-          console.error('Error: ', err);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error enviando el correo de verificacion',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            err,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error enviando el correo de verificacion',
+              icon: 'error',
+            },
+            `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
               err
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw err;
+            )}`
+          );
         });
 
       const user: Iuser = {
@@ -292,27 +278,19 @@ export class RegisterComponent implements OnInit {
           break;
       }
 
-      alerts.basicAlert('Error', errorText, 'error');
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Error',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
+        )}`
+      );
 
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
   }
 
@@ -351,30 +329,17 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllContries()
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
-      this.allCountries = [];
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ getCountries ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ getCountries ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -386,32 +351,21 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allStatesByCountry = [];
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -425,32 +379,21 @@ export class RegisterComponent implements OnInit {
         )
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allCities = [];
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 

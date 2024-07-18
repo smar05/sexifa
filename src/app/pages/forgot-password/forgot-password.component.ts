@@ -6,8 +6,6 @@ import { functions } from 'src/app/helpers/functions';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 
 @Component({
   selector: 'app-forgot-password',
@@ -71,33 +69,19 @@ export class ForgotPasswordComponent implements OnInit {
         this.loading = false;
       })
       .catch((error: any) => {
-        console.error('Error: ', error);
-
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la recuperacion de la contraseña',
-          'error'
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la recuperacion de la contraseña',
+            icon: 'error',
+          },
+          `file: forgot-password.component.ts: ~ ForgotPasswordComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`
         );
 
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: forgot-password.component.ts: ~ ForgotPasswordComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
-            error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-
-        functions.bloquearPantalla(false);
         this.loading = false;
-        throw error;
       });
   }
 

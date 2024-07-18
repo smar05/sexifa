@@ -8,8 +8,6 @@ import { map } from 'rxjs/operators';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { Router } from '@angular/router';
-import { alerts } from '../helpers/alerts';
-import { IFrontLogs } from '../interface/i-front-logs';
 import { FrontLogsService } from './front-logs.service';
 
 @Injectable({
@@ -64,29 +62,17 @@ export class LoginService {
     return this.afAuth.currentUser
       .then((user) => user?.getIdToken())
       .catch((err) => {
-        console.error('Error: ', err);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la consulta del token',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: login.service.ts:81 ~ LoginService ~ getAuthToken ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          err,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la consulta del token',
+            icon: 'error',
+          },
+          `file: login.service.ts:81 ~ LoginService ~ getAuthToken ~ JSON.stringify(error): ${JSON.stringify(
             err
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw err;
+          )}`
+        );
       });
   }
 

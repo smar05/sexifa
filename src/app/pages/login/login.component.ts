@@ -12,7 +12,6 @@ import { Iuser } from 'src/app/interface/iuser';
 import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
 import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 import { QueryFn } from '@angular/fire/compat/firestore';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { Imodels } from 'src/app/interface/imodels';
@@ -131,30 +130,17 @@ export class LoginComponent implements OnInit {
           user = { ...data[0].data };
           userIdDoc = data[0].id;
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error en la consulta de usuarios',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error en la consulta de usuarios',
+              icon: 'error',
+            },
+            `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-
-          throw error;
+            )}`
+          );
         }
 
         // Verificar el estado del usuario
@@ -212,34 +198,19 @@ export class LoginComponent implements OnInit {
                 );
               data = await this.modelsService.getDataFS(qf).toPromise();
             } catch (error) {
-              console.error('Error: ', error);
-              alerts.basicAlert(
-                'Error',
-                'Ha ocurrido un error en la consulta de usuarios',
-                'error'
+              this.frontLogsService.catchProcessError(
+                error,
+                {
+                  title: 'Error',
+                  text: 'Ha ocurrido un error en la consulta de usuarios',
+                  icon: 'error',
+                },
+                `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+                  error
+                )}`
               );
 
-              let data: IFrontLogs = {
-                date: new Date(),
-                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
-                  error
-                )}`,
-              };
-
-              this.frontLogsService
-                .postDataFS(data)
-                .then((res) => {})
-                .catch((err) => {
-                  alerts.basicAlert('Error', 'Error', 'error');
-                  functions.bloquearPantalla(false);
-                  this.loading = false;
-                  throw err;
-                });
-
-              functions.bloquearPantalla(false);
               this.loading = false;
-              throw error;
             }
 
             if (!data) throw 'Error';
@@ -265,34 +236,19 @@ export class LoginComponent implements OnInit {
           let data: Iuser = user;
           await this.userService.patchDataFS(userIdDoc, data);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error guardando al usuario',
-            'error'
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error guardando al usuario',
+              icon: 'error',
+            },
+            `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`
           );
 
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
-              error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              functions.bloquearPantalla(false);
-              this.loading = false;
-              throw err;
-            });
-
-          functions.bloquearPantalla(false);
           this.loading = false;
-          throw error;
         }
 
         this.router.navigateByUrl(url);
@@ -327,27 +283,19 @@ export class LoginComponent implements OnInit {
             break;
         }
 
-        let a;
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: login.component.ts: ~ LoginComponent ~ login ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en el login',
+            icon: 'error',
+          },
+          `file: login.component.ts: ~ LoginComponent ~ login ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
+          )}`
+        );
 
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-
-        functions.bloquearPantalla(false);
         this.loading = false;
-        throw error;
       });
   }
 

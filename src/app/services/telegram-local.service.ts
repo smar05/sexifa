@@ -3,8 +3,6 @@ import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { alerts } from '../helpers/alerts';
-import { IFrontLogs } from '../interface/i-front-logs';
-import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { FrontLogsService } from './front-logs.service';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 
@@ -95,29 +93,17 @@ export class TelegramLocalService {
     try {
       res = await this.getPruebaBotCliente({ fromId, url }).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error probando la conexion con el bot de Telegram',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: telegram-local.service.ts: ~ TelegramLocalService ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error probando la conexion con el bot de Telegram',
+          icon: 'error',
+        },
+        `file: telegram-local.service.ts: ~ TelegramLocalService ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (res.code == 200) {
