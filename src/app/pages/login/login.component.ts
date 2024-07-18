@@ -141,6 +141,7 @@ export class LoginComponent implements OnInit {
               error
             )}`
           );
+          this.loading = false;
         }
 
         // Verificar el estado del usuario
@@ -282,6 +283,7 @@ export class LoginComponent implements OnInit {
             alerts.basicAlert('Error', 'Error en el inicio de sesión', 'error');
             break;
         }
+        this.loading = false;
 
         this.frontLogsService.catchProcessError(
           error,
@@ -294,8 +296,6 @@ export class LoginComponent implements OnInit {
             error
           )}`
         );
-
-        this.loading = false;
       });
   }
 
