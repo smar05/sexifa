@@ -67,6 +67,7 @@ export class ModelComponent implements OnInit {
     try {
       await this.getModel();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -89,6 +90,7 @@ export class ModelComponent implements OnInit {
     try {
       await this.getUser();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -111,6 +113,7 @@ export class ModelComponent implements OnInit {
     try {
       await this.calcularPrecios();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -128,6 +131,7 @@ export class ModelComponent implements OnInit {
     try {
       await this.setViewsModelData();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -148,6 +152,7 @@ export class ModelComponent implements OnInit {
     try {
       data = await this.categoriesService.getItemFS(id).toPromise();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -177,6 +182,7 @@ export class ModelComponent implements OnInit {
     try {
       res = await this.userService.getDataFS(qf).toPromise();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -223,6 +229,7 @@ export class ModelComponent implements OnInit {
 
       res1 = await this.modelsService.getDataFS(qf).toPromise();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -246,6 +253,7 @@ export class ModelComponent implements OnInit {
           .getItemFS(this.modelId || '', qf)
           .toPromise();
       } catch (error) {
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
         this.frontLogsService.catchProcessError(
           error,
           {
@@ -303,6 +311,7 @@ export class ModelComponent implements OnInit {
     try {
       this.model = await this.modelsService.modelInterfaceToDTO(res);
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -334,6 +343,7 @@ export class ModelComponent implements OnInit {
         `${this.model.id}/gallery`
       );
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -412,6 +422,7 @@ export class ModelComponent implements OnInit {
         await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
       ).preciosCalculados;
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -446,6 +457,7 @@ export class ModelComponent implements OnInit {
 
         res = await this.telegramService.esMiembroDelGrupo(params).toPromise();
       } catch (error) {
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
         this.frontLogsService.catchProcessError(
           error,
           {
@@ -481,6 +493,7 @@ export class ModelComponent implements OnInit {
           .getDataFS(qf)
           .toPromise();
       } catch (error) {
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
         this.frontLogsService.catchProcessError(
           error,
           {
@@ -552,6 +565,7 @@ export class ModelComponent implements OnInit {
 
       this.router.navigateByUrl(`/${UrlPagesEnum.CHECKOUT}`);
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -579,6 +593,7 @@ export class ModelComponent implements OnInit {
 
       res = await this.telegramService.botEsAdminDelGrupo(params).toPromise();
     } catch (error) {
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
       this.frontLogsService.catchProcessError(
         error,
         {
@@ -630,6 +645,7 @@ export class ModelComponent implements OnInit {
       try {
         await this.viewsModelService.postDataFS(viewData);
       } catch (error) {
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
         this.frontLogsService.catchProcessError(
           error,
           {

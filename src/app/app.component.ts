@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
 import { functions } from './helpers/functions';
 
 @Component({
@@ -33,22 +33,5 @@ export class AppComponent {
         functions.bloquearPantalla(true);
       }
     });
-  }
-
-  @HostListener('document:visibilitychange', ['$event'])
-  visibilityChange() {
-    if (document.hidden) {
-      functions.bloquearPantalla(true);
-    }
-  }
-
-  @HostListener('window:blur', ['$event'])
-  onWindowBlur() {
-    functions.bloquearPantalla(true);
-  }
-
-  @HostListener('window:focus', ['$event'])
-  onWindowFocus() {
-    functions.bloquearPantalla(false);
   }
 }

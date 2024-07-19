@@ -1255,7 +1255,7 @@ export class PageSellerComponent {
           })
         );
       } else {
-        alerts.basicAlert('Error', 'El limite de detalles es de 5', 'error');
+        alerts.basicAlert('Error', 'El limite de precios es de 5', 'error');
       }
     }
   }
