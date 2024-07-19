@@ -28,7 +28,7 @@ export class RegisterComponent implements OnInit {
   public allCountries: ICountries[] = [];
   public allStatesByCountry: IState[] = [];
   public allCities: ICities[] = [];
-  public urlBotChatId: string = `${environment.urlBotGetId}?start=start`;
+  public urlBotChatId: string = `${environment.urlBot}?start=my_id`;
   public documentsType: { value: string; label: string }[] = [];
 
   //Grupo de controles
@@ -56,8 +56,9 @@ export class RegisterComponent implements OnInit {
     chatId: [
       '',
       [
-        Validators.max(99999999999999999999),
+        Validators.max(9999999999),
         Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
+        Validators.pattern(/^\d{10}$/),
       ],
     ],
     bornDate: ['', [Validators.required]],
@@ -186,7 +187,10 @@ export class RegisterComponent implements OnInit {
     this.formSubmitted = true; //Formulario enviado
 
     //Formulario correcto
-    if (!this.formValid()) {
+    if (
+      !this.formValid() ||
+      (this.type.value == 'usuario' && this.chatId.value == '')
+    ) {
       alerts.basicAlert('Error', 'Formulario invalido', 'error');
       return;
     }

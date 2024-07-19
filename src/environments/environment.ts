@@ -32,7 +32,6 @@ export const environment = {
   urlProd,
   urlServidorLocal,
   urlBot: 'https://t.me/OnlyGramGroup_BOT',
-  urlBotGetId: 'https://t.me/username_to_id_bot',
   urlCollections: {
     categories: 'categories',
     models: 'models',

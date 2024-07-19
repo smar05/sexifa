@@ -138,7 +138,7 @@
                     placeholder="No. Id de Telegram"
                     formControlName="chatId"
                     required
-                    maxlength="20"
+                    max="9999999999"
                     [ngClass]="{
                       'is-invalid':
                         invalidField('chatId') ||
@@ -176,12 +176,13 @@
                     El numero de id de Telegram no puede tener mas de 20 digitos
                   </span>
 
-                  <a
+                  <button
                     (click)="probarConexionBot()"
                     class="btn btn-primary btn-block bg-principal mb-2"
+                    [disabled]="this.chatId.invalid"
                   >
                     Probar conexion con el bot
-                  </a>
+                  </button>
                 </div>
                 <!--Fecha de nacimiento-->
                 <div class="form-group mb-3">

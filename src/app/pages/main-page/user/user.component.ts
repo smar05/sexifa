@@ -53,7 +53,7 @@ import { environment } from 'src/environments/environment';
 })
 export class UserComponent implements OnInit {
   public showSubscripciones: boolean = false;
-  public urlBotChatId: string = `${environment.urlBotGetId}?start=start`;
+  public urlBotChatId: string = `${environment.urlBot}?start=my_id`;
 
   public dataSource!: MatTableDataSource<Isubscriptions>; //Instancia la data que aparecera en la tabla
   public expandedElement!: Isubscriptions | null;
@@ -96,6 +96,7 @@ export class UserComponent implements OnInit {
         Validators.required,
         Validators.max(99999999999999999999),
         Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
+        Validators.pattern(/^\d{10}$/),
       ],
     ],
     bornDate: ['', [Validators.required]],

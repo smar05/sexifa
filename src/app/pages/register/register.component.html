@@ -221,68 +221,74 @@
             </span>
           </div>
 
-          <!--chatId-->
-          <div class="">
-            <i
-              class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
-              style="border-radius: 50%; background-color: azure"
-              (click)="this.infoClik()"
-            ></i>
-            <a
-              [href]="this.urlBotChatId"
-              target="_blank"
-              *ngIf="this.type.value == 'usuario'"
-              >Consultar id</a
-            >
-          </div>
-          <div class="input-group mb-3" *ngIf="this.type.value == 'usuario'">
-            <input
-              type="number"
-              class="form-control"
-              placeholder="No. Id de Telegram"
-              formControlName="chatId"
-              [ngClass]="{
-                'is-invalid':
-                  invalidField('chatId') ||
-                  (f.controls.chatId.invalid &&
-                    f.controls.chatId.errors?.max) ||
-                  (f.controls.chatId.invalid &&
-                    f.controls.chatId.errors?.pattern)
-              }"
-            />
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <i class="fa-brands fa-telegram"></i>
-              </div>
-            </div>
-            <span
-              class="invalid-feedback"
-              *ngIf="
-                invalidField('chatId') && f.controls.chatId.errors?.required
-              "
-            >
-              Por favor ingrese su numero de id en Telegram
-            </span>
-            <span
-              class="invalid-feedback"
-              *ngIf="f.controls.chatId.errors?.pattern"
-            >
-              Se encontraron caracteres invalidos
-            </span>
-            <span
-              class="invalid-feedback"
-              *ngIf="f.controls.chatId.errors?.max"
-            >
-              El numero de id de telegram no puede tener mas de 20 digitos
-            </span>
+          <ng-container *ngIf="this.type.value == 'usuario'">
+            <!--chatId-->
 
-            <a
-              (click)="probarConexionBot()"
-              class="btn btn-primary btn-block bg-principal mb-2 mt-1"
-            >
-              Probar conexion con el bot
-            </a>
-          </div>
+            <div>
+              <i
+                class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
+                style="border-radius: 50%; background-color: azure"
+                (click)="this.infoClik()"
+              ></i>
+              <a
+                [href]="this.urlBotChatId"
+                target="_blank"
+                *ngIf="this.type.value == 'usuario'"
+                >Consultar id</a
+              >
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="number"
+                class="form-control"
+                placeholder="No. Id de Telegram"
+                formControlName="chatId"
+                max="9999999999"
+                [ngClass]="{
+                  'is-invalid':
+                    invalidField('chatId') ||
+                    (f.controls.chatId.invalid &&
+                      f.controls.chatId.errors?.max) ||
+                    (f.controls.chatId.invalid &&
+                      f.controls.chatId.errors?.pattern)
+                }"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <i class="fa-brands fa-telegram"></i>
+                </div>
+              </div>
+              <span
+                class="invalid-feedback"
+                *ngIf="
+                  invalidField('chatId') && f.controls.chatId.errors?.required
+                "
+              >
+                Por favor ingrese su numero de id en Telegram
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="f.controls.chatId.errors?.pattern"
+              >
+                Se encontraron caracteres invalidos. El id debe ser de 10
+                digitos
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="f.controls.chatId.errors?.max"
+              >
+                El numero de id de telegram no puede tener mas de 10 digitos
+              </span>
+
+              <button
+                (click)="probarConexionBot()"
+                class="btn btn-primary btn-block bg-principal mb-2 mt-1"
+                [disabled]="this.chatId.invalid || this.chatId.value == ''"
+              >
+                Probar conexion con el bot
+              </button>
+            </div>
+          </ng-container>
 
           <!--Fecha de nacimiento-->
           <div class="form-group mb-3">
@@ -538,7 +544,10 @@
               <button
                 type="submit"
                 class="btn btn-block bg-secundario"
-                [disabled]="f.invalid"
+                [disabled]="
+                  f.invalid ||
+                  (this.type.value == 'usuario' && this.chatId.value == '')
+                "
               >
                 Registrar
               </button>
