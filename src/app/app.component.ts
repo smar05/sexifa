@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { functions } from './helpers/functions';
 
 @Component({
@@ -6,11 +6,15 @@ import { functions } from './helpers/functions';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'OnlyGram';
 
   constructor() {
     this.deshabilitarClickYSeleccionDeTexto();
+  }
+
+  public ngOnInit(): void {
+    document.body.style.removeProperty('min-height');
   }
 
   /**

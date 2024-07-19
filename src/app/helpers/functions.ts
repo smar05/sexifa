@@ -243,7 +243,7 @@ export class functions {
     let divApp: HTMLElement = document.querySelector('#app');
 
     divBloquear.style.display = bloquear ? 'flex' : 'none';
-    divApp.style.display = bloquear ? 'none' : 'block';
+    divApp.style.display = bloquear ? 'none' : 'grid';
   }
 
   /**
