@@ -405,14 +405,19 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  public probarConexionBot(): void {
-    if (this.chatId.value) {
-      this.telegramLocalService.probarConexionBot(
+  public async probarConexionBot(event: Event): Promise<void> {
+    functions.bloquearPantalla(true);
+    event.preventDefault();
+    if (this.chatId.value && !this.chatId.invalid) {
+      await this.telegramLocalService.probarConexionBot(
         this.chatId.value,
         UrlPagesEnum.REGISTER
       );
+
+      functions.bloquearPantalla(false);
     } else {
       alerts.basicAlert('Error', 'Ingrese un Id valido de Telegram', 'error');
+      functions.bloquearPantalla(false);
     }
   }
 

@@ -273,10 +273,11 @@
               </span>
 
               <button
-                (click)="probarConexionBot()"
+                (click)="probarConexionBot($event)"
+                type="button"
                 class="btn btn-primary btn-block bg-principal mb-2 mt-1"
                 [disabled]="this.chatId.invalid || this.chatId.value == ''"
-                *ngIf="!this.chatId.invalid"
+                *ngIf="!(this.chatId.invalid || this.chatId.value == '')"
               >
                 Probar conexion con el bot
               </button>
