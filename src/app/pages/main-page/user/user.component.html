@@ -180,6 +180,7 @@
                     (click)="probarConexionBot()"
                     class="btn btn-primary btn-block bg-principal mb-2"
                     [disabled]="this.chatId.invalid"
+                    *ngIf="!this.chatId.invalid"
                   >
                     Probar conexion con el bot
                   </button>

@@ -239,7 +239,7 @@ export class UserSellerComponent {
     this.name.setValue(this.user.name);
     this.email.setValue(this.user.email);
     this.celphone.setValue(this.user.celphone);
-    this.bornDate.setValue(this.user.bornDate);
+    this.bornDate.setValue(new Date(this.user.bornDate).toDateString());
     this.sex.setValue(this.user.sex);
     this.country.setValue(this.user.country);
     this.state.setValue(this.user.state);
@@ -379,6 +379,8 @@ export class UserSellerComponent {
     try {
       this.state.setValue(null);
       this.city.setValue(null);
+      this.allStates = null;
+      this.allCities = null;
       this.allStates = JSON.parse(
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
@@ -400,6 +402,7 @@ export class UserSellerComponent {
   public async stateChange(): Promise<void> {
     try {
       this.city.setValue(null);
+      this.allCities = null;
       this.allCities = JSON.parse(
         await this.locationService.getAllCitiesByCountryAndState(
           this.country.value,

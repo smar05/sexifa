@@ -36,6 +36,8 @@
             <button
               (click)="probarConexionBot()"
               class="btn btn-primary btn-block bg-principal mb-2"
+              [disabled]="!this.user?.chatId"
+              *ngIf="this.user?.chatId"
             >
               Probar conexion con el bot
             </button>
