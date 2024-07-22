@@ -18,6 +18,7 @@ import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
+import { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -351,6 +352,8 @@ export class RegisterComponent implements OnInit {
     try {
       this.state.setValue(null);
       this.city.setValue(null);
+      this.allStatesByCountry = null;
+      this.allCities = null;
       this.allStatesByCountry = JSON.parse(
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
@@ -376,6 +379,7 @@ export class RegisterComponent implements OnInit {
   public async stateChange(): Promise<void> {
     try {
       this.city.setValue(null);
+      this.allCities = null;
       this.allCities = JSON.parse(
         await this.locationService.getAllCitiesByCountryAndState(
           this.country.value,
@@ -416,12 +420,31 @@ export class RegisterComponent implements OnInit {
     return Object.values(UserTypeEnum);
   }
 
-  public infoClik(): void {
-    alerts.basicAlert(
-      'Consultar ID',
-      `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
-      'info'
-    );
+  public infoClik(input: string): void {
+    let alertData: { titulo: string; texto: string; icon: SweetAlertIcon };
+
+    switch (input) {
+      case 'type':
+        alertData = {
+          titulo: 'Tipo de cuenta',
+          texto: `Ingrese 'Creador' si es creador de contenido, si no ingrese 'Usuario' si desea hacer parte del grupo de un creador de contenido`,
+          icon: 'info',
+        };
+        break;
+
+      case 'chatId':
+        alertData = {
+          titulo: 'Consultar ID',
+          texto: `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
+          icon: 'info',
+        };
+        break;
+
+      default:
+        break;
+    }
+
+    alerts.basicAlert(alertData.titulo, alertData.texto, alertData.icon);
   }
 
   private getUserDocumentTypes(): { value: string; label: string }[] {

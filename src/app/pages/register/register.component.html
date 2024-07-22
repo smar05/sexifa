@@ -6,15 +6,24 @@
 
         <form (ngSubmit)="onSubmit(f)" [formGroup]="f" autocomplete="on">
           <!--Tipo de usuario-->
-          <div class="input-group mb-3">
+          <div class="form-group mb-3">
+            <label for="type">Tipo de cuenta</label>
+            <div>
+              <i
+                class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
+                style="border-radius: 50%; background-color: azure"
+                (click)="this.infoClik('type')"
+              ></i>
+            </div>
             <select
+              id="type"
               type="text"
               class="form-control"
               placeholder="Tipo de cuenta"
               formControlName="type"
               required
               [ngClass]="{
-                'is-invalid': invalidField('type')
+                'is-invalid': this.type.invalid
               }"
             >
               <option value="" disabled>Tipo de cuenta</option>
@@ -43,11 +52,7 @@
               required
               maxlength="50"
               [ngClass]="{
-                'is-invalid':
-                  invalidField('name') ||
-                  (f.controls.name.invalid &&
-                    f.controls.name.errors?.maxlength) ||
-                  (f.controls.name.invalid && f.controls.name.errors?.pattern)
+                'is-invalid': this.name.invalid
               }"
             />
             <div class="input-group-append">
@@ -75,8 +80,10 @@
             </span>
           </div>
           <!--Tipo de documento-->
-          <div class="input-group mb-3">
+          <div class="form-group mb-3">
+            <label for="document_type">Tipo de documento</label>
             <select
+              id="document_type"
               type="text"
               class="form-control"
               placeholder="Tipo de documento"
@@ -85,7 +92,7 @@
               minlength="2"
               maxlength="3"
               [ngClass]="{
-                'is-invalid': invalidField('document_type')
+                'is-invalid': this.document_type.invalid
               }"
             >
               <option value="" disabled selected>Tipo de documento</option>
@@ -117,9 +124,7 @@
               minlength="6"
               maxlength="10"
               [ngClass]="{
-                'is-invalid':
-                  invalidField('document_value') ||
-                  f.controls.document_value.invalid
+                'is-invalid': this.document_value.invalid
               }"
             />
             <span
@@ -153,10 +158,7 @@
               formControlName="email"
               required
               [ngClass]="{
-                'is-invalid':
-                  invalidField('email') &&
-                  f.controls.email.invalid &&
-                  f.controls.email.errors?.email
+                'is-invalid': this.email.invalid
               }"
             />
             <div class="input-group-append">
@@ -186,12 +188,7 @@
               formControlName="celphone"
               required
               [ngClass]="{
-                'is-invalid':
-                  invalidField('celphone') ||
-                  (f.controls.celphone.invalid &&
-                    f.controls.celphone.errors?.max) ||
-                  (f.controls.celphone.invalid &&
-                    f.controls.celphone.errors?.pattern)
+                'is-invalid': this.celphone.invalid
               }"
             />
             <div class="input-group-append">
@@ -228,7 +225,7 @@
               <i
                 class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
                 style="border-radius: 50%; background-color: azure"
-                (click)="this.infoClik()"
+                (click)="this.infoClik('chatId')"
               ></i>
               <a
                 [href]="this.urlBotChatId"
@@ -245,12 +242,7 @@
                 formControlName="chatId"
                 max="9999999999"
                 [ngClass]="{
-                  'is-invalid':
-                    invalidField('chatId') ||
-                    (f.controls.chatId.invalid &&
-                      f.controls.chatId.errors?.max) ||
-                    (f.controls.chatId.invalid &&
-                      f.controls.chatId.errors?.pattern)
+                  'is-invalid': this.chatId.invalid
                 }"
               />
               <div class="input-group-append">
@@ -284,6 +276,7 @@
                 (click)="probarConexionBot()"
                 class="btn btn-primary btn-block bg-principal mb-2 mt-1"
                 [disabled]="this.chatId.invalid || this.chatId.value == ''"
+                *ngIf="!this.chatId.invalid"
               >
                 Probar conexion con el bot
               </button>
@@ -302,7 +295,7 @@
               formControlName="bornDate"
               required
               [ngClass]="{
-                'is-invalid': invalidField('bornDate') || !mayor18Anios()
+                'is-invalid': this.bornDate.invalid || !mayor18Anios()
               }"
               [max]="this.fechaMinimaEdad"
             />
@@ -319,8 +312,10 @@
             </span>
           </div>
           <!--Pais-->
-          <div class="input-group mb-3">
+          <div class="form-group mb-3">
+            <label for="country">Pais</label>
             <select
+              id="country"
               type="text"
               class="form-control"
               placeholder="Pais"
@@ -328,7 +323,7 @@
               required
               (change)="this.countryChange()"
               [ngClass]="{
-                'is-invalid': invalidField('country')
+                'is-invalid': this.country.invalid
               }"
             >
               <option value="" disabled selected>Pais</option>
@@ -351,9 +346,10 @@
           </div>
           <!--Estado-->
           <div
-            class="input-group mb-3"
+            class="form-group mb-3"
             *ngIf="this.country.value && this.allStatesByCountry"
           >
+            <label for="state">Estado</label>
             <select
               type="text"
               class="form-control"
@@ -362,7 +358,7 @@
               required
               (change)="this.stateChange()"
               [ngClass]="{
-                'is-invalid': invalidField('state')
+                'is-invalid': this.state.invalid
               }"
             >
               <option value="" disabled selected>Estado</option>
@@ -383,7 +379,7 @@
           </div>
           <!--Ciudad-->
           <div
-            class="input-group mb-3"
+            class="form-group mb-3"
             *ngIf="
               this.country.value &&
               this.allStatesByCountry &&
@@ -391,14 +387,16 @@
               this.allCities
             "
           >
+            <label for="city">Ciudad</label>
             <select
+              id="city"
               type="text"
               class="form-control"
               placeholder="Ciudad"
               formControlName="city"
               required
               [ngClass]="{
-                'is-invalid': invalidField('city')
+                'is-invalid': this.city.invalid
               }"
             >
               <option value="" disabled selected>Ciudad</option>
@@ -415,15 +413,17 @@
             </span>
           </div>
           <!--Genero-->
-          <div class="input-group mb-3">
+          <div class="form-group mb-3">
+            <label for="sex">Genero</label>
             <select
+              id="sex"
               type="text"
               class="form-control"
               placeholder="Genero"
               formControlName="sex"
               required
               [ngClass]="{
-                'is-invalid': invalidField('sex')
+                'is-invalid': this.sex.invalid
               }"
             >
               <option value="" disabled selected>Genero</option>
