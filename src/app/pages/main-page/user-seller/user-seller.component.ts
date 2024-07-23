@@ -74,7 +74,12 @@ export class UserSellerComponent {
     ],
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     celphone: [
       '',
@@ -85,10 +90,33 @@ export class UserSellerComponent {
       ],
     ],
     bornDate: ['', [Validators.required]],
-    country: ['', [Validators.required]],
-    state: ['', [Validators.required]],
+    country: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    state: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
     city: ['', [Validators.required]],
-    sex: ['', [Validators.required]],
+    sex: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.maxLength(15),
+      ],
+    ],
     document_type: [
       '',
       [Validators.required, Validators.minLength(2), Validators.maxLength(3)],

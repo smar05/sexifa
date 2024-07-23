@@ -72,9 +72,24 @@ export class PageSellerComponent {
     ],
     category: ['', [Validators.required]],
     image: ['', []], //No se guarda en base de datos
-    description: ['', [Validators.required, Validators.maxLength(2048)]],
+    description: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(2048),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+      ],
+    ],
     price: new UntypedFormArray([]),
-    groupId: ['', [Validators.required, Validators.maxLength(20)]],
+    groupId: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(20),
+        Validators.pattern(EnumExpresioncesRegulares.CHANNEL_TELEGRAM_ID),
+      ],
+      ,
+    ],
     account: [false],
     redes: this.form.group({
       facebook: [
@@ -502,6 +517,7 @@ export class PageSellerComponent {
                 [
                   Validators.required,
                   Validators.min(5),
+                  Validators.max(10000),
                   Validators.pattern(
                     EnumExpresioncesRegulares.NUMEROS_REALES_POSITIVOS
                   ),

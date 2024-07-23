@@ -80,7 +80,12 @@ export class UserComponent implements OnInit {
     ],
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     celphone: [
       '',
@@ -100,9 +105,31 @@ export class UserComponent implements OnInit {
       ],
     ],
     bornDate: ['', [Validators.required]],
-    country: ['', [Validators.required]],
-    state: ['', [Validators.required]],
-    city: ['', [Validators.required]],
+    country: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    state: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    city: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS),
+      ],
+    ],
     sex: ['', [Validators.required]],
     document_type: [
       '',

@@ -28,7 +28,12 @@ export class LoginComponent implements OnInit {
   public f: any = this.form.group({
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     password: [
       '',

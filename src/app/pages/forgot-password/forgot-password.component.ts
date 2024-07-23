@@ -6,6 +6,7 @@ import { functions } from 'src/app/helpers/functions';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 
 @Component({
   selector: 'app-forgot-password',
@@ -17,7 +18,12 @@ export class ForgotPasswordComponent implements OnInit {
   public f: any = this.form.group({
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
   });
 

@@ -7,4 +7,6 @@ export let EnumExpresioncesRegulares = {
   NO_ESPACIO: /^[^\s]+$/ as RegExp,
   NUMEROS: /^[0-9]+$/ as RegExp,
   PASSWORD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/ as RegExp,
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  CHANNEL_TELEGRAM_ID: /^-100\d{10}$/,
 };

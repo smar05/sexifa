@@ -109,10 +109,7 @@
                 maxlength="30"
                 required
                 [ngClass]="{
-                  'is-invalid':
-                    invalidField('name') ||
-                    (name.invalid && name.errors?.product) ||
-                    (name.invalid && name.errors?.pattern)
+                  'is-invalid': name.invalid
                 }"
               />
               <span
@@ -146,7 +143,7 @@
                 maxlength="30"
                 required
                 [ngClass]="{
-                  'is-invalid': invalidField('url') || url.invalid
+                  'is-invalid': url.invalid
                 }"
               />
               <span
@@ -189,9 +186,15 @@
                 maxlength="20"
                 required
                 [ngClass]="{
-                  'is-invalid': invalidField('groupId')
+                  'is-invalid': groupId.invalid
                 }"
               />
+              <span>
+                <small
+                  >Formato: -100YYYYYYYYYY
+                  https://web.telegram.org/k/#-YYYYYYYYYY</small
+                >
+              </span>
               <span
                 class="invalid-feedback"
                 *ngIf="name.invalid && name.errors?.required"
@@ -227,7 +230,7 @@
               <select
                 class="form-control"
                 formControlName="category"
-                [ngClass]="{ 'is-invalid': invalidField('category') }"
+                [ngClass]="{ 'is-invalid': category.invalid }"
               >
                 <option value="" disabled>Seleccione una categoria</option>
                 <option
@@ -243,18 +246,6 @@
               >
                 Porfavor seleccione una categoria
               </span>
-            </div>
-            <!--Listado de titulo-->
-            <div class="form-group" *ngIf="titleList != ''">
-              <label for="titleList">Listado de titulo</label>
-              <input
-                type="text"
-                id="titleList"
-                class="form-control"
-                placeholder="Listado de titulo"
-                value="{{ titleList }}"
-                readonly
-              />
             </div>
             <!--Imagen-->
             <div class="form-group">
@@ -281,7 +272,7 @@
                   class="custom-file-input"
                   id="customFile"
                   formControlName="image"
-                  [ngClass]="{ 'is-invalid': invalidField('image') }"
+                  [ngClass]="{ 'is-invalid': image.invalid }"
                   (change)="validateImage($event, 'main')"
                   accept="image/*"
                 />
@@ -390,7 +381,7 @@
                   id="facebook"
                   maxlength="30"
                   [ngClass]="{
-                    'is-invalid': this.redes.controls.facebook.invalid
+                    'is-invalid': this.redes.controls?.facebook?.invalid
                   }"
                 />
 
@@ -440,7 +431,7 @@
                   id="instagram"
                   maxlength="30"
                   [ngClass]="{
-                    'is-invalid': this.redes.controls.instagram.invalid
+                    'is-invalid': this.redes.controls?.instagram?.invalid
                   }"
                 />
 
@@ -490,7 +481,7 @@
                   id="x"
                   maxlength="30"
                   [ngClass]="{
-                    'is-invalid': this.redes.controls.x.invalid
+                    'is-invalid': this.redes.controls?.x?.invalid
                   }"
                 />
 
@@ -537,7 +528,7 @@
                   id="tiktok"
                   maxlength="30"
                   [ngClass]="{
-                    'is-invalid': this.redes.controls.tiktok.invalid
+                    'is-invalid': this.redes.controls?.tiktok?.invalid
                   }"
                 />
 
@@ -554,7 +545,7 @@
                 <a
                   *ngIf="
                     this.redes.value.tiktok &&
-                    !this.redes.controls.tiktok.invalid
+                    !this.redes.controls?.tiktok?.invalid
                   "
                   [href]="this.getUrlPrueba('tiktok')"
                   target="_blank"
@@ -587,7 +578,7 @@
                   id="threads"
                   maxlength="30"
                   [ngClass]="{
-                    'is-invalid': this.redes.controls.threads.invalid
+                    'is-invalid': this.redes.controls?.threads?.invalid
                   }"
                 />
 
@@ -646,7 +637,7 @@
                     class="form-control py-4"
                     formControlName="time"
                     [ngClass]="{
-                      'is-invalid': price.controls.time.errors
+                      'is-invalid': price.controls?.time?.errors
                     }"
                   />
 
@@ -676,7 +667,7 @@
                     class="form-control py-4"
                     formControlName="value"
                     [ngClass]="{
-                      'is-invalid': price.controls.value.errors
+                      'is-invalid': price.controls?.value?.errors
                     }"
                   />
                   <span
@@ -732,7 +723,7 @@
                       step="any"
                       formControlName="value_offer"
                       [ngClass]="{
-                        'is-invalid': price.controls.value_offer.errors
+                        'is-invalid': price.controls?.value_offer?.errors
                       }"
                     />
 
@@ -810,7 +801,7 @@
                         step="any"
                         formControlName="sales"
                         [ngClass]="{
-                          'is-invalid': price.controls.sales.invalid
+                          'is-invalid': price.controls?.sales?.invalid
                         }"
                       />
 

@@ -39,12 +39,18 @@ export class RegisterComponent implements OnInit {
       [
         Validators.required,
         Validators.maxLength(50),
+        Validators.minLength(5),
         Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
       ],
     ],
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     celphone: [
       '',
@@ -63,9 +69,31 @@ export class RegisterComponent implements OnInit {
       ],
     ],
     bornDate: ['', [Validators.required]],
-    country: ['', [Validators.required]],
-    state: ['', [Validators.required]],
-    city: ['', [Validators.required]],
+    country: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    state: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    city: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS),
+      ],
+    ],
     sex: ['', [Validators.required]],
     password: [
       '',
@@ -81,11 +109,21 @@ export class RegisterComponent implements OnInit {
     type: ['', [Validators.required]],
     document_type: [
       '',
-      [Validators.required, Validators.minLength(2), Validators.maxLength(3)],
+      [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(3),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+      ],
     ],
     document_value: [
       '',
-      [Validators.required, Validators.minLength(6), Validators.maxLength(10)],
+      [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(10),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+      ],
     ],
   });
 
