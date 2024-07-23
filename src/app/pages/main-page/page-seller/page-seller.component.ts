@@ -82,7 +82,7 @@ export class PageSellerComponent {
     ],
     price: new UntypedFormArray([]),
     groupId: [
-      '-',
+      '-100',
       [
         Validators.required,
         Validators.maxLength(20),
@@ -1496,7 +1496,7 @@ export class PageSellerComponent {
       this.loadData = false;
       alerts.basicAlert(
         'Error',
-        'El BOT no pertenece al grupo, asugurate de agregarlo como administrador y que el id del grupo corresponda a tu grupo',
+        'El BOT no pertenece al grupo, asugurate de agregarlo como administrador con permisos de añadir y expulsar usuarios y que el id del grupo corresponda a tu grupo',
         'error'
       );
       return false;

@@ -43,22 +43,20 @@
             </div>
 
             <!--id_epayco-->
-
-            <div class="alert alert-info" role="alert">
-              <small
-                >No olvides añadir tu Cliente ID de tu cuenta Epayco validada,
-                la cual encontraras en el dashboard en el siguiente link:
-                <a target="_blank" href="{{ this.urlDashboardEpayco() }}"
-                  >Dashboard Epayco</a
-                ></small
-              >
-            </div>
-
             <div class="form-group">
               <label for="inputid_epayco"
                 >Cliente ID de la cuenta Epayco
                 <sup class="text-danger">*</sup></label
               >
+              <div class="alert alert-info" role="alert">
+                <small
+                  >No olvides añadir tu Cliente ID de tu cuenta Epayco validada,
+                  la cual encontraras en el dashboard en el siguiente link:
+                  <a target="_blank" href="{{ this.urlDashboardEpayco() }}"
+                    >Dashboard Epayco</a
+                  ></small
+                >
+              </div>
               <input
                 type="text"
                 placeholder="Cliente ID Epayco"
@@ -173,6 +171,23 @@
             </div>
             <!--Id del grupo de telegram-->
             <div class="form-group">
+              <label for="inputName"
+                >Id del grupo de Telegram
+                <sup class="text-danger">*</sup></label
+              >
+              <div class="alert alert-info" role="alert">
+                <small
+                  >No olvides añadir como administrador de tu grupo a nuestro
+                  BOT para que
+                  <strong
+                    >te envie el id del grupo de Telegram al chat del creador
+                    del grupo</strong
+                  >:
+                  <a target="_blank" href="{{ this.urlBot }}"
+                    >@OnlyGramGroup_BOT</a
+                  ></small
+                >
+              </div>
               <div>
                 <i
                   class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
@@ -181,10 +196,6 @@
                   >Información</i
                 >
               </div>
-              <label for="inputName"
-                >Id del grupo de Telegram
-                <sup class="text-danger">*</sup></label
-              >
               <input
                 type="text"
                 placeholder="Id del grupo de Telegram"
@@ -217,17 +228,10 @@
             <button
               class="btn btn-primary btn-block bg-principal mb-2"
               (click)="this.probarConexionBot()"
+              [disabled]="this.groupId.invalid"
             >
               Probar conexion con el bot
             </button>
-            <div class="alert alert-info" role="alert">
-              <small
-                >No olvides añadir como administrador de tu grupo a nuestro BOT:
-                <a target="_blank" href="{{ this.urlBot }}"
-                  >@OnlyGramGroup_BOT</a
-                ></small
-              >
-            </div>
             <!--Categoria-->
             <div class="form-group">
               <label for="inputCategory"

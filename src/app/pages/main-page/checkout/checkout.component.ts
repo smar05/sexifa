@@ -945,7 +945,13 @@ export class CheckoutComponent implements OnInit {
     return !(this.cart.length > 0 && this.total && this.user.chatId);
   }
 
-  public payEpayco(): void {
+  public async payEpayco(): Promise<void> {
+    try {
+      await this.probarConexionBot();
+    } catch (error) {
+      throw error;
+    }
+
     this.tokenService.actualizarToken(
       localStorage.getItem(LocalStorageEnum.REFRESH_TOKEN)
     );
