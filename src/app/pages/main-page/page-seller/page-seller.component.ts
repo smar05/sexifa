@@ -82,11 +82,12 @@ export class PageSellerComponent {
     ],
     price: new UntypedFormArray([]),
     groupId: [
-      '',
+      '-',
       [
         Validators.required,
         Validators.maxLength(20),
-        Validators.pattern(EnumExpresioncesRegulares.CHANNEL_TELEGRAM_ID),
+        Validators.minLength(8),
+        Validators.pattern(EnumExpresioncesRegulares.GROUP_TELEGRAM_ID),
       ],
       ,
     ],
@@ -1516,5 +1517,19 @@ export class PageSellerComponent {
     return `${environment.epayco.url_dashboard}${
       this.id_epayco.valid ? 'login' : 'register'
     }`;
+  }
+
+  public infoClik(): void {
+    alerts.basicAlert(
+      'Id del grupo',
+      `Inicia sesión con tu cuenta en Telegram web y selecciona el grupo de Telegram. Luego, en la URL de su navegador web debería ver algo similar a https://web.telegram.org/k/#-XXXXXXXXX. Luego, la ID que debes usar para el grupo de Telegram es -XXXXXXXXX, donde cada carácter X representa un número. Recuerde incluir el símbolo menos antes de los números. Finalmente, para canales privados en Telegram, seleccione el canal privado en Telegram web. Luego, en la URL de su navegador web debería ver algo similar a https://web.telegram.org/k/#-YYYYYYYYYY. Aquí, la ID que debe utilizar para el canal privado es -100YYYYYYYYYY. Es decir, debe incluir un 100 entre el símbolo menos y los números.`,
+      'info'
+    );
+  }
+
+  public changeGroupId(value: string): void {
+    if (value == '' || value == null) {
+      this.groupId.setValue('-');
+    }
   }
 }

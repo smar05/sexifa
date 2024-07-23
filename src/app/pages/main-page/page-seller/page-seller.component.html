@@ -173,6 +173,14 @@
             </div>
             <!--Id del grupo de telegram-->
             <div class="form-group">
+              <div>
+                <i
+                  class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
+                  style="border-radius: 50%; background-color: azure"
+                  (click)="this.infoClik()"
+                  >Información</i
+                >
+              </div>
               <label for="inputName"
                 >Id del grupo de Telegram
                 <sup class="text-danger">*</sup></label
@@ -188,12 +196,10 @@
                 [ngClass]="{
                   'is-invalid': groupId.invalid
                 }"
+                (ngModelChange)="this.changeGroupId($event)"
               />
               <span>
-                <small
-                  >Formato: -100YYYYYYYYYY
-                  https://web.telegram.org/k/#-YYYYYYYYYY</small
-                >
+                <small>Formato: -100YYYYYYYYYY</small>
               </span>
               <span
                 class="invalid-feedback"
