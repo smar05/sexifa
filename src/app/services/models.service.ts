@@ -13,6 +13,7 @@ import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 import { functions } from '../helpers/functions';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { IFireStoreRes } from '../interface/ifireStoreRes';
+import { CacheService } from './cache.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,13 +22,13 @@ export class ModelsService {
   private urlModels: string = environment.urlCollections.models;
   private urlImage: string = `/models`;
   private urlModelsApi: string = `${environment.urlServidorLocal}/api/${environment.urlsServidor.urlModelsApi}`;
-  private cache: { [key: string]: IFireStoreRes | IFireStoreRes[] } = {}; // Caché en memoria para almacenar los datos
 
   constructor(
     private storageService: StorageService,
     private fireStorageService: FireStorageService,
     private frontLogsService: FrontLogsService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cacheService: CacheService
   ) {}
 
   //------------ FireStorage---------------//
@@ -39,15 +40,19 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public getDataFS(qf: QueryFn = null): Observable<IFireStoreRes[]> {
-    const cacheKey: string = functions.createCacheKey(this.urlModels, qf);
+    let cacheData: IFireStoreRes[] =
+      (this.cacheService.getCacheData(this.urlModels, qf) as IFireStoreRes[]) ||
+      null;
 
-    if (this.cache[cacheKey]) {
-      return of(this.cache[cacheKey] as IFireStoreRes[]);
+    if (cacheData) {
+      return of(cacheData);
     }
 
     return this.fireStorageService.getData(this.urlModels, qf).pipe(
       this.fireStorageService.mapForPipe('many'),
-      tap((data: IFireStoreRes[]) => (this.cache[cacheKey] = data))
+      tap((data: IFireStoreRes[]) =>
+        this.cacheService.saveCacheData(this.urlModels, qf, data)
+      )
     );
   }
 
@@ -60,18 +65,19 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public getItemFS(doc: string, qf: QueryFn = null): Observable<IFireStoreRes> {
-    const cacheKey: string = functions.createCacheKey(
-      `${this.urlModels}/${doc}`,
-      qf
-    );
+    let key: string = `${this.urlModels}/${doc}`;
+    let cacheData: IFireStoreRes =
+      (this.cacheService.getCacheData(key, qf) as IFireStoreRes) || null;
 
-    if (this.cache[cacheKey]) {
-      return of(this.cache[cacheKey] as IFireStoreRes);
+    if (cacheData) {
+      return of(cacheData);
     }
 
     return this.fireStorageService.getItem(this.urlModels, doc, qf).pipe(
       this.fireStorageService.mapForPipe('one'),
-      tap((data: IFireStoreRes) => (this.cache[cacheKey] = data))
+      tap((data: IFireStoreRes) =>
+        this.cacheService.saveCacheData(key, qf, data)
+      )
     );
   }
 
