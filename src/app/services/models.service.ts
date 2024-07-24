@@ -2,7 +2,7 @@ import { environment } from './../../environments/environment';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
 import { Imodels } from './../interface/imodels';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { ImgModelEnum } from '../enum/imgModelEnum';
 import { FireStorageService } from './fire-storage.service';
@@ -12,6 +12,7 @@ import { HttpClient } from '@angular/common/http';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 import { functions } from '../helpers/functions';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
+import { IFireStoreRes } from '../interface/ifireStoreRes';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class ModelsService {
   private urlModels: string = environment.urlCollections.models;
   private urlImage: string = `/models`;
   private urlModelsApi: string = `${environment.urlServidorLocal}/api/${environment.urlsServidor.urlModelsApi}`;
+  private cache: { [key: string]: IFireStoreRes | IFireStoreRes[] } = {}; // Caché en memoria para almacenar los datos
 
   constructor(
     private storageService: StorageService,
@@ -33,13 +35,20 @@ export class ModelsService {
    * Se toma la informacion de la coleccion de modelos en Firebase
    *
    * @param {QueryFn} [qf=null]
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Observable<IFireStoreRes[]>}
    * @memberof ModelsService
    */
-  public getDataFS(qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getData(this.urlModels, qf)
-      .pipe(this.fireStorageService.mapForPipe('many'));
+  public getDataFS(qf: QueryFn = null): Observable<IFireStoreRes[]> {
+    const cacheKey: string = functions.createCacheKey(this.urlModels, qf);
+
+    if (this.cache[cacheKey]) {
+      return of(this.cache[cacheKey] as IFireStoreRes[]);
+    }
+
+    return this.fireStorageService.getData(this.urlModels, qf).pipe(
+      this.fireStorageService.mapForPipe('many'),
+      tap((data: IFireStoreRes[]) => (this.cache[cacheKey] = data))
+    );
   }
 
   /**
@@ -47,13 +56,23 @@ export class ModelsService {
    *
    * @param {string} doc
    * @param {QueryFn} [qf=null]
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Observable<IFireStoreRes>}
    * @memberof ModelsService
    */
-  public getItemFS(doc: string, qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getItem(this.urlModels, doc, qf)
-      .pipe(this.fireStorageService.mapForPipe('one'));
+  public getItemFS(doc: string, qf: QueryFn = null): Observable<IFireStoreRes> {
+    const cacheKey: string = functions.createCacheKey(
+      `${this.urlModels}/${doc}`,
+      qf
+    );
+
+    if (this.cache[cacheKey]) {
+      return of(this.cache[cacheKey] as IFireStoreRes);
+    }
+
+    return this.fireStorageService.getItem(this.urlModels, doc, qf).pipe(
+      this.fireStorageService.mapForPipe('one'),
+      tap((data: IFireStoreRes) => (this.cache[cacheKey] = data))
+    );
   }
 
   /**

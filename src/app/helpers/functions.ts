@@ -2,6 +2,7 @@ import { ngxCsv } from 'ngx-csv';
 import { alerts } from './alerts';
 import { FormGroup } from '@angular/forms';
 import * as watermark from 'watermarkjs';
+import { QueryFn } from '@angular/fire/compat/firestore';
 
 export class functions {
   /**
@@ -316,5 +317,18 @@ export class functions {
         reject(null);
       };
     });
+  }
+
+  /**
+   * Crear una clave única para la caché basada en la URL y la consulta
+   *
+   * @static
+   * @param {string} url
+   * @param {QueryFn} qf
+   * @return {*}  {string}
+   * @memberof functions
+   */
+  static createCacheKey(url: string, qf: QueryFn): string {
+    return `${url}-${qf ? qf.toString() : 'default'}`;
   }
 }
