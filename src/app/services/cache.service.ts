@@ -8,6 +8,7 @@ import { QueryFn } from '@angular/fire/compat/firestore';
 export class CacheService {
   // Caché en memoria para almacenar los datos
   private cache: { [key: string]: IFireStoreRes | IFireStoreRes[] } = {};
+  private cacheImg: { [key: string]: string } = {};
 
   constructor() {}
 
@@ -61,5 +62,33 @@ export class CacheService {
    */
   private createCacheKey(url: string, qf: QueryFn): string {
     return `${url}-${qf ? qf.toString() : 'default'}`;
+  }
+
+  /******************************************************************** */
+
+  /**
+   * Obtener imagen guardada en base 64
+   *
+   * @param {string} key
+   * @return {*}  {string}
+   * @memberof CacheService
+   */
+  public getCacheImg(key: string): string {
+    if (this.cacheImg[key]) {
+      return this.cacheImg[key];
+    }
+
+    return null;
+  }
+
+  /**
+   * Guardar imagen en base 64
+   *
+   * @param {string} key
+   * @param {string} data
+   * @memberof CacheService
+   */
+  public saveCacheImg(key: string, data: string): void {
+    this.cacheImg[key] = data;
   }
 }

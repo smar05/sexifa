@@ -2,7 +2,7 @@ import { environment } from './../../environments/environment';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
 import { Imodels } from './../interface/imodels';
-import { Observable, of, tap } from 'rxjs';
+import { from, Observable, of, switchMap, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { ImgModelEnum } from '../enum/imgModelEnum';
 import { FireStorageService } from './fire-storage.service';
@@ -14,6 +14,7 @@ import { functions } from '../helpers/functions';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { IFireStoreRes } from '../interface/ifireStoreRes';
 import { CacheService } from './cache.service';
+import { StorageReference } from '@angular/fire/storage';
 
 @Injectable({
   providedIn: 'root',
@@ -151,13 +152,20 @@ export class ModelsService {
    * @return {*}  {Promise<string>}
    * @memberof ModelsService
    */
-  public async getImage(url: string): Promise<string> {
-    let image: any = null;
+  public async getImage(url: string, modelUrl: string): Promise<string> {
+    let image: StorageReference = null;
+    const key: string = `${this.urlImage}/${url}`;
+    const urlImg: string =
+      (this.cacheService.getCacheImg(key) as string) || null;
+
+    if (urlImg) {
+      return new Promise((resolve) => {
+        resolve(urlImg);
+      });
+    }
 
     try {
-      image = (
-        await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
-      ).items[0];
+      image = (await this.storageService.getStorageListAll(key)).items[0];
     } catch (error) {
       this.frontLogsService.catchProcessError(
         error,
@@ -173,7 +181,23 @@ export class ModelsService {
     }
 
     if (image) {
-      return this.storageService.getDownloadURL(image);
+      return from(this.storageService.getDownloadURL(image))
+        .pipe(
+          switchMap(async (urlImg: string) => {
+            let texto: string = `${environment.urlFirebase.split('://')[1]}/${
+              UrlPagesEnum.GROUP
+            }/${modelUrl}`;
+
+            let base64: string = await functions.addWatermark(urlImg, texto, {
+              color: '#87796c',
+              opacity: 1,
+            });
+            this.cacheService.saveCacheImg(key, base64);
+
+            return base64;
+          })
+        )
+        .toPromise();
     }
 
     return '';
@@ -367,7 +391,8 @@ export class ModelsService {
 
         try {
           urlImage = await this.getImage(
-            `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+            `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`,
+            imodel.url
           );
         } catch (error) {
           this.frontLogsService.catchProcessError(
@@ -389,16 +414,11 @@ export class ModelsService {
     //Imagen principal
     try {
       let imageUrl: string = await this.getImage(
-        `${imodel.id}/${ImgModelEnum.MAIN}`
+        `${imodel.id}/${ImgModelEnum.MAIN}`,
+        imodel.url
       );
-      let texto: string = `${environment.urlFirebase.split('://')[1]}/${
-        UrlPagesEnum.GROUP
-      }/${modelDTO.url}`;
 
-      modelDTO.mainImage = await functions.addWatermark(imageUrl, texto, {
-        color: '#87796c',
-        opacity: 1,
-      });
+      modelDTO.mainImage = imageUrl;
     } catch (error) {
       this.frontLogsService.catchProcessError(
         error,
