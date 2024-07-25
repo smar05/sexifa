@@ -1,9 +1,11 @@
 import { environment } from './../../environments/environment';
 import { Icategories } from './../interface/icategories';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
+import { IFireStoreRes } from '../interface/ifireStoreRes';
+import { CacheService } from './cache.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +13,10 @@ import { QueryFn } from '@angular/fire/compat/firestore';
 export class CategoriesService {
   private urlCategories: string = environment.urlCollections.categories;
 
-  constructor(private fireStorageService: FireStorageService) {}
+  constructor(
+    private fireStorageService: FireStorageService,
+    private cacheService: CacheService
+  ) {}
 
   //------------ FireStorage---------------//
   /**
@@ -23,9 +28,22 @@ export class CategoriesService {
    * @memberof CategoriesService
    */
   public getDataFS(qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getData(this.urlCategories, qf)
-      .pipe(this.fireStorageService.mapForPipe('many'));
+    let cacheData: IFireStoreRes[] =
+      (this.cacheService.getCacheData(
+        this.urlCategories,
+        qf
+      ) as IFireStoreRes[]) || null;
+
+    if (cacheData) {
+      return of(cacheData);
+    }
+
+    return this.fireStorageService.getData(this.urlCategories, qf).pipe(
+      this.fireStorageService.mapForPipe('many'),
+      tap((data: IFireStoreRes[]) =>
+        this.cacheService.saveCacheData(this.urlCategories, qf, data)
+      )
+    );
   }
 
   /**
@@ -37,9 +55,20 @@ export class CategoriesService {
    * @memberof CategoriesService
    */
   public getItemFS(doc: string, qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getItem(this.urlCategories, doc, qf)
-      .pipe(this.fireStorageService.mapForPipe('one'));
+    let key: string = `${this.urlCategories}/${doc}`;
+    let cacheData: IFireStoreRes =
+      (this.cacheService.getCacheData(key, qf) as IFireStoreRes) || null;
+
+    if (cacheData) {
+      return of(cacheData);
+    }
+
+    return this.fireStorageService.getItem(this.urlCategories, doc, qf).pipe(
+      this.fireStorageService.mapForPipe('one'),
+      tap((data: IFireStoreRes) =>
+        this.cacheService.saveCacheData(key, qf, data)
+      )
+    );
   }
 
   /**

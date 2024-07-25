@@ -2,6 +2,7 @@ import { ngxCsv } from 'ngx-csv';
 import { alerts } from './alerts';
 import { FormGroup } from '@angular/forms';
 import * as watermark from 'watermarkjs';
+import { QueryFn } from '@angular/fire/compat/firestore';
 
 export class functions {
   /**

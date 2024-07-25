@@ -543,7 +543,8 @@ export class PageSellerComponent {
       //Obtener imagenes del producto
       try {
         this.imgTemp = await this.modelService.getImage(
-          `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`
+          `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`,
+          this.modelEnDb.url
         );
       } catch (error) {
         this.frontLogsService.catchProcessError(
@@ -565,7 +566,8 @@ export class PageSellerComponent {
             let urlImage: string = '';
             try {
               urlImage = await this.modelService.getImage(
-                `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+                `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`,
+                this.modelEnDb.url
               );
             } catch (error) {
               this.frontLogsService.catchProcessError(

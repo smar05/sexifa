@@ -2,7 +2,7 @@ import { environment } from './../../environments/environment';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
 import { Imodels } from './../interface/imodels';
-import { Observable } from 'rxjs';
+import { from, Observable, of, switchMap, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { ImgModelEnum } from '../enum/imgModelEnum';
 import { FireStorageService } from './fire-storage.service';
@@ -12,6 +12,9 @@ import { HttpClient } from '@angular/common/http';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 import { functions } from '../helpers/functions';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
+import { IFireStoreRes } from '../interface/ifireStoreRes';
+import { CacheService } from './cache.service';
+import { StorageReference } from '@angular/fire/storage';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +28,8 @@ export class ModelsService {
     private storageService: StorageService,
     private fireStorageService: FireStorageService,
     private frontLogsService: FrontLogsService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cacheService: CacheService
   ) {}
 
   //------------ FireStorage---------------//
@@ -33,13 +37,24 @@ export class ModelsService {
    * Se toma la informacion de la coleccion de modelos en Firebase
    *
    * @param {QueryFn} [qf=null]
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Observable<IFireStoreRes[]>}
    * @memberof ModelsService
    */
-  public getDataFS(qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getData(this.urlModels, qf)
-      .pipe(this.fireStorageService.mapForPipe('many'));
+  public getDataFS(qf: QueryFn = null): Observable<IFireStoreRes[]> {
+    let cacheData: IFireStoreRes[] =
+      (this.cacheService.getCacheData(this.urlModels, qf) as IFireStoreRes[]) ||
+      null;
+
+    if (cacheData) {
+      return of(cacheData);
+    }
+
+    return this.fireStorageService.getData(this.urlModels, qf).pipe(
+      this.fireStorageService.mapForPipe('many'),
+      tap((data: IFireStoreRes[]) =>
+        this.cacheService.saveCacheData(this.urlModels, qf, data)
+      )
+    );
   }
 
   /**
@@ -47,13 +62,24 @@ export class ModelsService {
    *
    * @param {string} doc
    * @param {QueryFn} [qf=null]
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Observable<IFireStoreRes>}
    * @memberof ModelsService
    */
-  public getItemFS(doc: string, qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getItem(this.urlModels, doc, qf)
-      .pipe(this.fireStorageService.mapForPipe('one'));
+  public getItemFS(doc: string, qf: QueryFn = null): Observable<IFireStoreRes> {
+    let key: string = `${this.urlModels}/${doc}`;
+    let cacheData: IFireStoreRes =
+      (this.cacheService.getCacheData(key, qf) as IFireStoreRes) || null;
+
+    if (cacheData) {
+      return of(cacheData);
+    }
+
+    return this.fireStorageService.getItem(this.urlModels, doc, qf).pipe(
+      this.fireStorageService.mapForPipe('one'),
+      tap((data: IFireStoreRes) =>
+        this.cacheService.saveCacheData(key, qf, data)
+      )
+    );
   }
 
   /**
@@ -126,13 +152,20 @@ export class ModelsService {
    * @return {*}  {Promise<string>}
    * @memberof ModelsService
    */
-  public async getImage(url: string): Promise<string> {
-    let image: any = null;
+  public async getImage(url: string, modelUrl: string): Promise<string> {
+    let image: StorageReference = null;
+    const key: string = `${this.urlImage}/${url}`;
+    const urlImg: string =
+      (this.cacheService.getCacheImg(key) as string) || null;
+
+    if (urlImg) {
+      return new Promise((resolve) => {
+        resolve(urlImg);
+      });
+    }
 
     try {
-      image = (
-        await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
-      ).items[0];
+      image = (await this.storageService.getStorageListAll(key)).items[0];
     } catch (error) {
       this.frontLogsService.catchProcessError(
         error,
@@ -148,7 +181,23 @@ export class ModelsService {
     }
 
     if (image) {
-      return this.storageService.getDownloadURL(image);
+      return from(this.storageService.getDownloadURL(image))
+        .pipe(
+          switchMap(async (urlImg: string) => {
+            let texto: string = `${environment.urlFirebase.split('://')[1]}/${
+              UrlPagesEnum.GROUP
+            }/${modelUrl}`;
+
+            let base64: string = await functions.addWatermark(urlImg, texto, {
+              color: '#87796c',
+              opacity: 1,
+            });
+            this.cacheService.saveCacheImg(key, base64);
+
+            return base64;
+          })
+        )
+        .toPromise();
     }
 
     return '';
@@ -342,7 +391,8 @@ export class ModelsService {
 
         try {
           urlImage = await this.getImage(
-            `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+            `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`,
+            imodel.url
           );
         } catch (error) {
           this.frontLogsService.catchProcessError(
@@ -364,16 +414,11 @@ export class ModelsService {
     //Imagen principal
     try {
       let imageUrl: string = await this.getImage(
-        `${imodel.id}/${ImgModelEnum.MAIN}`
+        `${imodel.id}/${ImgModelEnum.MAIN}`,
+        imodel.url
       );
-      let texto: string = `${environment.urlFirebase.split('://')[1]}/${
-        UrlPagesEnum.GROUP
-      }/${modelDTO.url}`;
 
-      modelDTO.mainImage = await functions.addWatermark(imageUrl, texto, {
-        color: '#87796c',
-        opacity: 1,
-      });
+      modelDTO.mainImage = imageUrl;
     } catch (error) {
       this.frontLogsService.catchProcessError(
         error,

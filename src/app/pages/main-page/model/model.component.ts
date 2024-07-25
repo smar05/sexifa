@@ -330,13 +330,6 @@ export class ModelComponent implements OnInit {
     this.load = false;
   }
 
-  private async addWatermark(imageUrl: string, text: string): Promise<void> {
-    this.imgPrincipal = await functions.addWatermark(imageUrl, text, {
-      color: '#87796c',
-      opacity: 1,
-    });
-  }
-
   public async getGaleria(): Promise<void> {
     try {
       this.galeria = await this.modelsService.getImages(
@@ -359,7 +352,7 @@ export class ModelComponent implements OnInit {
   }
 
   public setImgPrincipal(img: string): void {
-    this.addWatermark(img, this.watermark);
+    this.imgPrincipal = img;
   }
 
   public setModelSubscripctionModelValues(): void {
