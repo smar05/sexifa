@@ -24,6 +24,8 @@ import { CategoriesService } from 'src/app/services/categories.service';
 import { Icategories } from 'src/app/interface/icategories';
 import { FontAwesomeIconsService } from 'src/app/shared/font-awesome-icons/font-awesome-icons.service';
 import { environment } from 'src/environments/environment';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-model',
@@ -54,11 +56,13 @@ export class ModelComponent implements OnInit {
     private telegramService: TelegramLocalService,
     private userService: UserService,
     private categoriesService: CategoriesService,
-    public fontAwesomeIconsService: FontAwesomeIconsService
+    public fontAwesomeIconsService: FontAwesomeIconsService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     //Id del modelo
     this.modelId = this.route.snapshot.paramMap.get('url') || '';
 
@@ -674,5 +678,12 @@ export class ModelComponent implements OnInit {
       default:
         return null;
     }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.MODEL)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

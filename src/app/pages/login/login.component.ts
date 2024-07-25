@@ -17,6 +17,8 @@ import { ModelsService } from 'src/app/services/models.service';
 import { Imodels } from 'src/app/interface/imodels';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-login',
@@ -55,11 +57,13 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private frontLogsService: FrontLogsService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   ngOnInit(): void {
     functions.bloquearPantalla(true);
+    this.alertPage();
     let auxRedirectTo: string = localStorage.getItem(
       LocalStorageEnum.REDIRECT_TO
     );
@@ -318,5 +322,12 @@ export class LoginComponent implements OnInit {
    */
   public invalidField(field: string): boolean {
     return functions.invalidField(field, this.f, this.formSubmitted);
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.LOGIN)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

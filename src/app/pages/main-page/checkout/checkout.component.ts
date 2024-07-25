@@ -39,6 +39,8 @@ import {
 } from 'src/app/interface/i-metodos-de-pago';
 import { EnumEndpointsBack } from 'src/app/enum/enum-endpoints-back';
 import { TokenService } from 'src/app/services/token.service';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -82,11 +84,14 @@ export class CheckoutComponent implements OnInit {
     private frontLogsService: FrontLogsService,
     private businessParamsService: BusinessParamsService,
     private metodosDePagoService: MetodosDePagoService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+
+    this.alertPage();
 
     try {
       await this.getUserData();
@@ -1015,5 +1020,12 @@ export class CheckoutComponent implements OnInit {
     };
 
     handler.open(dataEpayco);
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.CHECKOUT)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

@@ -34,6 +34,8 @@ import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-page-seller',
@@ -257,11 +259,13 @@ export class PageSellerComponent {
     private route: Router,
     private frontLogsService: FrontLogsService,
     private modelsService: ModelsService,
-    private telegramService: TelegramLocalService
+    private telegramService: TelegramLocalService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
 
     // Fecha minima de las ofertas
     this.fechaMinima = new Date().toISOString().split('T')[0];
@@ -1533,5 +1537,12 @@ export class PageSellerComponent {
     if (value == '' || value == null) {
       this.groupId.setValue('-');
     }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.PAGE_SELLER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

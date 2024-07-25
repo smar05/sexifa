@@ -28,6 +28,8 @@ import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-user',
@@ -213,11 +215,13 @@ export class UserComponent implements OnInit {
     private locationService: LocationService,
     private telegramLocalService: TelegramLocalService,
     private subscriptionsService: SubscriptionsService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     try {
       await this.getUserData();
       await this.getLocationData();
@@ -574,5 +578,12 @@ export class UserComponent implements OnInit {
       `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
       'info'
     );
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.USER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

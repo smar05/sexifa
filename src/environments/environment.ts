@@ -44,6 +44,7 @@ export const environment = {
     saldos: 'saldos',
     metodos_de_pago: 'metodos_de_pago',
     epayco_trans: 'epayco_trans',
+    alerts: 'alerts',
   },
   urlsServidor: {
     urlTelegramApi: 'telegram',

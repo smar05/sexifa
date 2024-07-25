@@ -10,6 +10,7 @@ import { QueryFn } from '@angular/fire/compat/firestore';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { EnumPages } from 'src/app/enum/enum-pages';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
@@ -17,6 +18,7 @@ import { Isubscriptions } from 'src/app/interface/i- subscriptions';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { Imodels } from 'src/app/interface/imodels';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
@@ -66,6 +68,7 @@ export class HomeSellerComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
     try {
       await this.getMiGroup();
@@ -97,7 +100,8 @@ export class HomeSellerComponent implements OnInit {
   constructor(
     private subscriptionsService: SubscriptionsService,
     private modelsService: ModelsService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   public async getMiGroup(): Promise<void> {
@@ -229,5 +233,12 @@ export class HomeSellerComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.HOME_SELLER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

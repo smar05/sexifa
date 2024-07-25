@@ -19,6 +19,8 @@ import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
 import { SweetAlertIcon } from 'sweetalert2';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-register',
@@ -199,11 +201,13 @@ export class RegisterComponent implements OnInit {
     private userService: UserService,
     private locationService: LocationService,
     private telegramLocalService: TelegramLocalService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   ngOnInit(): void {
     functions.bloquearPantalla(true);
+    this.alertPage();
     localStorage.clear();
     this.documentsType = this.getUserDocumentTypes();
     // Fecha minima para escoger la edad
@@ -507,5 +511,12 @@ export class RegisterComponent implements OnInit {
     });
 
     return pairKeyDocumentType;
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.REGISTER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

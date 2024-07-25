@@ -3,6 +3,7 @@ import {
   AngularFirestore,
   DocumentReference,
   QueryFn,
+  QuerySnapshot,
 } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { IFireStoreRes } from '../interface/ifireStoreRes';
@@ -22,7 +23,10 @@ export class FireStorageService {
    * @return {*}  {Observable<any>}
    * @memberof FireStorageService
    */
-  public getData(collection: string, qf: QueryFn = null): Observable<any> {
+  public getData(
+    collection: string,
+    qf: QueryFn = null
+  ): Observable<QuerySnapshot<unknown>> {
     if (qf == null) return this.firestore.collection(collection).get();
     return this.firestore.collection(collection, qf).get();
   }

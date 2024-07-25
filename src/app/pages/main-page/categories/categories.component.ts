@@ -6,6 +6,8 @@ import { alerts } from 'src/app/helpers/alerts';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-categories',
@@ -17,16 +19,18 @@ export class CategoriesComponent implements OnInit {
 
   constructor(
     private categoriesService: CategoriesService, //public fontAwesomeIconsService: FontAwesomeIconsService
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   ngOnInit(): void {
+    this.alertPage();
     this.getAllCategories();
   }
 
   public getAllCategories(): void {
     this.categoriesService
-      .getData()
+      .getDataFS()
       .toPromise()
       .then(
         (res: Icategories[]) => {
@@ -58,5 +62,12 @@ export class CategoriesComponent implements OnInit {
           throw error;
         }
       );
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.CATEGORIES)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

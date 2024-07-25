@@ -11,6 +11,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { EnumPages } from 'src/app/enum/enum-pages';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
@@ -24,6 +25,7 @@ import { ICountries } from 'src/app/interface/icountries';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { IState } from 'src/app/interface/istate';
 import { Iuser } from 'src/app/interface/iuser';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { LocationService } from 'src/app/services/location.service';
 import { SaldosService } from 'src/app/services/saldos.service';
@@ -195,11 +197,13 @@ export class UserSellerComponent {
     private locationService: LocationService,
     private frontLogsService: FrontLogsService,
     private subscriptionsService: SubscriptionsService,
-    private saldosService: SaldosService
+    private saldosService: SaldosService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     try {
       await this.getUserData();
       await this.getLocationData();
@@ -755,5 +759,12 @@ export class UserSellerComponent {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.USER_SELLER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

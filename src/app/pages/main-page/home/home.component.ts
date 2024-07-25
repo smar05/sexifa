@@ -22,6 +22,8 @@ import { ActivatedRoute } from '@angular/router';
 import { OrdersService } from 'src/app/services/orders.service';
 import { Iorders } from 'src/app/interface/i-orders';
 import { StatusOrdersEnum } from 'src/app/enum/statusOrdersEnum';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-home',
@@ -43,11 +45,13 @@ export class HomeComponent implements OnInit {
     private frontLogsService: FrontLogsService,
     public fontAwesomeIconsService: FontAwesomeIconsService,
     private route: ActivatedRoute,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     let refEpayco: string = null;
     let searchOrder: boolean =
       localStorage.getItem(LocalStorageEnum.SEARCH_ORDER) === 'true';
@@ -396,5 +400,12 @@ export class HomeComponent implements OnInit {
 
   capitalizeFirstLetters(text: string): string {
     return functions.capitalizeFirstLetters(text);
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.HOME)
+      .toPromise()
+      .then((res: any) => {});
   }
 }
