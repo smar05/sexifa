@@ -26,6 +26,7 @@ import { FontAwesomeIconsService } from 'src/app/shared/font-awesome-icons/font-
 import { environment } from 'src/environments/environment';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
+import { IButtonComponent } from 'src/app/shared/button/button.component';
 
 @Component({
   selector: 'app-model',
@@ -45,6 +46,10 @@ export class ModelComponent implements OnInit {
   public precios: Array<number> = [];
   public category: Icategories = null;
   private watermark: string = '';
+  public cartButton: IButtonComponent = {
+    class: 'btn',
+    text: '<i class="fas fa-shopping-cart"></i>',
+  };
 
   constructor(
     private route: ActivatedRoute,

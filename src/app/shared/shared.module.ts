@@ -8,6 +8,7 @@ import { BottomNavComponent } from './bottom-nav/bottom-nav.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SkFoldingCubeComponent } from './sk-folding-cube/sk-folding-cube.component';
 import { ModelCardsComponent } from './model-cards/model-cards.component';
+import { ButtonComponent } from './button/button.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { ModelCardsComponent } from './model-cards/model-cards.component';
     SkFoldingCubeComponent,
     BottomNavComponent,
     ModelCardsComponent,
+    ButtonComponent,
   ],
   exports: [
     NavbarComponent,
@@ -25,6 +27,7 @@ import { ModelCardsComponent } from './model-cards/model-cards.component';
     SkFoldingCubeComponent,
     BottomNavComponent,
     ModelCardsComponent,
+    ButtonComponent,
     //FontAwesomeModule,
   ],
   imports: [CommonModule, RouterModule, FontAwesomeModule],

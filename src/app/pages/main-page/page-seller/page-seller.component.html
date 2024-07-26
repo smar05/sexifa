@@ -225,13 +225,14 @@
                 El Id de Telegram no puede tener mas de 20 caracteres
               </span>
             </div>
-            <button
-              class="btn btn-primary btn-block bg-principal mb-2"
+            <app-button
+              [properties]="{
+                class: 'btn btn-primary btn-block bg-principal mb-2',
+                disabled: this.groupId.invalid,
+                text: 'Probar conexion con el bot'
+              }"
               (click)="this.probarConexionBot()"
-              [disabled]="this.groupId.invalid"
-            >
-              Probar conexion con el bot
-            </button>
+            />
             <!--Categoria-->
             <div class="form-group">
               <label for="inputCategory"
@@ -317,12 +318,13 @@
                 <figure class="col-sm-2 pb-3" *ngFor="let pic of editGallery">
                   <img src="{{ pic }}" alt="" class="img-fluid" />
 
-                  <button
-                    class="btn btn-danger btn-sm"
+                  <app-button
+                    [properties]="{
+                      class: 'btn btn-danger btn-sm',
+                      text: 'Remover'
+                    }"
                     (click)="removeGallery(pic)"
-                  >
-                    Remover
-                  </button>
+                  />
                 </figure>
               </div>
 
@@ -630,13 +632,14 @@
                 <div class="col-12 col-lg-6 input-group" [formGroup]="price">
                   <div class="input-group-append">
                     <span class="input-group-text">
-                      <button
-                        type="button"
-                        class="btn btn-danger btn-sm"
+                      <app-button
+                        [properties]="{
+                          type: 'button',
+                          class: 'btn btn-danger btn-sm',
+                          text: '&times;'
+                        }"
                         (click)="removeInput(i, 'price')"
-                      >
-                        &times;
-                      </button>
+                      />
                     </span>
                   </div>
                   <div class="input-group-append">
@@ -834,45 +837,50 @@
                     </div>
                   </ng-container>
                 </ng-container>
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-sm m-2"
+                <app-button
+                  [properties]="{
+                    type: 'button',
+                    class: 'btn btn-secondary btn-sm m-2',
+                    disabled: price.invalid,
+                    text: 'Calcular precio'
+                  }"
                   (click)="this.calcularPrecio(price.value, i, price.invalid)"
-                  [disabled]="price.invalid"
-                >
-                  Calcular precio
-                </button>
+                />
+
                 <br />
                 <label *ngIf="this.preciosSimulados.get(i)"
                   >Precio Final:
                   {{ this.preciosSimulados.get(i) | currency : "USD" }}
                 </label>
               </div>
-              <button
-                type="button"
-                class="btn btn-primary btn-sm mb-2"
+              <app-button
+                [properties]="{
+                  type: 'button',
+                  class: 'btn btn-primary btn-sm mb-2',
+                  text: 'Añadir precio subscripción'
+                }"
                 (click)="addInput('price')"
-              >
-                Añadir precio subscripción
-              </button>
+              />
             </div>
           </ng-container>
         </div>
         <div class="card-footer">
-          <button
-            class="btn btn-secondary"
+          <app-button
+            [properties]="{
+              class: 'btn btn-secondary',
+              type: 'button',
+              text: 'Regresar'
+            }"
             [routerLink]="['/home-seller']"
-            type="button"
-          >
-            Regresar
-          </button>
-          <button
-            type="submit"
-            [disabled]="f.invalid"
-            class="btn btn-warning float-right"
-          >
-            Guardar
-          </button>
+          />
+          <app-button
+            [properties]="{
+              type: 'submit',
+              class: 'btn btn-warning float-right',
+              text: 'Guardar',
+              disabled: f.invalid
+            }"
+          />
         </div>
       </form>
     </ng-container>

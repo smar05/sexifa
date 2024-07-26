@@ -41,6 +41,7 @@ import { EnumEndpointsBack } from 'src/app/enum/enum-endpoints-back';
 import { TokenService } from 'src/app/services/token.service';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
+import { IButtonComponent } from 'src/app/shared/button/button.component';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -67,7 +68,12 @@ export class CheckoutComponent implements OnInit {
   public load: boolean = false;
   public models: Imodels[] = [];
   public metodosDePago: IMetodosDePago[] = null;
-  private ePayco: any = ePayco;
+  public epaycoProperties: IButtonComponent = {
+    style: 'padding: 0; background: none; border: none; cursor: pointer;',
+    class: 'epayco-button-render btn btn-block',
+    text: '<img src="https://multimedia.epayco.co/dashboard/btns/btn2.png" alt="" />',
+    id: 'epayco-btn',
+  };
 
   @ViewChild('paypal', { static: true })
   paypalElement!: ElementRef;

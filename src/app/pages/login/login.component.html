@@ -94,13 +94,14 @@
             <div class="row">
               <!-- /.col -->
               <div class="col-12">
-                <button
-                  type="submit"
-                  class="btn btn-primary btn-block bg-principal"
-                  [disabled]="f.invalid"
-                >
-                  Iniciar sesion
-                </button>
+                <app-button
+                  [properties]="{
+                    type: 'submit',
+                    class: 'btn btn-primary btn-block bg-principal btn-login',
+                    disabled: f.invalid,
+                    text: 'Iniciar sesion'
+                  }"
+                />
               </div>
               <!-- /.col -->
             </div>
@@ -118,11 +119,14 @@
         </div>
         -->
         <p class="mb-0 mt-2 text-center">
-          <a
+          <app-button
+            [properties]="{
+              type: 'button',
+              class: 'btn btn-primary btn-block bg-secundario',
+              text: 'Crear cuenta nueva'
+            }"
             [routerLink]="['/register']"
-            class="btn btn-primary btn-block bg-secundario"
-            >Crear cuenta nueva</a
-          >
+          />
         </p>
         <p class="mb-1 mt-2">
           <a [routerLink]="['/forgot-password']">Olvide mi contraseña</a>
