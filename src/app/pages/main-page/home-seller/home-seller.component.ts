@@ -22,6 +22,7 @@ import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
+import { IButtonComponent } from 'src/app/shared/button/button.component';
 
 @Component({
   selector: 'app-home-seller',
@@ -59,6 +60,10 @@ export class HomeSellerComponent implements OnInit {
     'statusUser',
     'actions',
   ]; //Variable para nombrar las columnas de la tabla
+  public eyeButton: IButtonComponent = {
+    class: 'btn btn-sm btn-warning mr-1',
+    text: '<i class="fas fa-eye"></i>',
+  };
 
   //Paginador
   @ViewChild(MatPaginator) paginator!: MatPaginator;

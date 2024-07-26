@@ -140,9 +140,10 @@
               class="add-to-catr-btn mb-2"
               *ngIf="this.price && this.precios && this.precios.length > 0"
             >
-              <button class="btn" (click)="this.clickParticipar()">
-                <i class="fas fa-shopping-cart"></i>
-              </button>
+              <app-button
+                [properties]="this.cartButton"
+                (click)="this.clickParticipar()"
+              />
             </div>
             <!--Redes-->
             <div

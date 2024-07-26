@@ -394,10 +394,6 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  public getUrlModel(model: ModelsDTO) {
-    return this.modelsService.getRouterLinkUrl(model);
-  }
-
   capitalizeFirstLetters(text: string): string {
     return functions.capitalizeFirstLetters(text);
   }
