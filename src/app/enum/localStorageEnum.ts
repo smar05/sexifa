@@ -10,5 +10,4 @@ export enum LocalStorageEnum {
   REDIRECT_TO = 'redirect_to',
   MODEL_ID = 'model_id',
   SEARCH_ORDER = 'search_order',
-  PUBLIC_KEY = 'public_key',
 }
