@@ -10,8 +10,10 @@ import { QueryFn } from '@angular/fire/compat/firestore';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { ClipboardService } from 'ngx-clipboard';
 import { EnumPages } from 'src/app/enum/enum-pages';
 import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { UrlPagesEnum } from 'src/app/enum/urlPagesEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Isubscriptions } from 'src/app/interface/i- subscriptions';
@@ -23,6 +25,7 @@ import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
 import { IButtonComponent } from 'src/app/shared/button/button.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home-seller',
@@ -48,7 +51,7 @@ import { IButtonComponent } from 'src/app/shared/button/button.component';
 })
 export class HomeSellerComponent implements OnInit {
   private userId: string = '';
-  private model: Imodels;
+  public model: Imodels;
   public subscriptions: Isubscriptions[] = [];
   public loading: boolean = false;
 
@@ -64,6 +67,7 @@ export class HomeSellerComponent implements OnInit {
     class: 'btn btn-sm btn-warning mr-1',
     text: '<i class="fas fa-eye"></i>',
   };
+  public urlModelPage: string = '';
 
   //Paginador
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -106,7 +110,8 @@ export class HomeSellerComponent implements OnInit {
     private subscriptionsService: SubscriptionsService,
     private modelsService: ModelsService,
     private frontLogsService: FrontLogsService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private clipboardService: ClipboardService
   ) {}
 
   public async getMiGroup(): Promise<void> {
@@ -146,6 +151,8 @@ export class HomeSellerComponent implements OnInit {
 
     this.model = res[0].data;
     this.model.id = res[0].id;
+
+    this.urlModelPage = `${environment.urlProd}#/${UrlPagesEnum.GROUP}/${this.model.url}`;
 
     functions.bloquearPantalla(false);
     this.loading = false;
@@ -245,5 +252,12 @@ export class HomeSellerComponent implements OnInit {
       .alertPage(EnumPages.HOME_SELLER)
       .toPromise()
       .then((res: any) => {});
+  }
+
+  public copyToClipboardUrlModel(): void {
+    if (!this.urlModelPage) return;
+
+    this.clipboardService.copyFromContent(this.urlModelPage);
+    alert('URL copiada al portapapeles!');
   }
 }
