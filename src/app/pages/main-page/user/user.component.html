@@ -177,7 +177,7 @@
                   </span>
 
                   <button
-                    (click)="probarConexionBot()"
+                    (click)="probarConexionBot($event)"
                     class="btn btn-primary btn-block bg-principal mb-2"
                     [disabled]="this.chatId.invalid"
                     *ngIf="!this.chatId.invalid"

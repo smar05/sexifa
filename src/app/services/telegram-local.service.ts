@@ -61,8 +61,9 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public botEsAdminDelGrupo(params: { chatId: number }): Observable<boolean> {
-    let paramsEncrypted: object =
-      this.encryptionService.encryptDataJson(params);
+    let paramsEncrypted: object = this.encryptionService.encryptDataJson(
+      params as any
+    );
 
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.BOT_ES_ADMIN_DEL_GRUPO}`,

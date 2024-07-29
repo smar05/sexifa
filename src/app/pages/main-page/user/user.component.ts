@@ -485,7 +485,8 @@ export class UserComponent implements OnInit {
     }
   }
 
-  public async probarConexionBot(): Promise<void> {
+  public async probarConexionBot(event: Event): Promise<void> {
+    event.preventDefault();
     functions.bloquearPantalla(true);
 
     try {
