@@ -412,8 +412,8 @@ export class ModelComponent implements OnInit {
     this.load = true;
 
     let prices: IpriceModel[] = this.model.price;
-    let params: object = {
-      prices: JSON.stringify(prices),
+    let params: { [key: string]: string | string[] } = {
+      prices: prices.map((price: IpriceModel) => JSON.stringify(price)),
       fechaActual: new Date().toISOString(),
     };
 

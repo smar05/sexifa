@@ -15,6 +15,7 @@ import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { IFireStoreRes } from '../interface/ifireStoreRes';
 import { CacheService } from './cache.service';
 import { StorageReference } from '@angular/fire/storage';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +30,8 @@ export class ModelsService {
     private fireStorageService: FireStorageService,
     private frontLogsService: FrontLogsService,
     private http: HttpClient,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private encryptionService: EncryptionService
   ) {}
 
   //------------ FireStorage---------------//
@@ -444,9 +446,12 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public calcularPrecioSubscripcion(params: any): Observable<any> {
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
     return this.http.get(
       `${this.urlModelsApi}/${EnumEndpointsBack.MODELS.OBTENER_PRECIOS}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 }

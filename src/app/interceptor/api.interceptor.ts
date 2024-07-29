@@ -1,5 +1,4 @@
 import { environment } from './../../environments/environment';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   HttpRequest,
@@ -14,15 +13,16 @@ import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { Router } from '@angular/router';
 import { TokenService } from '../services/token.service';
+import { EncryptionService } from '../services/encryption.service';
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
   private token: string = '';
 
   constructor(
-    private http: HttpClient,
     private router: Router,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private encryptionService: EncryptionService
   ) {}
 
   intercept(
@@ -72,10 +72,13 @@ export class ApiInterceptor implements HttpInterceptor {
     request: HttpRequest<unknown>,
     token: string
   ): HttpRequest<any> {
+    let dateEncrypted: string = this.encryptionService.encryptData(
+      new Date().toISOString()
+    );
     return request.clone({
       setParams: {
         auth: token,
-        date: new Date().toISOString(),
+        date: dateEncrypted,
       },
     });
   }

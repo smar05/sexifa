@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { alerts } from '../helpers/alerts';
 import { FrontLogsService } from './front-logs.service';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,20 +15,24 @@ export class TelegramLocalService {
 
   constructor(
     private http: HttpClient,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private encryptionService: EncryptionService
   ) {}
 
   /**
    * Probar la conexion entre el cliente y el bot de telegram
    *
-   * @param {*} body
+   * @param {*} params
    * @return {*}  {Observable<any>}
    * @memberof TelegramLocalService
    */
   public getPruebaBotCliente(params: any = {}): Observable<any> {
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.COMUNICAR_BOT_CLIENTE}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 
@@ -39,9 +44,12 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public esMiembroDelGrupo(params: any): Observable<any> {
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.ES_MIEMBRO_DEL_GRUPO}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 
@@ -53,10 +61,14 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public botEsAdminDelGrupo(params: { chatId: number }): Observable<boolean> {
+    let paramsEncrypted: object = this.encryptionService.encryptDataJson(
+      params as any
+    );
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.BOT_ES_ADMIN_DEL_GRUPO}`,
       {
-        params,
+        params: paramsEncrypted as any,
       }
     ) as Observable<boolean>;
   }
@@ -69,9 +81,12 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public getLinksOrden(params: any): Observable<any> {
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.ENVIAR_LINK}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 
