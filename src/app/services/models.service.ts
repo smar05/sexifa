@@ -446,8 +446,17 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public calcularPrecioSubscripcion(params: any): Observable<any> {
+    console.log(
+      '🚀 ~ ModelsService ~ calcularPrecioSubscripcion ~ params:',
+      params
+    );
     let paramsEncrypted: object =
       this.encryptionService.encryptDataJson(params);
+
+    console.log(
+      '🚀 ~ ModelsService ~ calcularPrecioSubscripcion ~ paramsEncrypted:',
+      paramsEncrypted
+    );
 
     return this.http.get(
       `${this.urlModelsApi}/${EnumEndpointsBack.MODELS.OBTENER_PRECIOS}`,

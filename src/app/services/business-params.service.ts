@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 
 export enum EnumBusinessParamsKeys {
   PUBLIC_KEY = 'public_key',
+  COMMISSION = 'commission',
 }
 
 @Injectable({

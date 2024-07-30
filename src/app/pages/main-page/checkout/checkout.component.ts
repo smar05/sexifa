@@ -996,7 +996,9 @@ export class CheckoutComponent implements OnInit {
           total: c.price.toString(),
           iva: '',
           base_iva: '',
-          fee: '20', // 20% comision
+          fee: c.model.commission
+            ? (c.model.commission * 100).toString()
+            : '20', // 20% comision
         };
       }),
       external: 'false',

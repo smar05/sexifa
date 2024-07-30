@@ -36,6 +36,10 @@ import { environment } from 'src/environments/environment';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
+import {
+  BusinessParamsService,
+  EnumBusinessParamsKeys,
+} from 'src/app/services/business-params.service';
 
 @Component({
   selector: 'app-page-seller',
@@ -260,7 +264,8 @@ export class PageSellerComponent {
     private frontLogsService: FrontLogsService,
     private modelsService: ModelsService,
     private telegramService: TelegramLocalService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private bussinesService: BusinessParamsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -544,6 +549,28 @@ export class PageSellerComponent {
           );
         });
 
+      try {
+        this.modelEnDb.commission =
+          this.modelEnDb.commission ??
+          (
+            await this.bussinesService
+              .getItemFS(EnumBusinessParamsKeys.COMMISSION)
+              .toPromise()
+          ).data.value;
+      } catch (err) {
+        this.frontLogsService.catchProcessError(
+          err,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error',
+            icon: 'error',
+          },
+          `file: page-seller.component.ts: ~ PageSellerComponent ~ getData ~ JSON.stringify(error): ${JSON.stringify(
+            err
+          )}`
+        );
+      }
+
       //Obtener imagenes del producto
       try {
         this.imgTemp = await this.modelService.getImage(
@@ -713,6 +740,7 @@ export class PageSellerComponent {
       url: this.f.controls.url.value,
       redes: this.redes.value,
       id_epayco: this.modelEnDb.id_epayco,
+      commission: this.modelEnDb.commission,
     };
 
     //Guardar la informacion del producto en base de datos
@@ -1344,7 +1372,7 @@ export class PageSellerComponent {
 
   private async calcularPrecios(prices: IpriceModel[]): Promise<void> {
     let params: object = {
-      prices: JSON.stringify(prices),
+      prices: prices.map((price: IpriceModel) => JSON.stringify(price)),
       fechaActual: new Date().toISOString(),
     };
 
