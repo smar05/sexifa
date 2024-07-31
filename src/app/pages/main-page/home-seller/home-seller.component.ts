@@ -12,7 +12,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ClipboardService } from 'ngx-clipboard';
 import { EnumPages } from 'src/app/enum/enum-pages';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 import { UrlPagesEnum } from 'src/app/enum/urlPagesEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
@@ -24,6 +24,7 @@ import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
 import { IButtonComponent } from 'src/app/shared/button/button.component';
 import { environment } from 'src/environments/environment';
 
@@ -78,7 +79,9 @@ export class HomeSellerComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
     this.alertPage();
-    this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    this.userId = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
     try {
       await this.getMiGroup();
       await this.getSubscriptions();
@@ -88,7 +91,9 @@ export class HomeSellerComponent implements OnInit {
 
       let data: IFrontLogs = {
         date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        userId: this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        ),
         log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
         )}`,
@@ -111,7 +116,8 @@ export class HomeSellerComponent implements OnInit {
     private modelsService: ModelsService,
     private frontLogsService: FrontLogsService,
     private alertsPagesService: AlertsPagesService,
-    private clipboardService: ClipboardService
+    private clipboardService: ClipboardService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   public async getMiGroup(): Promise<void> {
@@ -133,7 +139,9 @@ export class HomeSellerComponent implements OnInit {
 
       let data: IFrontLogs = {
         date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        userId: this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        ),
         log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ getMiGroup ~ JSON.stringify(error): ${JSON.stringify(
           error
         )}`,
@@ -181,7 +189,9 @@ export class HomeSellerComponent implements OnInit {
 
       let data: IFrontLogs = {
         date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        userId: this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        ),
         log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ getSubscriptions ~ JSON.stringify(error): ${JSON.stringify(
           error
         )}`,

@@ -19,6 +19,8 @@ import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-login',
@@ -58,7 +60,8 @@ export class LoginComponent implements OnInit {
     private userService: UserService,
     private frontLogsService: FrontLogsService,
     private modelsService: ModelsService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   ngOnInit(): void {
@@ -119,15 +122,13 @@ export class LoginComponent implements OnInit {
         );
 
         //Se captura el localId
-        localStorage.setItem(
-          LocalStorageEnum.LOCAL_ID,
-          res.user.multiFactor.user.uid
+        const localId: string = res.user.multiFactor.user.uid;
+        this.variablesGlobalesService.set(
+          EnumVariablesGlobales.USER_ID,
+          localId
         );
 
-        let qf: QueryFn = (ref) =>
-          ref
-            .where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID))
-            .limit(1);
+        let qf: QueryFn = (ref) => ref.where('id', '==', localId).limit(1);
 
         let user: Iuser = {} as any;
         let userIdDoc: string = null;
@@ -153,6 +154,11 @@ export class LoginComponent implements OnInit {
           this.loading = false;
         }
 
+        this.variablesGlobalesService.set(
+          EnumVariablesGlobales.USER_TYPE,
+          user.type
+        );
+
         // Verificar el estado del usuario
         switch (user.status) {
           case UserStatusEnum.INACTIVO:
@@ -175,9 +181,9 @@ export class LoginComponent implements OnInit {
 
         switch (user.type) {
           case UserTypeEnum.USUARIO:
-            localStorage.setItem(
-              LocalStorageEnum.USER_TYPE,
-              UserTypeEnum.USUARIO
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_TYPE,
+              user.type
             );
             let pathRedirectTo: string = localStorage.getItem(
               LocalStorageEnum.REDIRECT_TO
@@ -192,20 +198,15 @@ export class LoginComponent implements OnInit {
             break;
 
           case UserTypeEnum.CREADOR:
-            localStorage.setItem(
-              LocalStorageEnum.USER_TYPE,
-              UserTypeEnum.CREADOR
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_TYPE,
+              user.type
             );
 
             let model: Imodels = null;
             let data: IFireStoreRes[] = null;
             try {
-              let qf: QueryFn = (ref) =>
-                ref.where(
-                  'idUser',
-                  '==',
-                  localStorage.getItem(LocalStorageEnum.LOCAL_ID)
-                );
+              let qf: QueryFn = (ref) => ref.where('idUser', '==', localId);
               data = await this.modelsService.getDataFS(qf).toPromise();
             } catch (error) {
               this.frontLogsService.catchProcessError(
@@ -229,7 +230,10 @@ export class LoginComponent implements OnInit {
             model.id = data[0].id;
 
             if (model && model.id) {
-              localStorage.setItem(LocalStorageEnum.MODEL_ID, model.id);
+              this.variablesGlobalesService.set(
+                EnumVariablesGlobales.MODEL_ID,
+                model.id
+              );
             }
 
             url = `/${UrlPagesEnum.HOME_SELLER}`;

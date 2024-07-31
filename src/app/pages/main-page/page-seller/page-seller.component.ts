@@ -40,6 +40,8 @@ import {
   BusinessParamsService,
   EnumBusinessParamsKeys,
 } from 'src/app/services/business-params.service';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-page-seller',
@@ -265,7 +267,8 @@ export class PageSellerComponent {
     private modelsService: ModelsService,
     private telegramService: TelegramLocalService,
     private alertsPagesService: AlertsPagesService,
-    private bussinesService: BusinessParamsService
+    private bussinesService: BusinessParamsService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -275,7 +278,10 @@ export class PageSellerComponent {
     // Fecha minima de las ofertas
     this.fechaMinima = new Date().toISOString().split('T')[0];
 
-    this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID) || '';
+    this.userId =
+      this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.USER_ID
+      ) || '';
     await this.getCategories();
     try {
       await this.getUserModel();
@@ -412,7 +418,9 @@ export class PageSellerComponent {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -463,7 +471,9 @@ export class PageSellerComponent {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -766,7 +776,9 @@ export class PageSellerComponent {
 
           let data: IFrontLogs = {
             date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            userId: this.variablesGlobalesService.getCurrentValue(
+              EnumVariablesGlobales.USER_ID
+            ),
             log: `file: page-seller.component.ts: ~ PageSellerComponent ~ saveModel ~ JSON.stringify(error): ${JSON.stringify(
               err
             )}`,
@@ -799,7 +811,9 @@ export class PageSellerComponent {
 
           let data: IFrontLogs = {
             date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            userId: this.variablesGlobalesService.getCurrentValue(
+              EnumVariablesGlobales.USER_ID
+            ),
             log: `file: page-seller.component.ts: ~ PageSellerComponent ~ saveModel ~ JSON.stringify(error): ${JSON.stringify(
               err
             )}`,

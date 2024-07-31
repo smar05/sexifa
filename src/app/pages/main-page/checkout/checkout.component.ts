@@ -42,6 +42,8 @@ import { TokenService } from 'src/app/services/token.service';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
 import { IButtonComponent } from 'src/app/shared/button/button.component';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -91,7 +93,8 @@ export class CheckoutComponent implements OnInit {
     private businessParamsService: BusinessParamsService,
     private metodosDePagoService: MetodosDePagoService,
     private tokenService: TokenService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -222,7 +225,9 @@ export class CheckoutComponent implements OnInit {
    */
   private async payUProcess(params: QParamsPayU): Promise<void> {
     const timeNow: Date = new Date();
-    let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    let userId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
     let usd_cop: number = null;
 
     try {
@@ -417,8 +422,8 @@ export class CheckoutComponent implements OnInit {
 
           if (order.status == PayPalStatusEnum.COMPLETED) {
             const timeNow: Date = new Date();
-            let userId: string = localStorage.getItem(
-              LocalStorageEnum.LOCAL_ID
+            let userId: string = this.variablesGlobalesService.getCurrentValue(
+              EnumVariablesGlobales.USER_ID
             );
             let dataSubscriptions: Isubscriptions[] = [];
             let usd_cop: number = null;
@@ -629,7 +634,13 @@ export class CheckoutComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.load = true;
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
     let data: IFireStoreRes[] = [];
 
     try {

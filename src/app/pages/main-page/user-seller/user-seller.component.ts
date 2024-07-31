@@ -12,8 +12,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { EnumPages } from 'src/app/enum/enum-pages';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
@@ -31,6 +31,7 @@ import { LocationService } from 'src/app/services/location.service';
 import { SaldosService } from 'src/app/services/saldos.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
 import { UserService } from 'src/app/services/user.service';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
 
 @Component({
   selector: 'app-user-seller',
@@ -198,7 +199,8 @@ export class UserSellerComponent {
     private frontLogsService: FrontLogsService,
     private subscriptionsService: SubscriptionsService,
     private saldosService: SaldosService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -227,7 +229,13 @@ export class UserSellerComponent {
     functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
 
     this.user = await new Promise((resolve) => {
       this.userService
@@ -248,7 +256,9 @@ export class UserSellerComponent {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: user-seller.component.ts:151 ~ UserSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -329,7 +339,9 @@ export class UserSellerComponent {
 
         let data: IFrontLogs = {
           date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          userId: this.variablesGlobalesService.getCurrentValue(
+            EnumVariablesGlobales.USER_ID
+          ),
           log: `file: user-seller.component.ts:226 ~ UserSellerComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
             error
           )}`,
@@ -470,7 +482,9 @@ export class UserSellerComponent {
     this.loading = true;
 
     this.saldoPendiente = undefined;
-    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+    let modelId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.MODEL_ID
+    );
 
     if (!modelId) {
       return undefined;
@@ -601,7 +615,9 @@ export class UserSellerComponent {
     functions.bloquearPantalla(true);
     this.loading = true;
 
-    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+    let modelId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.MODEL_ID
+    );
 
     if (!modelId) {
       functions.bloquearPantalla(false);
@@ -678,7 +694,9 @@ export class UserSellerComponent {
       return;
     }
 
-    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+    let modelId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.MODEL_ID
+    );
 
     if (!modelId) {
       functions.bloquearPantalla(false);

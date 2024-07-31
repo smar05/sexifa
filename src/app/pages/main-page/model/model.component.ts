@@ -27,6 +27,8 @@ import { environment } from 'src/environments/environment';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
 import { IButtonComponent } from 'src/app/shared/button/button.component';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-model',
@@ -62,7 +64,8 @@ export class ModelComponent implements OnInit {
     private userService: UserService,
     private categoriesService: CategoriesService,
     public fontAwesomeIconsService: FontAwesomeIconsService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -71,7 +74,9 @@ export class ModelComponent implements OnInit {
     //Id del modelo
     this.modelId = this.route.snapshot.paramMap.get('url') || '';
 
-    this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    this.userId = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
 
     try {
       await this.getModel();
@@ -184,7 +189,13 @@ export class ModelComponent implements OnInit {
     functions.bloquearPantalla(true);
 
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
 
     let res: IFireStoreRes[] = null;
 
@@ -481,7 +492,9 @@ export class ModelComponent implements OnInit {
       }
 
       // COnsultar las subscripciones activas
-      let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+      let userId: string = this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.USER_ID
+      );
       let qf: QueryFn = (ref) =>
         ref
           .where('modelId', '==', this.model.id)

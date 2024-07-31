@@ -10,6 +10,8 @@ import { UserService } from '../services/user.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from '../interface/ifireStoreRes';
 import { Iuser } from '../interface/iuser';
+import { VariablesGlobalesService } from '../services/variables-globales.service';
+import { EnumVariablesGlobales } from '../enum/enum-variables-globales';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +20,8 @@ export class AuthGuard {
   constructor(
     private http: HttpClient,
     private loginService: LoginService,
-    private userService: UserService
+    private userService: UserService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   canActivate(): Promise<boolean> {
@@ -42,10 +45,12 @@ export class AuthGuard {
         };
         this.http.post(environment.urlGetUser, body).subscribe(
           async (resp: any): Promise<any> => {
-            // Se comprueba que el tipo de cliente pueda acceder solo a sus respectivas paginas
-            let tipoCliente: string = localStorage.getItem(
-              LocalStorageEnum.USER_TYPE
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_ID,
+              resp.users[0].localId || null
             );
+
+            // Se comprueba que el tipo de cliente pueda acceder solo a sus respectivas paginas
             let pathActual: string = window.location.hash;
             let usuarioPuedeAcceder: boolean = true;
 
@@ -53,7 +58,9 @@ export class AuthGuard {
               ref.where(
                 'id',
                 '==',
-                localStorage.getItem(LocalStorageEnum.LOCAL_ID)
+                this.variablesGlobalesService.getCurrentValue(
+                  EnumVariablesGlobales.USER_ID
+                )
               );
 
             let res: IFireStoreRes[] = null;
@@ -68,10 +75,11 @@ export class AuthGuard {
 
             let user: Iuser = { ...res[0].data };
 
-            if (user.type !== tipoCliente) {
-              resolve(false);
-              return;
-            }
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_TYPE,
+              user.type
+            );
+            const tipoCliente: string = user.type;
 
             switch (tipoCliente) {
               case UserTypeEnum.USUARIO:

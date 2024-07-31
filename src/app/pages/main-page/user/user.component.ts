@@ -8,7 +8,6 @@ import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
@@ -30,6 +29,8 @@ import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares
 import { environment } from 'src/environments/environment';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-user',
@@ -216,7 +217,8 @@ export class UserComponent implements OnInit {
     private telegramLocalService: TelegramLocalService,
     private subscriptionsService: SubscriptionsService,
     private frontLogsService: FrontLogsService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -245,7 +247,13 @@ export class UserComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
     this.user = await new Promise((resolve) => {
       this.userService
         .getDataFS(qf)
@@ -265,7 +273,9 @@ export class UserComponent implements OnInit {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: user.component.ts: ~ UserComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -348,7 +358,9 @@ export class UserComponent implements OnInit {
 
         let data: IFrontLogs = {
           date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          userId: this.variablesGlobalesService.getCurrentValue(
+            EnumVariablesGlobales.USER_ID
+          ),
           log: `file: user.component.ts: ~ UserComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
             error
           )}`,
@@ -516,7 +528,9 @@ export class UserComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.loading = true;
 
-    let userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    let userId = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
     let qf: QueryFn = (ref) =>
       ref.where('userId', '==', userId).limitToLast(50).orderBy('date_created');
 

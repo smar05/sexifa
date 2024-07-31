@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
 
 @Component({
   selector: 'app-main-page',
@@ -7,9 +8,9 @@ import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
   styleUrls: ['./main-page.component.css'],
 })
 export class MainPageComponent implements OnInit {
-  constructor() {}
+  constructor(private variablesGlobalesService: VariablesGlobalesService) {}
 
   ngOnInit(): void {
-    localStorage.setItem(LocalStorageEnum.SEARCH_ORDER, 'true');
+    this.variablesGlobalesService.set(EnumVariablesGlobales.SEARCH_ORDER, true);
   }
 }

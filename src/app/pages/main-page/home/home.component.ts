@@ -24,6 +24,8 @@ import { Iorders } from 'src/app/interface/i-orders';
 import { StatusOrdersEnum } from 'src/app/enum/statusOrdersEnum';
 import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { EnumPages } from 'src/app/enum/enum-pages';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-home',
@@ -46,15 +48,17 @@ export class HomeComponent implements OnInit {
     public fontAwesomeIconsService: FontAwesomeIconsService,
     private route: ActivatedRoute,
     private ordersService: OrdersService,
-    private alertsPagesService: AlertsPagesService
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
     this.alertPage();
     let refEpayco: string = null;
-    let searchOrder: boolean =
-      localStorage.getItem(LocalStorageEnum.SEARCH_ORDER) === 'true';
+    let searchOrder: boolean = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.SEARCH_ORDER
+    );
 
     // Parametros de la url
     this.route.queryParams.subscribe((params) => {
@@ -80,7 +84,10 @@ export class HomeComponent implements OnInit {
 
     // Consultar la orden generada en la transaccion epayco
     if (refEpayco || searchOrder) {
-      localStorage.removeItem(LocalStorageEnum.SEARCH_ORDER);
+      this.variablesGlobalesService.set(
+        EnumVariablesGlobales.SEARCH_ORDER,
+        false
+      );
 
       await this.consultarOrden();
     }

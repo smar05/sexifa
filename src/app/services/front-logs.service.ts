@@ -6,8 +6,9 @@ import { Observable } from 'rxjs';
 import { IFrontLogs } from '../interface/i-front-logs';
 import { alerts } from '../helpers/alerts';
 import { SweetAlertIcon } from 'sweetalert2';
-import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { functions } from '../helpers/functions';
+import { VariablesGlobalesService } from './variables-globales.service';
+import { EnumVariablesGlobales } from '../enum/enum-variables-globales';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,10 @@ import { functions } from '../helpers/functions';
 export class FrontLogsService {
   private urlFrontLogs: string = environment.urlCollections.front_logs;
 
-  constructor(private fireStorageService: FireStorageService) {}
+  constructor(
+    private fireStorageService: FireStorageService,
+    private variablesGlobalesService: VariablesGlobalesService
+  ) {}
 
   //------------ FireStorage---------------//
   /**
@@ -100,7 +104,9 @@ export class FrontLogsService {
 
     let data: IFrontLogs = {
       date: new Date(),
-      userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+      userId: this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.USER_ID
+      ),
       log,
     };
 

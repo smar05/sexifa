@@ -9,6 +9,8 @@ import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { UrlPagesEnum } from '../enum/urlPagesEnum';
 import { Router } from '@angular/router';
 import { FrontLogsService } from './front-logs.service';
+import { VariablesGlobalesService } from './variables-globales.service';
+import { EnumVariablesGlobales } from '../enum/enum-variables-globales';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +20,8 @@ export class LoginService {
     private http: HttpClient,
     private afAuth: AngularFireAuth,
     private router: Router,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   /**
@@ -36,7 +39,10 @@ export class LoginService {
         localStorage.setItem(LocalStorageEnum.REFRESH_TOKEN, resp.refreshToken);
 
         //Se captura el localId
-        localStorage.setItem(LocalStorageEnum.LOCAL_ID, resp.localId);
+        this.variablesGlobalesService.set(
+          EnumVariablesGlobales.USER_ID,
+          resp.localId
+        );
       })
     );
   }
