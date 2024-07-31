@@ -6,12 +6,20 @@ import { Injectable } from '@angular/core';
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { UserTypeEnum } from '../enum/userTypeEnum';
 import { LoginService } from '../services/login.service';
+import { UserService } from '../services/user.service';
+import { QueryFn } from '@angular/fire/compat/firestore';
+import { IFireStoreRes } from '../interface/ifireStoreRes';
+import { Iuser } from '../interface/iuser';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard  {
-  constructor(private http: HttpClient, private loginService: LoginService) {}
+export class AuthGuard {
+  constructor(
+    private http: HttpClient,
+    private loginService: LoginService,
+    private userService: UserService
+  ) {}
 
   canActivate(): Promise<boolean> {
     return new Promise((resolve) => {
@@ -30,16 +38,40 @@ export class AuthGuard  {
       if (token) {
         //Validamos que el token sea real
         let body: any = {
-          idToken: localStorage.getItem(LocalStorageEnum.TOKEN),
+          idToken: token,
         };
         this.http.post(environment.urlGetUser, body).subscribe(
-          (resp: any): any => {
+          async (resp: any): Promise<any> => {
             // Se comprueba que el tipo de cliente pueda acceder solo a sus respectivas paginas
             let tipoCliente: string = localStorage.getItem(
               LocalStorageEnum.USER_TYPE
             );
             let pathActual: string = window.location.hash;
             let usuarioPuedeAcceder: boolean = true;
+
+            let qf: QueryFn = (ref) =>
+              ref.where(
+                'id',
+                '==',
+                localStorage.getItem(LocalStorageEnum.LOCAL_ID)
+              );
+
+            let res: IFireStoreRes[] = null;
+            try {
+              res = await this.userService.getDataFS(qf).toPromise();
+            } catch (error) {}
+
+            if (!res || res.length == 0) {
+              resolve(false);
+              return;
+            }
+
+            let user: Iuser = { ...res[0].data };
+
+            if (user.type !== tipoCliente) {
+              resolve(false);
+              return;
+            }
 
             switch (tipoCliente) {
               case UserTypeEnum.USUARIO:
