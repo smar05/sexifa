@@ -270,4 +270,68 @@ export class HomeSellerComponent implements OnInit {
     this.clipboardService.copyFromContent(this.urlModelPage);
     alert('URL copiada al portapapeles!');
   }
+
+  public exportarSubscripciones(): void {
+    if (!(this.subscriptions && this.subscriptions.length > 0)) {
+      alerts.basicAlert(
+        'Alerta',
+        'No hay subscripciones por consultar',
+        'warning'
+      );
+      return;
+    }
+
+    functions.bloquearPantalla(true);
+    this.loading = true;
+    let data: any = this.subscriptions.map((subscripcion: Isubscriptions) => {
+      let r: any = {
+        id: subscripcion.id,
+        userId: subscripcion.userId,
+        status: subscripcion.status,
+        time: subscripcion.time,
+        beginTime: subscripcion.beginTime,
+        endTime: subscripcion.endTime,
+        price: subscripcion.price,
+        commission: `${subscripcion.commission * 100}%`,
+        commissionValue: subscripcion.price * subscripcion.commission,
+        total: subscripcion.price * (1 - subscripcion.commission),
+      };
+
+      return r;
+    });
+
+    let options: any = {
+      title: 'Detalle de las subscripciones',
+      fieldSeparator: ';',
+      quoteString: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      noDownload: false,
+      showTitle: false,
+      useBom: false,
+      headers: [
+        'Id de la subscripción',
+        'Id del usuario',
+        'Estado de la subscripción',
+        'Tiempo de la subscripción (Meses)',
+        'Inicio de la subscripción',
+        'Fin de la subscripción',
+        'Precio (USD)',
+        'Comisión (%)',
+        'Comisión (USD)',
+        'Total (USD)',
+      ],
+    };
+
+    functions.getCsv(
+      data,
+      `subscripciones${new Date().toISOString().split(' ').join('_')}`,
+      options
+    );
+
+    functions.bloquearPantalla(false);
+    this.loading = false;
+
+    alerts.basicAlert('Listo', 'Archivo generado', 'success');
+  }
 }
