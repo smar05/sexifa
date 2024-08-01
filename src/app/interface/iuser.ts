@@ -13,4 +13,12 @@ export interface Iuser {
   type?: string;
   date_created?: string;
   last_login?: string;
+  document_type: string;
+  document_value: string;
+}
+
+export enum EnumUserDocumentType {
+  CC = 'cc', // Documento nacional
+  CE = 'ce', // identificacion extranjera
+  PPN = 'ppn', // Pasaporte
 }

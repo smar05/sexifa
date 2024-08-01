@@ -8,7 +8,6 @@ import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
@@ -28,6 +27,10 @@ import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-user',
@@ -53,7 +56,7 @@ import { environment } from 'src/environments/environment';
 })
 export class UserComponent implements OnInit {
   public showSubscripciones: boolean = false;
-  public urlBotChatId: string = `${environment.urlBotGetId}?start=start`;
+  public urlBotChatId: string = `${environment.urlBot}?start=my_id`;
 
   public dataSource!: MatTableDataSource<Isubscriptions>; //Instancia la data que aparecera en la tabla
   public expandedElement!: Isubscriptions | null;
@@ -80,7 +83,12 @@ export class UserComponent implements OnInit {
     ],
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     celphone: [
       '',
@@ -96,13 +104,44 @@ export class UserComponent implements OnInit {
         Validators.required,
         Validators.max(99999999999999999999),
         Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
+        Validators.pattern(/^\d{10}$/),
       ],
     ],
     bornDate: ['', [Validators.required]],
-    country: ['', [Validators.required]],
-    state: ['', [Validators.required]],
-    city: ['', [Validators.required]],
+    country: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    state: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    city: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS),
+      ],
+    ],
     sex: ['', [Validators.required]],
+    document_type: [
+      '',
+      [Validators.required, Validators.minLength(2), Validators.maxLength(3)],
+    ],
+    document_value: [
+      '',
+      [Validators.required, Validators.minLength(6), Validators.maxLength(10)],
+    ],
   });
 
   //Validaciones personalizadas
@@ -154,6 +193,14 @@ export class UserComponent implements OnInit {
     return this.f.controls.terms;
   }
 
+  get document_type() {
+    return this.f.controls.document_type;
+  }
+
+  get document_value() {
+    return this.f.controls.document_value;
+  }
+
   public formSubmitted: boolean = false;
   public loading: boolean = false;
   private nameUserId: string = '';
@@ -169,35 +216,29 @@ export class UserComponent implements OnInit {
     private locationService: LocationService,
     private telegramLocalService: TelegramLocalService,
     private subscriptionsService: SubscriptionsService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     try {
       await this.getUserData();
       await this.getLocationData();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      functions.bloquearPantalla(false);
-      throw error;
+        )}`
+      );
     }
     functions.bloquearPantalla(false);
   }
@@ -206,7 +247,13 @@ export class UserComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
     this.user = await new Promise((resolve) => {
       this.userService
         .getDataFS(qf)
@@ -226,7 +273,9 @@ export class UserComponent implements OnInit {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: user.component.ts: ~ UserComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -250,12 +299,14 @@ export class UserComponent implements OnInit {
     this.name.setValue(this.user.name);
     this.email.setValue(this.user.email);
     this.celphone.setValue(this.user.celphone);
-    this.bornDate.setValue(this.user.bornDate);
+    this.bornDate.setValue(new Date(this.user.bornDate).toDateString());
     this.sex.setValue(this.user.sex);
     this.country.setValue(this.user.country);
     this.state.setValue(this.user.state);
     this.city.setValue(this.user.city);
     this.chatId.setValue(this.user.chatId);
+    this.document_type.setValue(this.user.document_type || '');
+    this.document_value.setValue(this.user.document_value);
 
     functions.bloquearPantalla(false);
     this.loading = false;
@@ -284,6 +335,8 @@ export class UserComponent implements OnInit {
       city: this.city.value,
       chatId: this.chatId.value,
       type: this.user.type,
+      document_type: this.user.document_type,
+      document_value: this.user.document_value,
     };
 
     this.userService.patchDataFS(this.nameUserId, data).then(
@@ -305,7 +358,9 @@ export class UserComponent implements OnInit {
 
         let data: IFrontLogs = {
           date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          userId: this.variablesGlobalesService.getCurrentValue(
+            EnumVariablesGlobales.USER_ID
+          ),
           log: `file: user.component.ts: ~ UserComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
             error
           )}`,
@@ -368,31 +423,20 @@ export class UserComponent implements OnInit {
       this.allCountrys = [];
       this.allStates = [];
       this.allCities = [];
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
+
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
   }
 
@@ -400,6 +444,8 @@ export class UserComponent implements OnInit {
     try {
       this.state.setValue(null);
       this.city.setValue(null);
+      this.allStates = null;
+      this.allCities = null;
       this.allStates = JSON.parse(
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
@@ -408,34 +454,25 @@ export class UserComponent implements OnInit {
       this.allStates = [];
       this.state.setValue(null);
       this.city.setValue(null);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
   public async stateChange(): Promise<void> {
     try {
       this.city.setValue(null);
+      this.allCities = null;
       this.allCities = JSON.parse(
         await this.locationService.getAllCitiesByCountryAndState(
           this.country.value,
@@ -446,32 +483,22 @@ export class UserComponent implements OnInit {
       console.error('Error: ', error);
       this.allCities = [];
       this.city.setValue(null);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
-  public async probarConexionBot(): Promise<void> {
+  public async probarConexionBot(event: Event): Promise<void> {
+    event.preventDefault();
     functions.bloquearPantalla(true);
 
     try {
@@ -501,7 +528,9 @@ export class UserComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.loading = true;
 
-    let userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    let userId = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
     let qf: QueryFn = (ref) =>
       ref.where('userId', '==', userId).limitToLast(50).orderBy('date_created');
 
@@ -509,29 +538,17 @@ export class UserComponent implements OnInit {
     try {
       res = await this.subscriptionsService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de subscripciones',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user.component.ts: ~ UserComponent ~ misSubscripciones ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de subscripciones',
+          icon: 'error',
+        },
+        `file: user.component.ts: ~ UserComponent ~ misSubscripciones ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
     let position: number = 1;
 
@@ -576,5 +593,12 @@ export class UserComponent implements OnInit {
       `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
       'info'
     );
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.USER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

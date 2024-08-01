@@ -1,7 +1,7 @@
 export enum UrlPagesEnum {
   HOME = '',
   USER = 'user',
-  GROUP = 'grupo',
+  GROUP = 'group',
   CHECKOUT = 'checkout',
   LOGIN = 'login',
   REGISTER = 'register',

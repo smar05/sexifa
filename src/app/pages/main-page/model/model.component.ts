@@ -16,7 +16,6 @@ import { alerts } from 'src/app/helpers/alerts';
 import { ViewsModelService } from 'src/app/services/views-model.service';
 import { IviewsModel } from 'src/app/interface/i-views-model';
 import { functions } from 'src/app/helpers/functions';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { UserService } from 'src/app/services/user.service';
@@ -25,6 +24,11 @@ import { CategoriesService } from 'src/app/services/categories.service';
 import { Icategories } from 'src/app/interface/icategories';
 import { FontAwesomeIconsService } from 'src/app/shared/font-awesome-icons/font-awesome-icons.service';
 import { environment } from 'src/environments/environment';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import { IButtonComponent } from 'src/app/shared/button/button.component';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-model',
@@ -40,9 +44,14 @@ export class ModelComponent implements OnInit {
   public price!: IpriceModel | undefined;
   public load: boolean = false;
   private userId: string = '';
-  private user: Iuser = {};
+  private user: Iuser = {} as any;
   public precios: Array<number> = [];
   public category: Icategories = null;
+  private watermark: string = '';
+  public cartButton: IButtonComponent = {
+    class: 'btn',
+    text: '<i class="fas fa-shopping-cart"></i>',
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -54,72 +63,59 @@ export class ModelComponent implements OnInit {
     private telegramService: TelegramLocalService,
     private userService: UserService,
     private categoriesService: CategoriesService,
-    public fontAwesomeIconsService: FontAwesomeIconsService
+    public fontAwesomeIconsService: FontAwesomeIconsService,
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     //Id del modelo
     this.modelId = this.route.snapshot.paramMap.get('url') || '';
 
-    this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    this.userId = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
 
     try {
       await this.getModel();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de modelo',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de modelo',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
+
+    this.watermark = `${environment.urlFirebase.split('://')[1]}/${
+      UrlPagesEnum.GROUP
+    }/${this.model.url}`;
 
     await this.getCategory(this.model.categorie);
 
     try {
       await this.getUser();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuario',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuario',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (!this.model || Object.keys(this.model).length === 0) return;
@@ -131,59 +127,36 @@ export class ModelComponent implements OnInit {
     try {
       await this.calcularPrecios();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de precios',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de precios',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     // Guardamos la visita del usuario a la pagina
     try {
       await this.setViewsModelData();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error al guardar la visita',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error al guardar la visita',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      functions.bloquearPantalla(false);
-      throw error;
+        )}`
+      );
     }
     functions.bloquearPantalla(false);
   }
@@ -193,29 +166,18 @@ export class ModelComponent implements OnInit {
     try {
       data = await this.categoriesService.getItemFS(id).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuario',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ getCategory ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuario',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ getCategory ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (!data) return null;
@@ -227,36 +189,31 @@ export class ModelComponent implements OnInit {
     functions.bloquearPantalla(true);
 
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
 
     let res: IFireStoreRes[] = null;
 
     try {
       res = await this.userService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuario',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ getUser ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuario',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ getUser ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     // Si no se encuentra un usuario
@@ -292,29 +249,18 @@ export class ModelComponent implements OnInit {
 
       res1 = await this.modelsService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de modelos',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de modelos',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     let res2: IFireStoreRes = null;
@@ -327,29 +273,18 @@ export class ModelComponent implements OnInit {
           .getItemFS(this.modelId || '', qf)
           .toPromise();
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la consulta de modelos',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la consulta de modelos',
+            icon: 'error',
+          },
+          `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
     }
 
@@ -396,29 +331,18 @@ export class ModelComponent implements OnInit {
     try {
       this.model = await this.modelsService.modelInterfaceToDTO(res);
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la conversion de modelo a DTO',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la conversion de modelo a DTO',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ getModel ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
     this.imgPrincipal = this.model.mainImage || '';
 
@@ -432,29 +356,18 @@ export class ModelComponent implements OnInit {
         `${this.model.id}/gallery`
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la obtencion de la galeria',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ getGaleria ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la obtencion de la galeria',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ getGaleria ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -510,8 +423,8 @@ export class ModelComponent implements OnInit {
     this.load = true;
 
     let prices: IpriceModel[] = this.model.price;
-    let params: object = {
-      prices: JSON.stringify(prices),
+    let params: { [key: string]: string | string[] } = {
+      prices: prices.map((price: IpriceModel) => JSON.stringify(price)),
       fechaActual: new Date().toISOString(),
     };
 
@@ -522,32 +435,19 @@ export class ModelComponent implements OnInit {
         await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
       ).preciosCalculados;
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de precios',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ calcularPrecios ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de precios',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ calcularPrecios ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
+        )}`
+      );
       this.load = false;
-      throw error;
     }
 
     functions.bloquearPantalla(false);
@@ -570,29 +470,18 @@ export class ModelComponent implements OnInit {
 
         res = await this.telegramService.esMiembroDelGrupo(params).toPromise();
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la consulta de pertenencia al grupo',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la consulta de pertenencia al grupo',
+            icon: 'error',
+          },
+          `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
 
       if (!res || res.perteneceAlGrupo) {
@@ -603,7 +492,9 @@ export class ModelComponent implements OnInit {
       }
 
       // COnsultar las subscripciones activas
-      let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+      let userId: string = this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.USER_ID
+      );
       let qf: QueryFn = (ref) =>
         ref
           .where('modelId', '==', this.model.id)
@@ -617,29 +508,18 @@ export class ModelComponent implements OnInit {
           .getDataFS(qf)
           .toPromise();
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la consulta de subscripciones',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la consulta de subscripciones',
+            icon: 'error',
+          },
+          `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
 
       if (subscritionsActivas && subscritionsActivas.length > 0) {
@@ -700,28 +580,19 @@ export class ModelComponent implements OnInit {
 
       this.router.navigateByUrl(`/${UrlPagesEnum.CHECKOUT}`);
     } catch (error) {
-      console.error('Error: ', error);
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ clickParticipar ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
+        )}`
+      );
       this.load = false;
-
-      throw error;
     }
   }
 
@@ -737,29 +608,18 @@ export class ModelComponent implements OnInit {
 
       res = await this.telegramService.botEsAdminDelGrupo(params).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de pertenencia al grupo del bot',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: model.component.ts: ~ ModelComponent ~ botEsAdminDelGrupo ~ JSON.stringify(error): ${JSON.stringify(
+      this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de pertenencia al grupo del bot',
+          icon: 'error',
+        },
+        `file: model.component.ts: ~ ModelComponent ~ botEsAdminDelGrupo ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (!res?.perteneceAlGrupo) {
@@ -800,29 +660,18 @@ export class ModelComponent implements OnInit {
       try {
         await this.viewsModelService.postDataFS(viewData);
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error al guardar la visita',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: model.component.ts: ~ ModelComponent ~ setViewsModelData ~ JSON.stringify(error): ${JSON.stringify(
+        this.router.navigate([`/${UrlPagesEnum.HOME}`]);
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error al guardar la visita',
+            icon: 'error',
+          },
+          `file: model.component.ts: ~ ModelComponent ~ setViewsModelData ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
     }
   }
@@ -847,5 +696,12 @@ export class ModelComponent implements OnInit {
       default:
         return null;
     }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.MODEL)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

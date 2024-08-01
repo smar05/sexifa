@@ -5,6 +5,7 @@ import { HomeSellerComponent } from './home-seller.component';
 import { HomeSellerRoutingModule } from './home-seller-routing.module';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { ClipboardModule } from 'ngx-clipboard';
 
 @NgModule({
   declarations: [HomeSellerComponent],
@@ -14,6 +15,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     SharedModule,
     MatTableModule,
     MatPaginatorModule,
+    ClipboardModule,
   ],
 })
 export class HomeSellerModule {}

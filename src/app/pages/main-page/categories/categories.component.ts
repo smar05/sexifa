@@ -4,8 +4,11 @@ import { Icategories } from './../../../interface/icategories';
 import { Component, OnInit } from '@angular/core';
 import { alerts } from 'src/app/helpers/alerts';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-categories',
@@ -17,16 +20,19 @@ export class CategoriesComponent implements OnInit {
 
   constructor(
     private categoriesService: CategoriesService, //public fontAwesomeIconsService: FontAwesomeIconsService
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   ngOnInit(): void {
+    this.alertPage();
     this.getAllCategories();
   }
 
   public getAllCategories(): void {
     this.categoriesService
-      .getData()
+      .getDataFS()
       .toPromise()
       .then(
         (res: Icategories[]) => {
@@ -42,7 +48,9 @@ export class CategoriesComponent implements OnInit {
 
           let data: IFrontLogs = {
             date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            userId: this.variablesGlobalesService.getCurrentValue(
+              EnumVariablesGlobales.USER_ID
+            ),
             log: `file: categories.component.ts: ~ CategoriesComponent ~ getAllCategories ~ JSON.stringify(error): ${JSON.stringify(
               error
             )}`,
@@ -58,5 +66,12 @@ export class CategoriesComponent implements OnInit {
           throw error;
         }
       );
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.CATEGORIES)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

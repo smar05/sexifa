@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 import { LoginService } from 'src/app/services/login.service';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
 
 @Component({
   selector: 'app-side-bar',
@@ -10,10 +11,17 @@ import { LoginService } from 'src/app/services/login.service';
 export class SideBarComponent implements OnInit {
   public userType: string = '';
 
-  constructor(private loginService: LoginService) {}
+  constructor(
+    private loginService: LoginService,
+    private variablesGlobalesService: VariablesGlobalesService
+  ) {}
 
   ngOnInit(): void {
-    this.userType = localStorage.getItem(LocalStorageEnum.USER_TYPE) || '';
+    this.variablesGlobalesService
+      .getVariable(EnumVariablesGlobales.USER_TYPE)
+      .subscribe((res: string) => {
+        this.userType = res || '';
+      });
   }
 
   //Funcion de salida del sistema

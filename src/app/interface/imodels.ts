@@ -14,6 +14,7 @@ export interface Imodels {
   url: string;
   redes: IModelsRedes;
   id_epayco: string;
+  commission: number;
 }
 
 export interface IModelsRedes {

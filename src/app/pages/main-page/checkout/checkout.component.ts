@@ -30,7 +30,6 @@ import { StatusOrdersEnum } from 'src/app/enum/statusOrdersEnum';
 import { CurrencyConverterService } from 'src/app/services/currency-converter.service';
 import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { CurrencyEnum } from 'src/app/enum/currencyEnum';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { BusinessParamsService } from 'src/app/services/business-params.service';
 import { MetodosDePagoService } from 'src/app/services/metodos-de-pago.service';
@@ -40,6 +39,11 @@ import {
 } from 'src/app/interface/i-metodos-de-pago';
 import { EnumEndpointsBack } from 'src/app/enum/enum-endpoints-back';
 import { TokenService } from 'src/app/services/token.service';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import { IButtonComponent } from 'src/app/shared/button/button.component';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -58,7 +62,7 @@ type QParamsPayU = {
   styleUrls: ['./checkout.component.css'],
 })
 export class CheckoutComponent implements OnInit {
-  public user: Iuser = {};
+  public user: Iuser = {} as any;
   public cartLocal: IInfoModelSubscription[] = []; // Carrito de localstorage en local
   public cart: ICart[] = []; // Objeto que se muestra en pantalla
   public total: number = 0;
@@ -66,7 +70,12 @@ export class CheckoutComponent implements OnInit {
   public load: boolean = false;
   public models: Imodels[] = [];
   public metodosDePago: IMetodosDePago[] = null;
-  private ePayco: any = ePayco;
+  public epaycoProperties: IButtonComponent = {
+    style: 'padding: 0; background: none; border: none; cursor: pointer;',
+    class: 'epayco-button-render btn btn-block',
+    text: '<img src="https://multimedia.epayco.co/dashboard/btns/btn2.png" alt="" />',
+    id: 'epayco-btn',
+  };
 
   @ViewChild('paypal', { static: true })
   paypalElement!: ElementRef;
@@ -83,94 +92,62 @@ export class CheckoutComponent implements OnInit {
     private frontLogsService: FrontLogsService,
     private businessParamsService: BusinessParamsService,
     private metodosDePagoService: MetodosDePagoService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
 
+    this.alertPage();
+
     try {
       await this.getUserData();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta del carrito',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta del carrito',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     try {
       await this.getCartData();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta del carrito',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta del carrito',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     try {
       await this.ifPayU();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error con el metodo PayU',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error con el metodo PayU',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     await this.getMetodosDePago();
@@ -199,29 +176,17 @@ export class CheckoutComponent implements OnInit {
       try {
         await this.payUProcess(params);
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error con el proceso de PayU',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: checkout.component.ts: ~ CheckoutComponent ~ ifPayU ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error con el proceso de PayU',
+            icon: 'error',
+          },
+          `file: checkout.component.ts: ~ CheckoutComponent ~ ifPayU ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
     }
   }
@@ -234,29 +199,17 @@ export class CheckoutComponent implements OnInit {
         .getItemFS('commission')
         .toPromise();
     } catch (err) {
-      console.error('Error: ', err);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error enviando el correo de verificacion',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ getComission ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        err,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error enviando el correo de verificacion',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ getComission ~ JSON.stringify(error): ${JSON.stringify(
           err
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw err;
+        )}`
+      );
     }
 
     return data.data.value;
@@ -272,7 +225,9 @@ export class CheckoutComponent implements OnInit {
    */
   private async payUProcess(params: QParamsPayU): Promise<void> {
     const timeNow: Date = new Date();
-    let userId: string = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    let userId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
     let usd_cop: number = null;
 
     try {
@@ -284,29 +239,17 @@ export class CheckoutComponent implements OnInit {
         ).rates.COP.rate
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la conversion de la moneda',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la conversion de la moneda',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     let dataSubscriptions: Isubscriptions[] = [];
@@ -351,29 +294,17 @@ export class CheckoutComponent implements OnInit {
           try {
             res = await this.subscriptionsService.postDataFS(data);
           } catch (error) {
-            console.error('Error: ', error);
-            alerts.basicAlert(
-              'Error',
-              'Ha ocurrido un error en la consulta de subscripciones',
-              'error'
-            );
-
-            let data: IFrontLogs = {
-              date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-              log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+            this.frontLogsService.catchProcessError(
+              error,
+              {
+                title: 'Error',
+                text: 'Ha ocurrido un error en la consulta de subscripciones',
+                icon: 'error',
+              },
+              `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
                 error
-              )}`,
-            };
-
-            this.frontLogsService
-              .postDataFS(data)
-              .then((res) => {})
-              .catch((err) => {
-                alerts.basicAlert('Error', 'Error', 'error');
-                throw err;
-              });
-            throw error;
+              )}`
+            );
           }
 
           idsSubscriptions.push(res.id);
@@ -399,29 +330,17 @@ export class CheckoutComponent implements OnInit {
         try {
           orderId = (await this.ordersService.postDataFS(dataOrder)).id;
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error al guardar la orden',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error al guardar la orden',
+              icon: 'error',
+            },
+            `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
 
         localStorage.removeItem(LocalStorageEnum.CART);
@@ -432,29 +351,17 @@ export class CheckoutComponent implements OnInit {
             .getLinksOrden({ orderId })
             .toPromise();
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error en la obtencion de los links de los grupos',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error en la obtencion de los links de los grupos',
+              icon: 'error',
+            },
+            `file: checkout.component.ts: ~ CheckoutComponent ~ payUProcess ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
 
         alerts.basicAlert(
@@ -500,35 +407,23 @@ export class CheckoutComponent implements OnInit {
           try {
             order = await actions.order.capture();
           } catch (error) {
-            console.error('Error: ', error);
-            alerts.basicAlert(
-              'Error',
-              'Ha ocurrido un error en la captura de la orden',
-              'error'
-            );
-
-            let data: IFrontLogs = {
-              date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-              log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+            this.frontLogsService.catchProcessError(
+              error,
+              {
+                title: 'Error',
+                text: 'Ha ocurrido un error en la captura de la orden',
+                icon: 'error',
+              },
+              `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
                 error
-              )}`,
-            };
-
-            this.frontLogsService
-              .postDataFS(data)
-              .then((res) => {})
-              .catch((err) => {
-                alerts.basicAlert('Error', 'Error', 'error');
-                throw err;
-              });
-            throw error;
+              )}`
+            );
           }
 
           if (order.status == PayPalStatusEnum.COMPLETED) {
             const timeNow: Date = new Date();
-            let userId: string = localStorage.getItem(
-              LocalStorageEnum.LOCAL_ID
+            let userId: string = this.variablesGlobalesService.getCurrentValue(
+              EnumVariablesGlobales.USER_ID
             );
             let dataSubscriptions: Isubscriptions[] = [];
             let usd_cop: number = null;
@@ -542,29 +437,17 @@ export class CheckoutComponent implements OnInit {
                 ).rates.COP.rate
               );
             } catch (error) {
-              console.error('Error: ', error);
-              alerts.basicAlert(
-                'Error',
-                'Ha ocurrido un error en la conversion de la divisa',
-                'error'
-              );
-
-              let data: IFrontLogs = {
-                date: new Date(),
-                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+              this.frontLogsService.catchProcessError(
+                error,
+                {
+                  title: 'Error',
+                  text: 'Ha ocurrido un error en la conversion de la divisa',
+                  icon: 'error',
+                },
+                `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
                   error
-                )}`,
-              };
-
-              this.frontLogsService
-                .postDataFS(data)
-                .then((res) => {})
-                .catch((err) => {
-                  alerts.basicAlert('Error', 'Error', 'error');
-                  throw err;
-                });
-              throw error;
+                )}`
+              );
             }
 
             let commission: number = await this.getCommision();
@@ -601,29 +484,17 @@ export class CheckoutComponent implements OnInit {
               try {
                 res = await this.subscriptionsService.postDataFS(data);
               } catch (error) {
-                console.error('Error: ', error);
-                alerts.basicAlert(
-                  'Error',
-                  'Ha ocurrido un error guardando la subscripcion',
-                  'error'
-                );
-
-                let data: IFrontLogs = {
-                  date: new Date(),
-                  userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                  log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+                this.frontLogsService.catchProcessError(
+                  error,
+                  {
+                    title: 'Error',
+                    text: 'Ha ocurrido un error guardando la subscripcion',
+                    icon: 'error',
+                  },
+                  `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
                     error
-                  )}`,
-                };
-
-                this.frontLogsService
-                  .postDataFS(data)
-                  .then((res) => {})
-                  .catch((err) => {
-                    alerts.basicAlert('Error', 'Error', 'error');
-                    throw err;
-                  });
-                throw error;
+                  )}`
+                );
               }
 
               idsSubscriptions.push(res.id);
@@ -649,29 +520,17 @@ export class CheckoutComponent implements OnInit {
             try {
               orderId = (await this.ordersService.postDataFS(dataOrder)).id;
             } catch (error) {
-              console.error('Error: ', error);
-              alerts.basicAlert(
-                'Error',
-                'Ha ocurrido un errorguardando la orden',
-                'error'
-              );
-
-              let data: IFrontLogs = {
-                date: new Date(),
-                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+              this.frontLogsService.catchProcessError(
+                error,
+                {
+                  title: 'Error',
+                  text: 'Ha ocurrido un errorguardando la orden',
+                  icon: 'error',
+                },
+                `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
                   error
-                )}`,
-              };
-
-              this.frontLogsService
-                .postDataFS(data)
-                .then((res) => {})
-                .catch((err) => {
-                  alerts.basicAlert('Error', 'Error', 'error');
-                  throw err;
-                });
-              throw error;
+                )}`
+              );
             }
 
             localStorage.removeItem(LocalStorageEnum.CART);
@@ -684,29 +543,17 @@ export class CheckoutComponent implements OnInit {
                 .getLinksOrden({ orderId })
                 .toPromise();
             } catch (error) {
-              console.error('Error: ', error);
-              alerts.basicAlert(
-                'Error',
-                'Ha ocurrido un error obteniendo los links de los grupos',
-                'error'
-              );
-
-              let data: IFrontLogs = {
-                date: new Date(),
-                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+              this.frontLogsService.catchProcessError(
+                error,
+                {
+                  title: 'Error',
+                  text: 'Ha ocurrido un error obteniendo los links de los grupos',
+                  icon: 'error',
+                },
+                `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
                   error
-                )}`,
-              };
-
-              this.frontLogsService
-                .postDataFS(data)
-                .then((res) => {})
-                .catch((err) => {
-                  alerts.basicAlert('Error', 'Error', 'error');
-                  throw err;
-                });
-              throw error;
+                )}`
+              );
             }
 
             alerts.basicAlert(
@@ -768,29 +615,17 @@ export class CheckoutComponent implements OnInit {
 
         await this.modelsService.patchDataFS(dataModelId, dataModelUpdate);
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error actualizando el modelo',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error actualizando el modelo',
+            icon: 'error',
+          },
+          `file: checkout.component.ts: ~ CheckoutComponent ~ onApprove ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
     }
   }
@@ -799,37 +634,30 @@ export class CheckoutComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.load = true;
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
     let data: IFireStoreRes[] = [];
 
     try {
       data = await this.userService.getDataFS(qf).toPromise();
     } catch (err) {
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuarios',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ getUserData ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        err,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuarios',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ getUserData ~ JSON.stringify(error): ${JSON.stringify(
           err
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
+        )}`
+      );
       this.load = false;
-      throw err;
     }
 
     this.user = data[0].data;
@@ -842,7 +670,12 @@ export class CheckoutComponent implements OnInit {
     this.load = true;
 
     let aux: string = localStorage.getItem(LocalStorageEnum.CART);
-    if (!aux || !JSON.parse(aux) || JSON.parse(aux).length === 0) return;
+    if (!aux || !JSON.parse(aux) || JSON.parse(aux).length === 0) {
+      this.cart = [];
+      functions.bloquearPantalla(false);
+      this.load = false;
+      return;
+    }
 
     this.cartLocal = JSON.parse(
       localStorage.getItem(LocalStorageEnum.CART) || ''
@@ -881,29 +714,19 @@ export class CheckoutComponent implements OnInit {
                   resolve(model);
                 },
                 (err) => {
-                  console.error(err);
-                  alerts.basicAlert(
-                    'Error',
-                    'Ha ocurrido un error en la obtencion de la modelo',
-                    'error'
+                  this.frontLogsService.catchProcessError(
+                    err,
+                    {
+                      title: 'Error',
+                      text: 'Ha ocurrido un error en la obtencion de la modelo',
+                      icon: 'error',
+                    },
+                    `file: checkout.component.ts: ~ CheckoutComponent ~ getCartData ~ JSON.stringify(error): ${JSON.stringify(
+                      err
+                    )}`
                   );
 
-                  let data: IFrontLogs = {
-                    date: new Date(),
-                    userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                    log: `file: checkout.component.ts: ~ CheckoutComponent ~ getCartData ~ JSON.stringify(error): ${JSON.stringify(
-                      err
-                    )}`,
-                  };
-
-                  this.frontLogsService
-                    .postDataFS(data)
-                    .then((res) => {})
-                    .catch((err) => {
-                      alerts.basicAlert('Error', 'Error', 'error');
-                      throw err;
-                    });
-
+                  this.load = false;
                   resolve(null);
                   throw err;
                 }
@@ -975,27 +798,19 @@ export class CheckoutComponent implements OnInit {
         functions.bloquearPantalla(false);
         this.load = false;
       } catch (error) {
-        console.error('Error: ', error);
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: checkout.component.ts: ~ CheckoutComponent ~ this.cartLocal.forEach ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error',
+            icon: 'error',
+          },
+          `file: checkout.component.ts: ~ CheckoutComponent ~ this.cartLocal.forEach ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
+          )}`
+        );
 
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-
-        functions.bloquearPantalla(false);
         this.load = false;
-        throw error;
       }
     });
 
@@ -1015,28 +830,18 @@ export class CheckoutComponent implements OnInit {
         await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
       ).preciosCalculados;
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de precios',
-        'error'
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de precios',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ calcularPrecio ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ calcularPrecio ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
       return undefined;
     }
 
@@ -1130,29 +935,17 @@ export class CheckoutComponent implements OnInit {
     try {
       res = await this.metodosDePagoService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta del carrito',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: checkout.component.ts: ~ CheckoutComponent ~ getMetodosDePago ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta del carrito',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ getMetodosDePago ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (!res) return null;
@@ -1174,7 +967,13 @@ export class CheckoutComponent implements OnInit {
     return !(this.cart.length > 0 && this.total && this.user.chatId);
   }
 
-  public payEpayco(): void {
+  public async payEpayco(): Promise<void> {
+    try {
+      await this.probarConexionBot();
+    } catch (error) {
+      throw error;
+    }
+
     this.tokenService.actualizarToken(
       localStorage.getItem(LocalStorageEnum.REFRESH_TOKEN)
     );
@@ -1208,7 +1007,9 @@ export class CheckoutComponent implements OnInit {
           total: c.price.toString(),
           iva: '',
           base_iva: '',
-          fee: '20', // 20% comision
+          fee: c.model.commission
+            ? (c.model.commission * 100).toString()
+            : '20', // 20% comision
         };
       }),
       external: 'false',
@@ -1232,11 +1033,18 @@ export class CheckoutComponent implements OnInit {
       //Atributos cliente
       name_billing: this.user.name,
       address_billing: '',
-      type_doc_billing: '', //cc
+      type_doc_billing: this.user.document_type,
       mobilephone_billing: this.user.celphone.toString(),
-      number_doc_billing: '',
+      number_doc_billing: this.user.document_value,
     };
 
     handler.open(dataEpayco);
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.CHECKOUT)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

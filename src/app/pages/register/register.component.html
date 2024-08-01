@@ -1,4 +1,4 @@
-<div class="hold-transition login-page">
+<div class="hold-transition login-page" style="height: 100%">
   <div class="register-box">
     <div class="card">
       <div class="card-body">
@@ -6,15 +6,25 @@
 
         <form (ngSubmit)="onSubmit(f)" [formGroup]="f" autocomplete="on">
           <!--Tipo de usuario-->
-          <div class="input-group mb-3">
+          <div class="form-group mb-3">
+            <label for="type">Tipo de cuenta</label>
+            <div>
+              <i
+                class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
+                style="border-radius: 50%; background-color: azure"
+                (click)="this.infoClik('type')"
+                >Información</i
+              >
+            </div>
             <select
+              id="type"
               type="text"
               class="form-control"
               placeholder="Tipo de cuenta"
               formControlName="type"
               required
               [ngClass]="{
-                'is-invalid': invalidField('type')
+                'is-invalid': this.type.invalid
               }"
             >
               <option value="" disabled>Tipo de cuenta</option>
@@ -43,11 +53,7 @@
               required
               maxlength="50"
               [ngClass]="{
-                'is-invalid':
-                  invalidField('name') ||
-                  (f.controls.name.invalid &&
-                    f.controls.name.errors?.maxlength) ||
-                  (f.controls.name.invalid && f.controls.name.errors?.pattern)
+                'is-invalid': this.name.invalid
               }"
             />
             <div class="input-group-append">
@@ -74,6 +80,76 @@
               El nombre no puede tener mas de 50 caracteres
             </span>
           </div>
+          <!--Tipo de documento-->
+          <div class="form-group mb-3">
+            <label for="document_type">Tipo de documento</label>
+            <select
+              id="document_type"
+              type="text"
+              class="form-control"
+              placeholder="Tipo de documento"
+              formControlName="document_type"
+              required
+              minlength="2"
+              maxlength="3"
+              [ngClass]="{
+                'is-invalid': this.document_type.invalid
+              }"
+            >
+              <option value="" disabled selected>Tipo de documento</option>
+              <option
+                value="{{ documentType.value }}"
+                *ngFor="let documentType of this.documentsType"
+              >
+                {{ documentType.label }}
+              </option>
+            </select>
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('document_type') &&
+                f.controls.document_type.errors?.required
+              "
+            >
+              Por favor ingrese su tipo de documento
+            </span>
+          </div>
+          <!--Numero de documento-->
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="No. de documento"
+              formControlName="document_value"
+              required
+              minlength="6"
+              maxlength="10"
+              [ngClass]="{
+                'is-invalid': this.document_value.invalid
+              }"
+            />
+            <span
+              class="invalid-feedback"
+              *ngIf="
+                invalidField('document_value') &&
+                f.controls.document_value.errors?.required
+              "
+            >
+              Por favor ingrese su numero de documento
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.document_value.errors?.minlength"
+            >
+              El numero de documento no puede tener menos de 6 digitos
+            </span>
+            <span
+              class="invalid-feedback"
+              *ngIf="f.controls.document_value.errors?.maxlength"
+            >
+              El numero de documento no puede tener mas de 10 digitos
+            </span>
+          </div>
           <!--Correo-->
           <div class="input-group mb-3">
             <input
@@ -83,10 +159,7 @@
               formControlName="email"
               required
               [ngClass]="{
-                'is-invalid':
-                  invalidField('email') &&
-                  f.controls.email.invalid &&
-                  f.controls.email.errors?.email
+                'is-invalid': this.email.invalid
               }"
             />
             <div class="input-group-append">
@@ -116,12 +189,7 @@
               formControlName="celphone"
               required
               [ngClass]="{
-                'is-invalid':
-                  invalidField('celphone') ||
-                  (f.controls.celphone.invalid &&
-                    f.controls.celphone.errors?.max) ||
-                  (f.controls.celphone.invalid &&
-                    f.controls.celphone.errors?.pattern)
+                'is-invalid': this.celphone.invalid
               }"
             />
             <div class="input-group-append">
@@ -151,63 +219,71 @@
             </span>
           </div>
 
-          <!--chatId-->
-          <div class="">
-            <i
-              class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
-              style="border-radius: 50%; background-color: azure"
-              (click)="this.infoClik()"
-            ></i>
-            <a [href]="this.urlBotChatId" target="_blank">Consultar id</a>
-          </div>
-          <div class="input-group mb-3" *ngIf="this.type.value == 'usuario'">
-            <input
-              type="number"
-              class="form-control"
-              placeholder="No. Id de Telegram"
-              formControlName="chatId"
-              [ngClass]="{
-                'is-invalid':
-                  invalidField('chatId') ||
-                  (f.controls.chatId.invalid &&
-                    f.controls.chatId.errors?.max) ||
-                  (f.controls.chatId.invalid &&
-                    f.controls.chatId.errors?.pattern)
-              }"
-            />
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <i class="fa-brands fa-telegram"></i>
-              </div>
-            </div>
-            <span
-              class="invalid-feedback"
-              *ngIf="
-                invalidField('chatId') && f.controls.chatId.errors?.required
-              "
-            >
-              Por favor ingrese su numero de id en Telegram
-            </span>
-            <span
-              class="invalid-feedback"
-              *ngIf="f.controls.chatId.errors?.pattern"
-            >
-              Se encontraron caracteres invalidos
-            </span>
-            <span
-              class="invalid-feedback"
-              *ngIf="f.controls.chatId.errors?.max"
-            >
-              El numero de id de telegram no puede tener mas de 20 digitos
-            </span>
+          <ng-container *ngIf="this.type.value == 'usuario'">
+            <!--chatId-->
 
-            <a
-              (click)="probarConexionBot()"
-              class="btn btn-primary btn-block bg-principal mb-2 mt-1"
-            >
-              Probar conexion con el bot
-            </a>
-          </div>
+            <div>
+              <i
+                class="fas fa-info m-1 pl-2 pr-2 pt-1 pb-1"
+                style="border-radius: 50%; background-color: azure"
+                (click)="this.infoClik('chatId')"
+              ></i>
+              <a
+                [href]="this.urlBotChatId"
+                target="_blank"
+                *ngIf="this.type.value == 'usuario'"
+                >Consultar id</a
+              >
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="number"
+                class="form-control"
+                placeholder="No. Id de Telegram"
+                formControlName="chatId"
+                max="9999999999"
+                [ngClass]="{
+                  'is-invalid': this.chatId.invalid
+                }"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <i class="fa-brands fa-telegram"></i>
+                </div>
+              </div>
+              <span
+                class="invalid-feedback"
+                *ngIf="
+                  invalidField('chatId') && f.controls.chatId.errors?.required
+                "
+              >
+                Por favor ingrese su numero de id en Telegram
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="f.controls.chatId.errors?.pattern"
+              >
+                Se encontraron caracteres invalidos. El id debe ser de 10
+                digitos
+              </span>
+              <span
+                class="invalid-feedback"
+                *ngIf="f.controls.chatId.errors?.max"
+              >
+                El numero de id de telegram no puede tener mas de 10 digitos
+              </span>
+
+              <button
+                (click)="probarConexionBot($event)"
+                type="button"
+                class="btn btn-primary btn-block bg-principal mb-2 mt-1"
+                [disabled]="this.chatId.invalid || this.chatId.value == ''"
+                *ngIf="!(this.chatId.invalid || this.chatId.value == '')"
+              >
+                Probar conexion con el bot
+              </button>
+            </div>
+          </ng-container>
 
           <!--Fecha de nacimiento-->
           <div class="form-group mb-3">
@@ -221,7 +297,7 @@
               formControlName="bornDate"
               required
               [ngClass]="{
-                'is-invalid': invalidField('bornDate') || !mayor18Anios()
+                'is-invalid': this.bornDate.invalid || !mayor18Anios()
               }"
               [max]="this.fechaMinimaEdad"
             />
@@ -238,8 +314,10 @@
             </span>
           </div>
           <!--Pais-->
-          <div class="input-group mb-3">
+          <div class="form-group mb-3">
+            <label for="country">Pais</label>
             <select
+              id="country"
               type="text"
               class="form-control"
               placeholder="Pais"
@@ -247,7 +325,7 @@
               required
               (change)="this.countryChange()"
               [ngClass]="{
-                'is-invalid': invalidField('country')
+                'is-invalid': this.country.invalid
               }"
             >
               <option value="" disabled selected>Pais</option>
@@ -270,9 +348,10 @@
           </div>
           <!--Estado-->
           <div
-            class="input-group mb-3"
+            class="form-group mb-3"
             *ngIf="this.country.value && this.allStatesByCountry"
           >
+            <label for="state">Estado</label>
             <select
               type="text"
               class="form-control"
@@ -281,7 +360,7 @@
               required
               (change)="this.stateChange()"
               [ngClass]="{
-                'is-invalid': invalidField('state')
+                'is-invalid': this.state.invalid
               }"
             >
               <option value="" disabled selected>Estado</option>
@@ -302,7 +381,7 @@
           </div>
           <!--Ciudad-->
           <div
-            class="input-group mb-3"
+            class="form-group mb-3"
             *ngIf="
               this.country.value &&
               this.allStatesByCountry &&
@@ -310,14 +389,16 @@
               this.allCities
             "
           >
+            <label for="city">Ciudad</label>
             <select
+              id="city"
               type="text"
               class="form-control"
               placeholder="Ciudad"
               formControlName="city"
               required
               [ngClass]="{
-                'is-invalid': invalidField('city')
+                'is-invalid': this.city.invalid
               }"
             >
               <option value="" disabled selected>Ciudad</option>
@@ -334,15 +415,17 @@
             </span>
           </div>
           <!--Genero-->
-          <div class="input-group mb-3">
+          <div class="form-group mb-3">
+            <label for="sex">Genero</label>
             <select
+              id="sex"
               type="text"
               class="form-control"
               placeholder="Genero"
               formControlName="sex"
               required
               [ngClass]="{
-                'is-invalid': invalidField('sex')
+                'is-invalid': this.sex.invalid
               }"
             >
               <option value="" disabled selected>Genero</option>
@@ -463,7 +546,10 @@
               <button
                 type="submit"
                 class="btn btn-block bg-secundario"
-                [disabled]="f.invalid"
+                [disabled]="
+                  f.invalid ||
+                  (this.type.value == 'usuario' && this.chatId.value == '')
+                "
               >
                 Registrar
               </button>

@@ -107,6 +107,44 @@
 
             <br />
 
+            <!--Tipo de subscripcion-->
+            <div
+              class="color-section"
+              *ngIf="
+                this.timeSubscriptionInput &&
+                this.timeSubscriptionInput.length > 0
+              "
+            >
+              <div class="left">
+                <p class="label">
+                  Seleccione el tiempo de subscripción en meses
+                </p>
+                <div class="sizes">
+                  <div
+                    class="select"
+                    *ngFor="let price of this.model.price; let i = index"
+                  >
+                    <input
+                      type="radio"
+                      id="{{ 'price_' + i }}"
+                      name="{{ 'price_' + i }}"
+                      (click)="this.subscriptionModelInputChange(i)"
+                      [checked]="this.timeSubscriptionInput[i].checked"
+                    />
+                    <label for="{{ 'price_' + i }}">{{ price.time }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="add-to-catr-btn mb-2"
+              *ngIf="this.price && this.precios && this.precios.length > 0"
+            >
+              <app-button
+                [properties]="this.cartButton"
+                (click)="this.clickParticipar()"
+              />
+            </div>
             <!--Redes-->
             <div
               class="row"
@@ -227,50 +265,11 @@
                 </a>
               </div>
             </div>
-
-            <!--Tipo de subscripcion-->
-            <div
-              class="color-section"
-              *ngIf="
-                this.timeSubscriptionInput &&
-                this.timeSubscriptionInput.length > 0
-              "
-            >
-              <div class="left">
-                <p class="label">
-                  Seleccione el tiempo de subscripción en meses
-                </p>
-                <div class="sizes">
-                  <div
-                    class="select"
-                    *ngFor="let price of this.model.price; let i = index"
-                  >
-                    <input
-                      type="radio"
-                      id="{{ 'price_' + i }}"
-                      name="{{ 'price_' + i }}"
-                      (click)="this.subscriptionModelInputChange(i)"
-                      [checked]="this.timeSubscriptionInput[i].checked"
-                    />
-                    <label for="{{ 'price_' + i }}">{{ price.time }}</label>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div class="description">
               <div class="tab">
                 <p class="font-weight-bold">Descripción</p>
               </div>
               <p class="text" [innerHTML]="this.model.description"></p>
-            </div>
-
-            <div
-              class="add-to-catr-btn"
-              *ngIf="this.price && this.precios && this.precios.length > 0"
-            >
-              <button class="btn" (click)="this.clickParticipar()">
-                <i class="fas fa-shopping-cart"></i>
-              </button>
             </div>
           </div>
         </div>

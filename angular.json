@@ -1,8 +1,8 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "node-v": "16.16.0",
-  "angular-v": "15.2.9",
+  "node-v": "20.0.0",
+  "angular-v": "16.2.14",
   "newProjectRoot": "projects",
   "projects": {
     "sexifa": {
@@ -27,6 +27,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
+              "src/manifest.webmanifest",
               "src/manifest.webmanifest"
             ],
             "styles": [
@@ -37,7 +38,9 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/summernote/dist/summernote-lite.min.js"
-            ]
+            ],
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
             "production": {
@@ -97,7 +100,11 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
               "@angular/material/prebuilt-themes/pink-bluegrey.css",
               "src/styles.css"
@@ -108,7 +115,6 @@
       }
     }
   },
-  "defaultProject": "sexifa",
   "cli": {
     "analytics": false
   }

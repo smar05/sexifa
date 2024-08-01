@@ -2,17 +2,20 @@ import { environment } from './../../environments/environment';
 import { ModelsDTO } from './../dto/models-dto';
 import { StorageService } from './storage.service';
 import { Imodels } from './../interface/imodels';
-import { Observable } from 'rxjs';
+import { from, Observable, of, switchMap, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { ImgModelEnum } from '../enum/imgModelEnum';
 import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
-import { alerts } from '../helpers/alerts';
-import { IFrontLogs } from '../interface/i-front-logs';
 import { FrontLogsService } from './front-logs.service';
-import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { HttpClient } from '@angular/common/http';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
+import { functions } from '../helpers/functions';
+import { UrlPagesEnum } from '../enum/urlPagesEnum';
+import { IFireStoreRes } from '../interface/ifireStoreRes';
+import { CacheService } from './cache.service';
+import { StorageReference } from '@angular/fire/storage';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +29,9 @@ export class ModelsService {
     private storageService: StorageService,
     private fireStorageService: FireStorageService,
     private frontLogsService: FrontLogsService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cacheService: CacheService,
+    private encryptionService: EncryptionService
   ) {}
 
   //------------ FireStorage---------------//
@@ -34,13 +39,24 @@ export class ModelsService {
    * Se toma la informacion de la coleccion de modelos en Firebase
    *
    * @param {QueryFn} [qf=null]
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Observable<IFireStoreRes[]>}
    * @memberof ModelsService
    */
-  public getDataFS(qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getData(this.urlModels, qf)
-      .pipe(this.fireStorageService.mapForPipe('many'));
+  public getDataFS(qf: QueryFn = null): Observable<IFireStoreRes[]> {
+    let cacheData: IFireStoreRes[] =
+      (this.cacheService.getCacheData(this.urlModels, qf) as IFireStoreRes[]) ||
+      null;
+
+    if (cacheData) {
+      return of(cacheData);
+    }
+
+    return this.fireStorageService.getData(this.urlModels, qf).pipe(
+      this.fireStorageService.mapForPipe('many'),
+      tap((data: IFireStoreRes[]) =>
+        this.cacheService.saveCacheData(this.urlModels, qf, data)
+      )
+    );
   }
 
   /**
@@ -48,13 +64,24 @@ export class ModelsService {
    *
    * @param {string} doc
    * @param {QueryFn} [qf=null]
-   * @return {*}  {Observable<any>}
+   * @return {*}  {Observable<IFireStoreRes>}
    * @memberof ModelsService
    */
-  public getItemFS(doc: string, qf: QueryFn = null): Observable<any> {
-    return this.fireStorageService
-      .getItem(this.urlModels, doc, qf)
-      .pipe(this.fireStorageService.mapForPipe('one'));
+  public getItemFS(doc: string, qf: QueryFn = null): Observable<IFireStoreRes> {
+    let key: string = `${this.urlModels}/${doc}`;
+    let cacheData: IFireStoreRes =
+      (this.cacheService.getCacheData(key, qf) as IFireStoreRes) || null;
+
+    if (cacheData) {
+      return of(cacheData);
+    }
+
+    return this.fireStorageService.getItem(this.urlModels, doc, qf).pipe(
+      this.fireStorageService.mapForPipe('one'),
+      tap((data: IFireStoreRes) =>
+        this.cacheService.saveCacheData(key, qf, data)
+      )
+    );
   }
 
   /**
@@ -127,41 +154,52 @@ export class ModelsService {
    * @return {*}  {Promise<string>}
    * @memberof ModelsService
    */
-  public async getImage(url: string): Promise<string> {
-    let image: any = null;
+  public async getImage(url: string, modelUrl: string): Promise<string> {
+    let image: StorageReference = null;
+    const key: string = `${this.urlImage}/${url}`;
+    const urlImg: string =
+      (this.cacheService.getCacheImg(key) as string) || null;
+
+    if (urlImg) {
+      return new Promise((resolve) => {
+        resolve(urlImg);
+      });
+    }
 
     try {
-      image = (
-        await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
-      ).items[0];
+      image = (await this.storageService.getStorageListAll(key)).items[0];
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la obtencion de la imagen',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: models.service.ts: ~ ModelsService ~ getImage ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la obtencion de la imagen',
+          icon: 'error',
+        },
+        `file: models.service.ts: ~ ModelsService ~ getImage ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (image) {
-      return this.storageService.getDownloadURL(image);
+      return from(this.storageService.getDownloadURL(image))
+        .pipe(
+          switchMap(async (urlImg: string) => {
+            let texto: string = `${environment.urlFirebase.split('://')[1]}/${
+              UrlPagesEnum.GROUP
+            }/${modelUrl}`;
+
+            let base64: string = await functions.addWatermark(urlImg, texto, {
+              color: '#87796c',
+              opacity: 1,
+            });
+            this.cacheService.saveCacheImg(key, base64);
+
+            return base64;
+          })
+        )
+        .toPromise();
     }
 
     return '';
@@ -182,29 +220,17 @@ export class ModelsService {
         await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
       ).items;
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la obtencion de imagenes',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: models.service.ts: ~ ModelsService ~ getImages ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la obtencion de imagenes',
+          icon: 'error',
+        },
+        `file: models.service.ts: ~ ModelsService ~ getImages ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (images) {
@@ -214,28 +240,17 @@ export class ModelsService {
         try {
           url = await this.storageService.getDownloadURL(image);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error en la obtencion de la imagen',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: models.service.ts: ~ ModelsService ~ getImages ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error en la obtencion de la imagen',
+              icon: 'error',
+            },
+            `file: models.service.ts: ~ ModelsService ~ getImages ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
+            )}`
+          );
         }
         imagesUrl.push();
         throw console.error();
@@ -263,29 +278,17 @@ export class ModelsService {
           await this.storageService.getStorageListAll(`${this.urlImage}/${url}`)
         ).items;
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la obtencion de las imagenes',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la obtencion de las imagenes',
+            icon: 'error',
+          },
+          `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw error;
+          )}`
+        );
       }
 
       if (images && images.length > 0) {
@@ -294,29 +297,17 @@ export class ModelsService {
             try {
               await this.storageService.deleteImage(image._location.path);
             } catch (error) {
-              console.error('Error: ', error);
-              alerts.basicAlert(
-                'Error',
-                'Ha ocurrido un error eliminando la imagen',
-                'error'
-              );
-
-              let data: IFrontLogs = {
-                date: new Date(),
-                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                log: `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
+              this.frontLogsService.catchProcessError(
+                error,
+                {
+                  title: 'Error',
+                  text: 'Ha ocurrido un error eliminando la imagen',
+                  icon: 'error',
+                },
+                `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
                   error
-                )}`,
-              };
-
-              this.frontLogsService
-                .postDataFS(data)
-                .then((res) => {})
-                .catch((err) => {
-                  alerts.basicAlert('Error', 'Error', 'error');
-                  throw err;
-                });
-              throw error;
+                )}`
+              );
             }
           } else {
             continue;
@@ -324,25 +315,19 @@ export class ModelsService {
         }
       }
     } catch (error) {
-      console.error('Error: ', error);
       complete = false;
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error',
+          icon: 'error',
+        },
+        `file: models.service.ts: ~ ModelsService ~ deleteImages ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     return complete;
@@ -363,29 +348,17 @@ export class ModelsService {
     try {
       guardarImagen = await this.storageService.saveImage(file, url);
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error guardando la imagen',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: models.service.ts: ~ ModelsService ~ saveImage ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error guardando la imagen',
+          icon: 'error',
+        },
+        `file: models.service.ts: ~ ModelsService ~ saveImage ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     return guardarImagen;
@@ -420,32 +393,21 @@ export class ModelsService {
 
         try {
           urlImage = await this.getImage(
-            `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+            `${imodel.id}/${ImgModelEnum.GALLERY}/${galleryItem}`,
+            imodel.url
           );
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error obteniendo la galeria',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: models.service.ts: ~ ModelsService ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error obteniendo la galeria',
+              icon: 'error',
+            },
+            `file: models.service.ts: ~ ModelsService ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
 
         modelDTO.gallery?.push(urlImage);
@@ -453,33 +415,24 @@ export class ModelsService {
 
     //Imagen principal
     try {
-      modelDTO.mainImage = await this.getImage(
-        `${imodel.id}/${ImgModelEnum.MAIN}`
+      let imageUrl: string = await this.getImage(
+        `${imodel.id}/${ImgModelEnum.MAIN}`,
+        imodel.url
       );
+
+      modelDTO.mainImage = imageUrl;
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error obteniendo la imagen principal',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: models.service.ts: ~ ModelsService ~ modelInterfaceToDTO ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error obteniendo la imagen principal',
+          icon: 'error',
+        },
+        `file: models.service.ts: ~ ModelsService ~ modelInterfaceToDTO ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     return modelDTO;
@@ -493,9 +446,21 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public calcularPrecioSubscripcion(params: any): Observable<any> {
+    console.log(
+      '🚀 ~ ModelsService ~ calcularPrecioSubscripcion ~ params:',
+      params
+    );
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
+    console.log(
+      '🚀 ~ ModelsService ~ calcularPrecioSubscripcion ~ paramsEncrypted:',
+      paramsEncrypted
+    );
+
     return this.http.get(
       `${this.urlModelsApi}/${EnumEndpointsBack.MODELS.OBTENER_PRECIOS}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 }

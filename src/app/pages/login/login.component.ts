@@ -12,12 +12,15 @@ import { Iuser } from 'src/app/interface/iuser';
 import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
 import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
 import { QueryFn } from '@angular/fire/compat/firestore';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { Imodels } from 'src/app/interface/imodels';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +32,12 @@ export class LoginComponent implements OnInit {
   public f: any = this.form.group({
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     password: [
       '',
@@ -51,11 +59,14 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private frontLogsService: FrontLogsService,
-    private modelsService: ModelsService
+    private modelsService: ModelsService,
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   ngOnInit(): void {
     functions.bloquearPantalla(true);
+    this.alertPage();
     let auxRedirectTo: string = localStorage.getItem(
       LocalStorageEnum.REDIRECT_TO
     );
@@ -111,17 +122,15 @@ export class LoginComponent implements OnInit {
         );
 
         //Se captura el localId
-        localStorage.setItem(
-          LocalStorageEnum.LOCAL_ID,
-          res.user.multiFactor.user.uid
+        const localId: string = res.user.multiFactor.user.uid;
+        this.variablesGlobalesService.set(
+          EnumVariablesGlobales.USER_ID,
+          localId
         );
 
-        let qf: QueryFn = (ref) =>
-          ref
-            .where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID))
-            .limit(1);
+        let qf: QueryFn = (ref) => ref.where('id', '==', localId).limit(1);
 
-        let user: Iuser = {};
+        let user: Iuser = {} as any;
         let userIdDoc: string = null;
 
         try {
@@ -131,31 +140,24 @@ export class LoginComponent implements OnInit {
           user = { ...data[0].data };
           userIdDoc = data[0].id;
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error en la consulta de usuarios',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error en la consulta de usuarios',
+              icon: 'error',
+            },
+            `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-
-          throw error;
+            )}`
+          );
+          this.loading = false;
         }
+
+        this.variablesGlobalesService.set(
+          EnumVariablesGlobales.USER_TYPE,
+          user.type
+        );
 
         // Verificar el estado del usuario
         switch (user.status) {
@@ -179,9 +181,9 @@ export class LoginComponent implements OnInit {
 
         switch (user.type) {
           case UserTypeEnum.USUARIO:
-            localStorage.setItem(
-              LocalStorageEnum.USER_TYPE,
-              UserTypeEnum.USUARIO
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_TYPE,
+              user.type
             );
             let pathRedirectTo: string = localStorage.getItem(
               LocalStorageEnum.REDIRECT_TO
@@ -196,50 +198,30 @@ export class LoginComponent implements OnInit {
             break;
 
           case UserTypeEnum.CREADOR:
-            localStorage.setItem(
-              LocalStorageEnum.USER_TYPE,
-              UserTypeEnum.CREADOR
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_TYPE,
+              user.type
             );
 
             let model: Imodels = null;
             let data: IFireStoreRes[] = null;
             try {
-              let qf: QueryFn = (ref) =>
-                ref.where(
-                  'idUser',
-                  '==',
-                  localStorage.getItem(LocalStorageEnum.LOCAL_ID)
-                );
+              let qf: QueryFn = (ref) => ref.where('idUser', '==', localId);
               data = await this.modelsService.getDataFS(qf).toPromise();
             } catch (error) {
-              console.error('Error: ', error);
-              alerts.basicAlert(
-                'Error',
-                'Ha ocurrido un error en la consulta de usuarios',
-                'error'
+              this.frontLogsService.catchProcessError(
+                error,
+                {
+                  title: 'Error',
+                  text: 'Ha ocurrido un error en la consulta de usuarios',
+                  icon: 'error',
+                },
+                `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+                  error
+                )}`
               );
 
-              let data: IFrontLogs = {
-                date: new Date(),
-                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
-                  error
-                )}`,
-              };
-
-              this.frontLogsService
-                .postDataFS(data)
-                .then((res) => {})
-                .catch((err) => {
-                  alerts.basicAlert('Error', 'Error', 'error');
-                  functions.bloquearPantalla(false);
-                  this.loading = false;
-                  throw err;
-                });
-
-              functions.bloquearPantalla(false);
               this.loading = false;
-              throw error;
             }
 
             if (!data) throw 'Error';
@@ -248,7 +230,10 @@ export class LoginComponent implements OnInit {
             model.id = data[0].id;
 
             if (model && model.id) {
-              localStorage.setItem(LocalStorageEnum.MODEL_ID, model.id);
+              this.variablesGlobalesService.set(
+                EnumVariablesGlobales.MODEL_ID,
+                model.id
+              );
             }
 
             url = `/${UrlPagesEnum.HOME_SELLER}`;
@@ -265,34 +250,19 @@ export class LoginComponent implements OnInit {
           let data: Iuser = user;
           await this.userService.patchDataFS(userIdDoc, data);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error guardando al usuario',
-            'error'
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error guardando al usuario',
+              icon: 'error',
+            },
+            `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
+              error
+            )}`
           );
 
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: login.component.ts: ~ LoginComponent ~ JSON.stringify(error): ${JSON.stringify(
-              error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              functions.bloquearPantalla(false);
-              this.loading = false;
-              throw err;
-            });
-
-          functions.bloquearPantalla(false);
           this.loading = false;
-          throw error;
         }
 
         this.router.navigateByUrl(url);
@@ -326,28 +296,19 @@ export class LoginComponent implements OnInit {
             alerts.basicAlert('Error', 'Error en el inicio de sesión', 'error');
             break;
         }
-
-        let a;
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: login.component.ts: ~ LoginComponent ~ login ~ JSON.stringify(error): ${JSON.stringify(
-            error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-
-        functions.bloquearPantalla(false);
         this.loading = false;
-        throw error;
+
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en el login',
+            icon: 'error',
+          },
+          `file: login.component.ts: ~ LoginComponent ~ login ~ JSON.stringify(error): ${JSON.stringify(
+            error
+          )}`
+        );
       });
   }
 
@@ -365,5 +326,12 @@ export class LoginComponent implements OnInit {
    */
   public invalidField(field: string): boolean {
     return functions.invalidField(field, this.f, this.formSubmitted);
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.LOGIN)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

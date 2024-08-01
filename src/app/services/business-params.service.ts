@@ -4,6 +4,11 @@ import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 
+export enum EnumBusinessParamsKeys {
+  PUBLIC_KEY = 'public_key',
+  COMMISSION = 'commission',
+}
+
 @Injectable({
   providedIn: 'root',
 })

@@ -10,16 +10,23 @@ import { QueryFn } from '@angular/fire/compat/firestore';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
+import { ClipboardService } from 'ngx-clipboard';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
+import { UrlPagesEnum } from 'src/app/enum/urlPagesEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
 import { Isubscriptions } from 'src/app/interface/i- subscriptions';
 import { IFrontLogs } from 'src/app/interface/i-front-logs';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { Imodels } from 'src/app/interface/imodels';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { ModelsService } from 'src/app/services/models.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { IButtonComponent } from 'src/app/shared/button/button.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home-seller',
@@ -45,7 +52,7 @@ import { SubscriptionsService } from 'src/app/services/subscriptions.service';
 })
 export class HomeSellerComponent implements OnInit {
   private userId: string = '';
-  private model: Imodels;
+  public model: Imodels;
   public subscriptions: Isubscriptions[] = [];
   public loading: boolean = false;
 
@@ -57,6 +64,11 @@ export class HomeSellerComponent implements OnInit {
     'statusUser',
     'actions',
   ]; //Variable para nombrar las columnas de la tabla
+  public eyeButton: IButtonComponent = {
+    class: 'btn btn-sm btn-warning mr-1',
+    text: '<i class="fas fa-eye"></i>',
+  };
+  public urlModelPage: string = '';
 
   //Paginador
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -66,7 +78,10 @@ export class HomeSellerComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
-    this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID);
+    this.alertPage();
+    this.userId = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.USER_ID
+    );
     try {
       await this.getMiGroup();
       await this.getSubscriptions();
@@ -76,7 +91,9 @@ export class HomeSellerComponent implements OnInit {
 
       let data: IFrontLogs = {
         date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        userId: this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        ),
         log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
         )}`,
@@ -97,7 +114,10 @@ export class HomeSellerComponent implements OnInit {
   constructor(
     private subscriptionsService: SubscriptionsService,
     private modelsService: ModelsService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService,
+    private clipboardService: ClipboardService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   public async getMiGroup(): Promise<void> {
@@ -119,7 +139,9 @@ export class HomeSellerComponent implements OnInit {
 
       let data: IFrontLogs = {
         date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        userId: this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        ),
         log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ getMiGroup ~ JSON.stringify(error): ${JSON.stringify(
           error
         )}`,
@@ -137,6 +159,8 @@ export class HomeSellerComponent implements OnInit {
 
     this.model = res[0].data;
     this.model.id = res[0].id;
+
+    this.urlModelPage = `${environment.urlProd}#/${UrlPagesEnum.GROUP}/${this.model.url}`;
 
     functions.bloquearPantalla(false);
     this.loading = false;
@@ -165,7 +189,9 @@ export class HomeSellerComponent implements OnInit {
 
       let data: IFrontLogs = {
         date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+        userId: this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        ),
         log: `file: home-seller.component.ts: ~ HomeSellerComponent ~ getSubscriptions ~ JSON.stringify(error): ${JSON.stringify(
           error
         )}`,
@@ -229,5 +255,19 @@ export class HomeSellerComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.HOME_SELLER)
+      .toPromise()
+      .then((res: any) => {});
+  }
+
+  public copyToClipboardUrlModel(): void {
+    if (!this.urlModelPage) return;
+
+    this.clipboardService.copyFromContent(this.urlModelPage);
+    alert('URL copiada al portapapeles!');
   }
 }

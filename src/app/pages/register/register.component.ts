@@ -5,21 +5,22 @@ import { alerts } from 'src/app/helpers/alerts';
 import { RegisterService } from './../../services/register.service';
 import { functions } from 'src/app/helpers/functions';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Iregister } from 'src/app/interface/iregister';
 import { Router } from '@angular/router';
-import { Iuser } from 'src/app/interface/iuser';
+import { EnumUserDocumentType, Iuser } from 'src/app/interface/iuser';
 import { ICountries } from 'src/app/interface/icountries';
 import { IState } from 'src/app/interface/istate';
 import { ICities } from 'src/app/interface/icities';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
 import { UserStatusEnum } from 'src/app/enum/userStatusEnum';
 import { UserTypeEnum } from 'src/app/enum/userTypeEnum';
-import { IFrontLogs } from 'src/app/interface/i-front-logs';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
+import { SweetAlertIcon } from 'sweetalert2';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
 
 @Component({
   selector: 'app-register',
@@ -30,7 +31,8 @@ export class RegisterComponent implements OnInit {
   public allCountries: ICountries[] = [];
   public allStatesByCountry: IState[] = [];
   public allCities: ICities[] = [];
-  public urlBotChatId: string = `${environment.urlBotGetId}?start=start`;
+  public urlBotChatId: string = `${environment.urlBot}?start=my_id`;
+  public documentsType: { value: string; label: string }[] = [];
 
   //Grupo de controles
   public f: any = this.form.group({
@@ -39,12 +41,18 @@ export class RegisterComponent implements OnInit {
       [
         Validators.required,
         Validators.maxLength(50),
+        Validators.minLength(5),
         Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
       ],
     ],
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     celphone: [
       '',
@@ -57,14 +65,37 @@ export class RegisterComponent implements OnInit {
     chatId: [
       '',
       [
-        Validators.max(99999999999999999999),
+        Validators.max(9999999999),
         Validators.pattern(EnumExpresioncesRegulares.NUMEROS),
+        Validators.pattern(/^\d{10}$/),
       ],
     ],
     bornDate: ['', [Validators.required]],
-    country: ['', [Validators.required]],
-    state: ['', [Validators.required]],
-    city: ['', [Validators.required]],
+    country: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    state: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    city: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.NUMEROS_ENTEROS_POSITIVOS),
+      ],
+    ],
     sex: ['', [Validators.required]],
     password: [
       '',
@@ -78,6 +109,24 @@ export class RegisterComponent implements OnInit {
     repeatPassword: ['', [Validators.required]],
     terms: ['', [Validators.required]],
     type: ['', [Validators.required]],
+    document_type: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(3),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+      ],
+    ],
+    document_value: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(6),
+        Validators.maxLength(10),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+      ],
+    ],
   });
 
   //Validaciones personalizadas
@@ -133,6 +182,14 @@ export class RegisterComponent implements OnInit {
     return this.f.controls.type;
   }
 
+  get document_type() {
+    return this.f.controls.document_type;
+  }
+
+  get document_value() {
+    return this.f.controls.document_value;
+  }
+
   public formSubmitted: boolean = false;
   public loading: boolean = false;
   public fechaMinimaEdad: string = null;
@@ -144,12 +201,15 @@ export class RegisterComponent implements OnInit {
     private userService: UserService,
     private locationService: LocationService,
     private telegramLocalService: TelegramLocalService,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private alertsPagesService: AlertsPagesService
   ) {}
 
   ngOnInit(): void {
     functions.bloquearPantalla(true);
+    this.alertPage();
     localStorage.clear();
+    this.documentsType = this.getUserDocumentTypes();
     // Fecha minima para escoger la edad
     let fechaActual: Date = new Date();
     this.fechaMinimaEdad = new Date(
@@ -170,7 +230,10 @@ export class RegisterComponent implements OnInit {
     this.formSubmitted = true; //Formulario enviado
 
     //Formulario correcto
-    if (!this.formValid()) {
+    if (
+      !this.formValid() ||
+      (this.type.value == 'usuario' && this.chatId.value == '')
+    ) {
       alerts.basicAlert('Error', 'Formulario invalido', 'error');
       return;
     }
@@ -198,29 +261,17 @@ export class RegisterComponent implements OnInit {
           );
         })
         .catch((err: any) => {
-          console.error('Error: ', err);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error enviando el correo de verificacion',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            err,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error enviando el correo de verificacion',
+              icon: 'error',
+            },
+            `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
               err
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw err;
+            )}`
+          );
         });
 
       const user: Iuser = {
@@ -240,6 +291,8 @@ export class RegisterComponent implements OnInit {
         chatId: this.chatId.value,
         type: this.type.value,
         date_created: new Date().toISOString(),
+        document_type: this.document_type.value,
+        document_value: this.document_value.value,
       };
 
       await this.userService.postDataFS(user);
@@ -272,27 +325,19 @@ export class RegisterComponent implements OnInit {
           break;
       }
 
-      alerts.basicAlert('Error', errorText, 'error');
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Error',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
+        )}`
+      );
 
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
   }
 
@@ -331,30 +376,17 @@ export class RegisterComponent implements OnInit {
         await this.locationService.getAllContries()
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
-      this.allCountries = [];
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ getCountries ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ getCountries ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -362,42 +394,34 @@ export class RegisterComponent implements OnInit {
     try {
       this.state.setValue(null);
       this.city.setValue(null);
+      this.allStatesByCountry = null;
+      this.allCities = null;
       this.allStatesByCountry = JSON.parse(
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allStatesByCountry = [];
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
   public async stateChange(): Promise<void> {
     try {
       this.city.setValue(null);
+      this.allCities = null;
       this.allCities = JSON.parse(
         await this.locationService.getAllCitiesByCountryAndState(
           this.country.value,
@@ -405,43 +429,37 @@ export class RegisterComponent implements OnInit {
         )
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
       this.state.setValue(null);
       this.city.setValue(null);
       this.allCities = [];
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: register.component.ts: ~ RegisterComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: register.component.ts: ~ RegisterComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
-  public probarConexionBot(): void {
-    if (this.chatId.value) {
-      this.telegramLocalService.probarConexionBot(
+  public async probarConexionBot(event: Event): Promise<void> {
+    functions.bloquearPantalla(true);
+    event.preventDefault();
+    if (this.chatId.value && !this.chatId.invalid) {
+      await this.telegramLocalService.probarConexionBot(
         this.chatId.value,
         UrlPagesEnum.REGISTER
       );
+
+      functions.bloquearPantalla(false);
     } else {
       alerts.basicAlert('Error', 'Ingrese un Id valido de Telegram', 'error');
+      functions.bloquearPantalla(false);
     }
   }
 
@@ -449,11 +467,56 @@ export class RegisterComponent implements OnInit {
     return Object.values(UserTypeEnum);
   }
 
-  public infoClik(): void {
-    alerts.basicAlert(
-      'Consultar ID',
-      `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
-      'info'
-    );
+  public infoClik(input: string): void {
+    let alertData: { titulo: string; texto: string; icon: SweetAlertIcon };
+
+    switch (input) {
+      case 'type':
+        alertData = {
+          titulo: 'Tipo de cuenta',
+          texto: `Ingrese 'Creador' si es creador de contenido, si no ingrese 'Usuario' si desea hacer parte del grupo de un creador de contenido`,
+          icon: 'info',
+        };
+        break;
+
+      case 'chatId':
+        alertData = {
+          titulo: 'Consultar ID',
+          texto: `Ingrese al chat con el bot y escriba el comando '/start' para obtener el id de su chat`,
+          icon: 'info',
+        };
+        break;
+
+      default:
+        break;
+    }
+
+    alerts.basicAlert(alertData.titulo, alertData.texto, alertData.icon);
+  }
+
+  private getUserDocumentTypes(): { value: string; label: string }[] {
+    let pairKeyDocumentType: { value: string; label: string }[] = [];
+
+    pairKeyDocumentType.push({
+      value: EnumUserDocumentType.CC,
+      label: 'Documento Nacional',
+    });
+    pairKeyDocumentType.push({
+      value: EnumUserDocumentType.CE,
+      label: 'Identificación Extrangera',
+    });
+    pairKeyDocumentType.push({
+      value: EnumUserDocumentType.PPN,
+      label: 'Pasaporte',
+    });
+
+    return pairKeyDocumentType;
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.REGISTER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Icategories } from 'src/app/interface/icategories';
 import {
   ActiveModelEnum,
-  IModelsRedes,
   Imodels,
   ModelsAccountEnum,
 } from 'src/app/interface/imodels';
@@ -10,7 +9,6 @@ import {
   AbstractControl,
   UntypedFormArray,
   UntypedFormBuilder,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -36,6 +34,14 @@ import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
 import { environment } from 'src/environments/environment';
 import { TelegramLocalService } from 'src/app/services/telegram-local.service';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import {
+  BusinessParamsService,
+  EnumBusinessParamsKeys,
+} from 'src/app/services/business-params.service';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 
 @Component({
   selector: 'app-page-seller',
@@ -74,9 +80,25 @@ export class PageSellerComponent {
     ],
     category: ['', [Validators.required]],
     image: ['', []], //No se guarda en base de datos
-    description: ['', [Validators.required, Validators.maxLength(2048)]],
+    description: [
+      '',
+      [
+        Validators.required,
+        Validators.maxLength(2048),
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+      ],
+    ],
     price: new UntypedFormArray([]),
-    groupId: ['', [Validators.required, Validators.maxLength(20)]],
+    groupId: [
+      '-100',
+      [
+        Validators.required,
+        Validators.maxLength(20),
+        Validators.minLength(8),
+        Validators.pattern(EnumExpresioncesRegulares.GROUP_TELEGRAM_ID),
+      ],
+      ,
+    ],
     account: [false],
     redes: this.form.group({
       facebook: [
@@ -243,42 +265,39 @@ export class PageSellerComponent {
     private route: Router,
     private frontLogsService: FrontLogsService,
     private modelsService: ModelsService,
-    private telegramService: TelegramLocalService
+    private telegramService: TelegramLocalService,
+    private alertsPagesService: AlertsPagesService,
+    private bussinesService: BusinessParamsService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
 
     // Fecha minima de las ofertas
     this.fechaMinima = new Date().toISOString().split('T')[0];
 
-    this.userId = localStorage.getItem(LocalStorageEnum.LOCAL_ID) || '';
+    this.userId =
+      this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.USER_ID
+      ) || '';
     await this.getCategories();
     try {
       await this.getUserModel();
       await this.getData();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error',
+          icon: 'error',
+        },
+        `file: page-seller.component.ts: ~ PageSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
-      throw error;
+        )}`
+      );
     }
     functions.bloquearPantalla(false);
   }
@@ -349,28 +368,18 @@ export class PageSellerComponent {
             resolve(null);
           }
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ isRepeatUrl ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ isRepeatUrl ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-
-          functions.bloquearPantalla(false);
+            )}`
+          );
           this.loadData = false;
-          throw error;
         }
       });
     };
@@ -409,7 +418,9 @@ export class PageSellerComponent {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -460,7 +471,9 @@ export class PageSellerComponent {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -524,6 +537,7 @@ export class PageSellerComponent {
                 [
                   Validators.required,
                   Validators.min(5),
+                  Validators.max(10000),
                   Validators.pattern(
                     EnumExpresioncesRegulares.NUMEROS_REALES_POSITIVOS
                   ),
@@ -545,36 +559,46 @@ export class PageSellerComponent {
           );
         });
 
+      try {
+        this.modelEnDb.commission =
+          this.modelEnDb.commission ??
+          (
+            await this.bussinesService
+              .getItemFS(EnumBusinessParamsKeys.COMMISSION)
+              .toPromise()
+          ).data.value;
+      } catch (err) {
+        this.frontLogsService.catchProcessError(
+          err,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error',
+            icon: 'error',
+          },
+          `file: page-seller.component.ts: ~ PageSellerComponent ~ getData ~ JSON.stringify(error): ${JSON.stringify(
+            err
+          )}`
+        );
+      }
+
       //Obtener imagenes del producto
       try {
         this.imgTemp = await this.modelService.getImage(
-          `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`
+          `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`,
+          this.modelEnDb.url
         );
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la obtencion de la imagen principal',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: page-seller.component.ts: ~ PageSellerComponent ~ getData ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la obtencion de la imagen principal',
+            icon: 'error',
+          },
+          `file: page-seller.component.ts: ~ PageSellerComponent ~ getData ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-
-        throw error;
+          )}`
+        );
       }
 
       if (this.modelEnDb.gallery) {
@@ -583,32 +607,21 @@ export class PageSellerComponent {
             let urlImage: string = '';
             try {
               urlImage = await this.modelService.getImage(
-                `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`
+                `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`,
+                this.modelEnDb.url
               );
             } catch (error) {
-              console.error('Error: ', error);
-              alerts.basicAlert(
-                'Error',
-                'Ha ocurrido un error en la obtencion de la imagen principal',
-                'error'
-              );
-
-              let data: IFrontLogs = {
-                date: new Date(),
-                userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-                log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+              this.frontLogsService.catchProcessError(
+                error,
+                {
+                  title: 'Error',
+                  text: 'Ha ocurrido un error en la obtencion de la imagen principal',
+                  icon: 'error',
+                },
+                `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
                   error
-                )}`,
-              };
-
-              this.frontLogsService
-                .postDataFS(data)
-                .then((res) => {})
-                .catch((err) => {
-                  alerts.basicAlert('Error', 'Error', 'error');
-                  throw err;
-                });
-              throw error;
+                )}`
+              );
             }
             this.allGallery.push(urlImage);
             this.editGallery.push(urlImage);
@@ -737,6 +750,7 @@ export class PageSellerComponent {
       url: this.f.controls.url.value,
       redes: this.redes.value,
       id_epayco: this.modelEnDb.id_epayco,
+      commission: this.modelEnDb.commission,
     };
 
     //Guardar la informacion del producto en base de datos
@@ -762,7 +776,9 @@ export class PageSellerComponent {
 
           let data: IFrontLogs = {
             date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            userId: this.variablesGlobalesService.getCurrentValue(
+              EnumVariablesGlobales.USER_ID
+            ),
             log: `file: page-seller.component.ts: ~ PageSellerComponent ~ saveModel ~ JSON.stringify(error): ${JSON.stringify(
               err
             )}`,
@@ -795,7 +811,9 @@ export class PageSellerComponent {
 
           let data: IFrontLogs = {
             date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+            userId: this.variablesGlobalesService.getCurrentValue(
+              EnumVariablesGlobales.USER_ID
+            ),
             log: `file: page-seller.component.ts: ~ PageSellerComponent ~ saveModel ~ JSON.stringify(error): ${JSON.stringify(
               err
             )}`,
@@ -836,29 +854,17 @@ export class PageSellerComponent {
           await this.modelService.deleteImages(`${res}/${ImgModelEnum.MAIN}`);
           await this.saveProductImages(res, this.imgFile, ImgModelEnum.MAIN);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error guardando la imagen principal',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error guardando la imagen principal',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
       }
 
@@ -870,29 +876,17 @@ export class PageSellerComponent {
         try {
           nombres = await this.saveProductGallery(res, this.files);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error guardando la galeria',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error guardando la galeria',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
         nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(nombres);
       }
@@ -916,29 +910,17 @@ export class PageSellerComponent {
               `${res}/${ImgModelEnum.GALLERY}/${name}`
             );
           } catch (error) {
-            console.error('Error: ', error);
-            alerts.basicAlert(
-              'Error',
-              'Ha ocurrido un error eliminando las imagenes de la galeria',
-              'error'
-            );
-
-            let data: IFrontLogs = {
-              date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-              log: `file: page-seller.component.ts: ~ PageSellerComponent ~ this.imagenesABorrarGaleria.forEach ~ JSON.stringify(error): ${JSON.stringify(
+            this.frontLogsService.catchProcessError(
+              error,
+              {
+                title: 'Error',
+                text: 'Ha ocurrido un error eliminando las imagenes de la galeria',
+                icon: 'error',
+              },
+              `file: page-seller.component.ts: ~ PageSellerComponent ~ this.imagenesABorrarGaleria.forEach ~ JSON.stringify(error): ${JSON.stringify(
                 error
-              )}`,
-            };
-
-            this.frontLogsService
-              .postDataFS(data)
-              .then((res) => {})
-              .catch((err) => {
-                alerts.basicAlert('Error', 'Error', 'error');
-                throw err;
-              });
-            throw error;
+              )}`
+            );
           }
         });
       }
@@ -953,29 +935,17 @@ export class PageSellerComponent {
         try {
           await this.modelService.patchDataFS(res, dataModel);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error actualizando el modelo',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error actualizando el modelo',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
       }
 
@@ -1001,29 +971,17 @@ export class PageSellerComponent {
             ImgModelEnum.MAIN
           );
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error guardando la imagen principal',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error guardando la imagen principal',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
       }
 
@@ -1037,29 +995,17 @@ export class PageSellerComponent {
             this.files
           );
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error guardando la galeria',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error guardando la galeria',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
         nombreGaleriaAGuardar = nombreGaleriaAGuardar.concat(nombres);
       }
@@ -1083,29 +1029,17 @@ export class PageSellerComponent {
               `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${name}`
             );
           } catch (error) {
-            console.error('Error: ', error);
-            alerts.basicAlert(
-              'Error',
-              'Ha ocurrido un error eliminando la galeria',
-              'error'
-            );
-
-            let data: IFrontLogs = {
-              date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-              log: `file: page-seller.component.ts: ~ PageSellerComponent ~ this.imagenesABorrarGaleria.forEach ~ JSON.stringify(error): ${JSON.stringify(
+            this.frontLogsService.catchProcessError(
+              error,
+              {
+                title: 'Error',
+                text: 'Ha ocurrido un error eliminando la galeria',
+                icon: 'error',
+              },
+              `file: page-seller.component.ts: ~ PageSellerComponent ~ this.imagenesABorrarGaleria.forEach ~ JSON.stringify(error): ${JSON.stringify(
                 error
-              )}`,
-            };
-
-            this.frontLogsService
-              .postDataFS(data)
-              .then((res) => {})
-              .catch((err) => {
-                alerts.basicAlert('Error', 'Error', 'error');
-                throw err;
-              });
-            throw error;
+              )}`
+            );
           }
         });
       }
@@ -1120,29 +1054,17 @@ export class PageSellerComponent {
         try {
           await this.modelService.patchDataFS(this.modelEnDb.id, dataModel);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            'Ha ocurrido un error actualizando el modelo',
-            'error'
-          );
-
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error actualizando el modelo',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-          throw error;
+            )}`
+          );
         }
       }
 
@@ -1165,30 +1087,17 @@ export class PageSellerComponent {
     try {
       resp = await functions.validateImage(e);
     } catch (error) {
-      console.error('Error: ', error);
-      console.error(error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error validando la imagen',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ validateImage ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error validando la imagen',
+          icon: 'error',
+        },
+        `file: page-seller.component.ts: ~ PageSellerComponent ~ validateImage ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
     if (resp) {
       switch (type) {
@@ -1232,29 +1141,17 @@ export class PageSellerComponent {
     try {
       resp = await this.categoriesService.getDataFS().toPromise();
     } catch (err) {
-      console.error('Error: ', err);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de categorias',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ getCategories ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        err,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de categorias',
+          icon: 'error',
+        },
+        `file: page-seller.component.ts: ~ PageSellerComponent ~ getCategories ~ JSON.stringify(error): ${JSON.stringify(
           err
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw err;
+        )}`
+      );
     }
 
     if (!resp) return null;
@@ -1285,34 +1182,17 @@ export class PageSellerComponent {
             `${idProduct}/${type}/${name}`
           );
       } catch (error) {
-        console.error('Error: ', error);
-        alerts.basicAlert(
-          'Error',
-          `Ha ocurrido un error guardando la imagen ${type}`,
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          error,
+          {
+            title: 'Error',
+            text: `Ha ocurrido un error guardando la imagen ${type}`,
+            icon: 'error',
+          },
+          `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
             error
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            functions.bloquearPantalla(false);
-            this.loadData = false;
-            throw err;
-          });
-
-        functions.bloquearPantalla(false);
-        this.loadData = false;
-        throw error;
+          )}`
+        );
       }
     }
   }
@@ -1339,31 +1219,18 @@ export class PageSellerComponent {
 
           nombres.push(nameSinTipo);
         } catch (error) {
-          console.error('Error: ', error);
-          alerts.basicAlert(
-            'Error',
-            `Ha ocurrido un error guardando la imagen de la galeria del producto`,
-            'error'
-          );
-          let data: IFrontLogs = {
-            date: new Date(),
-            userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-            log: `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
+          this.frontLogsService.catchProcessError(
+            error,
+            {
+              title: 'Error',
+              text: 'Ha ocurrido un error guardando la imagen de la galeria del producto',
+              icon: 'error',
+            },
+            `file: page-seller.component.ts: ~ PageSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
               error
-            )}`,
-          };
-
-          this.frontLogsService
-            .postDataFS(data)
-            .then((res) => {})
-            .catch((err) => {
-              alerts.basicAlert('Error', 'Error', 'error');
-              throw err;
-            });
-
-          functions.bloquearPantalla(false);
+            )}`
+          );
           this.loadData = false;
-          throw error;
         }
       }
     }
@@ -1453,7 +1320,7 @@ export class PageSellerComponent {
           })
         );
       } else {
-        alerts.basicAlert('Error', 'El limite de detalles es de 5', 'error');
+        alerts.basicAlert('Error', 'El limite de precios es de 5', 'error');
       }
     }
   }
@@ -1519,7 +1386,7 @@ export class PageSellerComponent {
 
   private async calcularPrecios(prices: IpriceModel[]): Promise<void> {
     let params: object = {
-      prices: JSON.stringify(prices),
+      prices: prices.map((price: IpriceModel) => JSON.stringify(price)),
       fechaActual: new Date().toISOString(),
     };
 
@@ -1530,29 +1397,17 @@ export class PageSellerComponent {
         await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
       ).preciosCalculados;
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de precios',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ calcularPrecios ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de precios',
+          icon: 'error',
+        },
+        `file: page-seller.component.ts: ~ PageSellerComponent ~ calcularPrecios ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -1591,33 +1446,18 @@ export class PageSellerComponent {
         await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
       ).preciosCalculados;
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de precios',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ calcularPrecio ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de precios',
+          icon: 'error',
+        },
+        `file: page-seller.component.ts: ~ PageSellerComponent ~ calcularPrecio ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
+        )}`
+      );
       this.loadData = false;
-
-      throw error;
     }
 
     this.preciosSimulados.set(index, precioCalculado[0]);
@@ -1686,29 +1526,17 @@ export class PageSellerComponent {
 
       res = await this.telegramService.botEsAdminDelGrupo(params).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de pertenencia al grupo del bot',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: page-seller.component.ts: ~ PageSellerComponent ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de pertenencia al grupo del bot',
+          icon: 'error',
+        },
+        `file: page-seller.component.ts: ~ PageSellerComponent ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (!res?.perteneceAlGrupo) {
@@ -1716,7 +1544,7 @@ export class PageSellerComponent {
       this.loadData = false;
       alerts.basicAlert(
         'Error',
-        'El BOT no pertenece al grupo, asugurate de agregarlo como administrador y que el id del grupo corresponda a tu grupo',
+        'El BOT no pertenece al grupo, asugurate de agregarlo como administrador con permisos de añadir y expulsar usuarios y que el id del grupo corresponda a tu grupo',
         'error'
       );
       return false;
@@ -1737,5 +1565,26 @@ export class PageSellerComponent {
     return `${environment.epayco.url_dashboard}${
       this.id_epayco.valid ? 'login' : 'register'
     }`;
+  }
+
+  public infoClik(): void {
+    alerts.basicAlert(
+      'Id del grupo',
+      `Inicia sesión con tu cuenta en Telegram web y selecciona el grupo de Telegram. Luego, en la URL de su navegador web debería ver algo similar a https://web.telegram.org/k/#-XXXXXXXXX. Luego, la ID que debes usar para el grupo de Telegram es -XXXXXXXXX, donde cada carácter X representa un número. Recuerde incluir el símbolo menos antes de los números. Finalmente, para canales privados en Telegram, seleccione el canal privado en Telegram web. Luego, en la URL de su navegador web debería ver algo similar a https://web.telegram.org/k/#-YYYYYYYYYY. Aquí, la ID que debe utilizar para el canal privado es -100YYYYYYYYYY. Es decir, debe incluir un 100 entre el símbolo menos y los números.`,
+      'info'
+    );
+  }
+
+  public changeGroupId(value: string): void {
+    if (value == '' || value == null) {
+      this.groupId.setValue('-');
+    }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.PAGE_SELLER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

@@ -1,0 +1,14 @@
+.btn-login {
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+}
+
+.btn-login:hover {
+  background-color: var(--color-secundario);
+  border-color: var(--color-secundario);
+}
+
+.btn-login:disabled {
+  background-color: var(--paleta-4);
+  border-color: var(--paleta-4);
+}

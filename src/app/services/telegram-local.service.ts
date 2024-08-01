@@ -3,10 +3,9 @@ import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { alerts } from '../helpers/alerts';
-import { IFrontLogs } from '../interface/i-front-logs';
-import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { FrontLogsService } from './front-logs.service';
 import { EnumEndpointsBack } from '../enum/enum-endpoints-back';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,20 +15,24 @@ export class TelegramLocalService {
 
   constructor(
     private http: HttpClient,
-    private frontLogsService: FrontLogsService
+    private frontLogsService: FrontLogsService,
+    private encryptionService: EncryptionService
   ) {}
 
   /**
    * Probar la conexion entre el cliente y el bot de telegram
    *
-   * @param {*} body
+   * @param {*} params
    * @return {*}  {Observable<any>}
    * @memberof TelegramLocalService
    */
   public getPruebaBotCliente(params: any = {}): Observable<any> {
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.COMUNICAR_BOT_CLIENTE}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 
@@ -41,9 +44,12 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public esMiembroDelGrupo(params: any): Observable<any> {
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.ES_MIEMBRO_DEL_GRUPO}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 
@@ -55,10 +61,14 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public botEsAdminDelGrupo(params: { chatId: number }): Observable<boolean> {
+    let paramsEncrypted: object = this.encryptionService.encryptDataJson(
+      params as any
+    );
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.BOT_ES_ADMIN_DEL_GRUPO}`,
       {
-        params,
+        params: paramsEncrypted as any,
       }
     ) as Observable<boolean>;
   }
@@ -71,9 +81,12 @@ export class TelegramLocalService {
    * @memberof TelegramLocalService
    */
   public getLinksOrden(params: any): Observable<any> {
+    let paramsEncrypted: object =
+      this.encryptionService.encryptDataJson(params);
+
     return this.http.get(
       `${this.url}/${EnumEndpointsBack.TELEGRAM.ENVIAR_LINK}`,
-      { params }
+      { params: paramsEncrypted as any }
     );
   }
 
@@ -95,29 +108,17 @@ export class TelegramLocalService {
     try {
       res = await this.getPruebaBotCliente({ fromId, url }).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error probando la conexion con el bot de Telegram',
-        'error'
-      );
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: telegram-local.service.ts: ~ TelegramLocalService ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error probando la conexion con el bot de Telegram',
+          icon: 'error',
+        },
+        `file: telegram-local.service.ts: ~ TelegramLocalService ~ probarConexionBot ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
 
     if (res.code == 200) {

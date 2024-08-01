@@ -2,16 +2,27 @@ import { UrlPagesEnum } from './../enum/urlPagesEnum';
 import { environment } from './../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
+
 import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { UserTypeEnum } from '../enum/userTypeEnum';
 import { LoginService } from '../services/login.service';
+import { UserService } from '../services/user.service';
+import { QueryFn } from '@angular/fire/compat/firestore';
+import { IFireStoreRes } from '../interface/ifireStoreRes';
+import { Iuser } from '../interface/iuser';
+import { VariablesGlobalesService } from '../services/variables-globales.service';
+import { EnumVariablesGlobales } from '../enum/enum-variables-globales';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
-  constructor(private http: HttpClient, private loginService: LoginService) {}
+export class AuthGuard {
+  constructor(
+    private http: HttpClient,
+    private loginService: LoginService,
+    private userService: UserService,
+    private variablesGlobalesService: VariablesGlobalesService
+  ) {}
 
   canActivate(): Promise<boolean> {
     return new Promise((resolve) => {
@@ -30,16 +41,45 @@ export class AuthGuard implements CanActivate {
       if (token) {
         //Validamos que el token sea real
         let body: any = {
-          idToken: localStorage.getItem(LocalStorageEnum.TOKEN),
+          idToken: token,
         };
         this.http.post(environment.urlGetUser, body).subscribe(
-          (resp: any): any => {
-            // Se comprueba que el tipo de cliente pueda acceder solo a sus respectivas paginas
-            let tipoCliente: string = localStorage.getItem(
-              LocalStorageEnum.USER_TYPE
+          async (resp: any): Promise<any> => {
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_ID,
+              resp.users[0].localId || null
             );
+
+            // Se comprueba que el tipo de cliente pueda acceder solo a sus respectivas paginas
             let pathActual: string = window.location.hash;
             let usuarioPuedeAcceder: boolean = true;
+
+            let qf: QueryFn = (ref) =>
+              ref.where(
+                'id',
+                '==',
+                this.variablesGlobalesService.getCurrentValue(
+                  EnumVariablesGlobales.USER_ID
+                )
+              );
+
+            let res: IFireStoreRes[] = null;
+            try {
+              res = await this.userService.getDataFS(qf).toPromise();
+            } catch (error) {}
+
+            if (!res || res.length == 0) {
+              resolve(false);
+              return;
+            }
+
+            let user: Iuser = { ...res[0].data };
+
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.USER_TYPE,
+              user.type
+            );
+            const tipoCliente: string = user.type;
 
             switch (tipoCliente) {
               case UserTypeEnum.USUARIO:

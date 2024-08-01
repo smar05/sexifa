@@ -1,10 +1,6 @@
-import { Observable } from 'rxjs';
 import { Iregister } from './../interface/iregister';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { alerts } from '../helpers/alerts';
-import { IFrontLogs } from '../interface/i-front-logs';
-import { LocalStorageEnum } from '../enum/localStorageEnum';
 import { FrontLogsService } from './front-logs.service';
 
 @Injectable({
@@ -53,29 +49,17 @@ export class RegisterService {
         user.sendEmailVerification();
       })
       .catch((err) => {
-        console.error('Error: ', err);
-        alerts.basicAlert(
-          'Error',
-          'Ha ocurrido un error en la verificacion del email',
-          'error'
-        );
-
-        let data: IFrontLogs = {
-          date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-          log: `file: register.service.ts: ~ RegisterService ~ verificEmail ~ JSON.stringify(error): ${JSON.stringify(
+        this.frontLogsService.catchProcessError(
+          err,
+          {
+            title: 'Error',
+            text: 'Ha ocurrido un error en la verificacion del email',
+            icon: 'error',
+          },
+          `file: register.service.ts: ~ RegisterService ~ verificEmail ~ JSON.stringify(error): ${JSON.stringify(
             err
-          )}`,
-        };
-
-        this.frontLogsService
-          .postDataFS(data)
-          .then((res) => {})
-          .catch((err) => {
-            alerts.basicAlert('Error', 'Error', 'error');
-            throw err;
-          });
-        throw err;
+          )}`
+        );
       });
   }
 }

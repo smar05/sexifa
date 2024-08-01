@@ -58,40 +58,7 @@
           <!--Modelos-->
           <ng-container *ngIf="!load; else loading">
             <ng-container *ngFor="let model of models">
-              <div
-                class="img-box"
-                [routerLink]="['/grupo/' + this.getUrlModel(model)]"
-              >
-                <img
-                  [src]="model.mainImage"
-                  [alt]="model.name"
-                  loading="lazy"
-                />
-                <div class="description">
-                  <div class="headring-row">
-                    <h1 class="heading font-weight-bold">
-                      {{ model.name }}
-                    </h1>
-                    <!--<p class="price">$120</p>-->
-                  </div>
-                  <!--Categoria-->
-                  <div class="sub-desc">
-                    <p>
-                      <span class="font-weight-bold">Categoria: </span
-                      >{{ this.findCategorie(model.categorie).name }}
-                    </p>
-                  </div>
-                  <div class="reting">
-                    <fa-icon
-                      [icon]="
-                        this.fontAwesomeIconsService.getIcon(
-                          this.findCategorie(model.categorie).icon
-                        )
-                      "
-                    ></fa-icon>
-                  </div>
-                </div>
-              </div>
+              <app-model-cards [model]="model" [categories]="this.categories" />
             </ng-container>
 
             <nav aria-label="Page navigation" class="mt-2">

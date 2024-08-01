@@ -5,8 +5,10 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BottomNavComponent } from './bottom-nav/bottom-nav.component';
-//import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SkFoldingCubeComponent } from './sk-folding-cube/sk-folding-cube.component';
+import { ModelCardsComponent } from './model-cards/model-cards.component';
+import { ButtonComponent } from './button/button.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +17,8 @@ import { SkFoldingCubeComponent } from './sk-folding-cube/sk-folding-cube.compon
     SideBarComponent,
     SkFoldingCubeComponent,
     BottomNavComponent,
+    ModelCardsComponent,
+    ButtonComponent,
   ],
   exports: [
     NavbarComponent,
@@ -22,8 +26,10 @@ import { SkFoldingCubeComponent } from './sk-folding-cube/sk-folding-cube.compon
     SideBarComponent,
     SkFoldingCubeComponent,
     BottomNavComponent,
+    ModelCardsComponent,
+    ButtonComponent,
     //FontAwesomeModule,
   ],
-  imports: [CommonModule, RouterModule /*FontAwesomeModule*/],
+  imports: [CommonModule, RouterModule, FontAwesomeModule],
 })
 export class SharedModule {}

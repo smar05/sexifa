@@ -11,8 +11,9 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { EnumPages } from 'src/app/enum/enum-pages';
+import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 import { EnumExpresioncesRegulares } from 'src/app/enum/EnumExpresionesRegulares';
-import { LocalStorageEnum } from 'src/app/enum/localStorageEnum';
 import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { alerts } from 'src/app/helpers/alerts';
 import { functions } from 'src/app/helpers/functions';
@@ -24,11 +25,13 @@ import { ICountries } from 'src/app/interface/icountries';
 import { IFireStoreRes } from 'src/app/interface/ifireStoreRes';
 import { IState } from 'src/app/interface/istate';
 import { Iuser } from 'src/app/interface/iuser';
+import { AlertsPagesService } from 'src/app/services/alerts-page.service';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
 import { LocationService } from 'src/app/services/location.service';
 import { SaldosService } from 'src/app/services/saldos.service';
 import { SubscriptionsService } from 'src/app/services/subscriptions.service';
 import { UserService } from 'src/app/services/user.service';
+import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
 
 @Component({
   selector: 'app-user-seller',
@@ -74,7 +77,12 @@ export class UserSellerComponent {
     ],
     email: [
       '',
-      [Validators.required, Validators.email, Validators.maxLength(320)],
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(320),
+        Validators.pattern(EnumExpresioncesRegulares.EMAIL),
+      ],
     ],
     celphone: [
       '',
@@ -85,10 +93,41 @@ export class UserSellerComponent {
       ],
     ],
     bornDate: ['', [Validators.required]],
-    country: ['', [Validators.required]],
-    state: ['', [Validators.required]],
+    country: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
+    state: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.minLength(2),
+        Validators.maxLength(5),
+      ],
+    ],
     city: ['', [Validators.required]],
-    sex: ['', [Validators.required]],
+    sex: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(EnumExpresioncesRegulares.CARACTERES),
+        Validators.maxLength(15),
+      ],
+    ],
+    document_type: [
+      '',
+      [Validators.required, Validators.minLength(2), Validators.maxLength(3)],
+    ],
+    document_value: [
+      '',
+      [Validators.required, Validators.minLength(6), Validators.maxLength(10)],
+    ],
   });
 
   //Validaciones personalizadas
@@ -136,6 +175,14 @@ export class UserSellerComponent {
     return this.f.controls.terms;
   }
 
+  get document_type() {
+    return this.f.controls.document_type;
+  }
+
+  get document_value() {
+    return this.f.controls.document_value;
+  }
+
   public formSubmitted: boolean = false;
   public loading: boolean = false;
   private nameUserId: string = '';
@@ -151,35 +198,29 @@ export class UserSellerComponent {
     private locationService: LocationService,
     private frontLogsService: FrontLogsService,
     private subscriptionsService: SubscriptionsService,
-    private saldosService: SaldosService
+    private saldosService: SaldosService,
+    private alertsPagesService: AlertsPagesService,
+    private variablesGlobalesService: VariablesGlobalesService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+    this.alertPage();
     try {
       await this.getUserData();
       await this.getLocationData();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert('Error', 'Ha ocurrido un error', 'error');
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      functions.bloquearPantalla(false);
-      throw error;
+        )}`
+      );
     }
     functions.bloquearPantalla(false);
   }
@@ -188,7 +229,13 @@ export class UserSellerComponent {
     functions.bloquearPantalla(true);
     this.loading = true;
     let qf: QueryFn = (ref) =>
-      ref.where('id', '==', localStorage.getItem(LocalStorageEnum.LOCAL_ID));
+      ref.where(
+        'id',
+        '==',
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.USER_ID
+        )
+      );
 
     this.user = await new Promise((resolve) => {
       this.userService
@@ -209,7 +256,9 @@ export class UserSellerComponent {
 
             let data: IFrontLogs = {
               date: new Date(),
-              userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+              userId: this.variablesGlobalesService.getCurrentValue(
+                EnumVariablesGlobales.USER_ID
+              ),
               log: `file: user-seller.component.ts:151 ~ UserSellerComponent ~ JSON.stringify(error): ${JSON.stringify(
                 err
               )}`,
@@ -232,11 +281,13 @@ export class UserSellerComponent {
     this.name.setValue(this.user.name);
     this.email.setValue(this.user.email);
     this.celphone.setValue(this.user.celphone);
-    this.bornDate.setValue(this.user.bornDate);
+    this.bornDate.setValue(new Date(this.user.bornDate).toDateString());
     this.sex.setValue(this.user.sex);
     this.country.setValue(this.user.country);
     this.state.setValue(this.user.state);
     this.city.setValue(this.user.city);
+    this.document_type.setValue(this.user.document_type || '');
+    this.document_value.setValue(this.user.document_value);
 
     functions.bloquearPantalla(false);
     this.loading = false;
@@ -265,6 +316,8 @@ export class UserSellerComponent {
       city: this.city.value,
       chatId: this.user.chatId,
       type: this.user.type,
+      document_type: this.user.document_type,
+      document_value: this.user.document_value,
     };
 
     this.userService.patchDataFS(this.nameUserId, data).then(
@@ -286,7 +339,9 @@ export class UserSellerComponent {
 
         let data: IFrontLogs = {
           date: new Date(),
-          userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
+          userId: this.variablesGlobalesService.getCurrentValue(
+            EnumVariablesGlobales.USER_ID
+          ),
           log: `file: user-seller.component.ts:226 ~ UserSellerComponent ~ onSubmit ~ JSON.stringify(error): ${JSON.stringify(
             error
           )}`,
@@ -345,36 +400,22 @@ export class UserSellerComponent {
       functions.bloquearPantalla(false);
       this.loading = false;
     } catch (error) {
-      console.error('Error: ', error);
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
       this.allCountrys = [];
       this.allStates = [];
       this.allCities = [];
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
 
-      throw error;
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ getLocationData ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
+      );
     }
   }
 
@@ -382,42 +423,30 @@ export class UserSellerComponent {
     try {
       this.state.setValue(null);
       this.city.setValue(null);
+      this.allStates = null;
+      this.allCities = null;
       this.allStates = JSON.parse(
         await this.locationService.getAllStatesByCountry(this.country.value)
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
-      this.allStates = [];
-      this.state.setValue(null);
-      this.city.setValue(null);
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ countryChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
   public async stateChange(): Promise<void> {
     try {
       this.city.setValue(null);
+      this.allCities = null;
       this.allCities = JSON.parse(
         await this.locationService.getAllCitiesByCountryAndState(
           this.country.value,
@@ -425,31 +454,17 @@ export class UserSellerComponent {
         )
       );
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de ubicaciones',
-        'error'
-      );
-      this.allCities = [];
-      this.city.setValue(null);
-
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ubicaciones',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ stateChange ~ JSON.stringify(error): ${JSON.stringify(
           error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          throw err;
-        });
-      throw error;
+        )}`
+      );
     }
   }
 
@@ -467,7 +482,9 @@ export class UserSellerComponent {
     this.loading = true;
 
     this.saldoPendiente = undefined;
-    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+    let modelId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.MODEL_ID
+    );
 
     if (!modelId) {
       return undefined;
@@ -481,34 +498,19 @@ export class UserSellerComponent {
           .where('modelStatus', '==', ModelStatusEnum.PENDIENTE_PAGO);
       data = await this.subscriptionsService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuarios',
-        'error'
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuarios',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ calcularSaldoModelo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ calcularSaldoModelo ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          functions.bloquearPantalla(false);
-          this.loading = false;
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
 
     if (!data) return undefined;
@@ -613,7 +615,9 @@ export class UserSellerComponent {
     functions.bloquearPantalla(true);
     this.loading = true;
 
-    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+    let modelId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.MODEL_ID
+    );
 
     if (!modelId) {
       functions.bloquearPantalla(false);
@@ -628,34 +632,19 @@ export class UserSellerComponent {
 
       data = await this.saldosService.getDataFS(qf).toPromise();
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuarios',
-        'error'
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuarios',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ getSaldosSolicitados ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ getSaldosSolicitados ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          functions.bloquearPantalla(false);
-          this.loading = false;
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
 
     if (!data || data.length == 0) {
@@ -705,7 +694,9 @@ export class UserSellerComponent {
       return;
     }
 
-    let modelId: string = localStorage.getItem(LocalStorageEnum.MODEL_ID);
+    let modelId: string = this.variablesGlobalesService.getCurrentValue(
+      EnumVariablesGlobales.MODEL_ID
+    );
 
     if (!modelId) {
       functions.bloquearPantalla(false);
@@ -728,34 +719,19 @@ export class UserSellerComponent {
     try {
       await this.subscriptionsService.updateDocuments(dataUpdate);
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuarios',
-        'error'
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuarios',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ solicitarSaldo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ solicitarSaldo ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          functions.bloquearPantalla(false);
-          this.loading = false;
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
 
     let saldoData: ISaldos = {
@@ -773,34 +749,19 @@ export class UserSellerComponent {
     try {
       await this.saldosService.postDataFS(saldoData);
     } catch (error) {
-      console.error('Error: ', error);
-      alerts.basicAlert(
-        'Error',
-        'Ha ocurrido un error en la consulta de usuarios',
-        'error'
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de usuarios',
+          icon: 'error',
+        },
+        `file: user-seller.component.ts: ~ UserSellerComponent ~ solicitarSaldo ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
       );
 
-      let data: IFrontLogs = {
-        date: new Date(),
-        userId: localStorage.getItem(LocalStorageEnum.LOCAL_ID),
-        log: `file: user-seller.component.ts: ~ UserSellerComponent ~ solicitarSaldo ~ JSON.stringify(error): ${JSON.stringify(
-          error
-        )}`,
-      };
-
-      this.frontLogsService
-        .postDataFS(data)
-        .then((res) => {})
-        .catch((err) => {
-          alerts.basicAlert('Error', 'Error', 'error');
-          functions.bloquearPantalla(false);
-          this.loading = false;
-          throw err;
-        });
-
-      functions.bloquearPantalla(false);
       this.loading = false;
-      throw error;
     }
 
     alerts.basicAlert('Listo', 'El saldo ya ha sido solicitado', 'success');
@@ -816,5 +777,12 @@ export class UserSellerComponent {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  private alertPage(): void {
+    this.alertsPagesService
+      .alertPage(EnumPages.USER_SELLER)
+      .toPromise()
+      .then((res: any) => {});
   }
 }

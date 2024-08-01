@@ -4,6 +4,11 @@ import { FireStorageService } from './fire-storage.service';
 import { QueryFn } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { IFrontLogs } from '../interface/i-front-logs';
+import { alerts } from '../helpers/alerts';
+import { SweetAlertIcon } from 'sweetalert2';
+import { functions } from '../helpers/functions';
+import { VariablesGlobalesService } from './variables-globales.service';
+import { EnumVariablesGlobales } from '../enum/enum-variables-globales';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +16,10 @@ import { IFrontLogs } from '../interface/i-front-logs';
 export class FrontLogsService {
   private urlFrontLogs: string = environment.urlCollections.front_logs;
 
-  constructor(private fireStorageService: FireStorageService) {}
+  constructor(
+    private fireStorageService: FireStorageService,
+    private variablesGlobalesService: VariablesGlobalesService
+  ) {}
 
   //------------ FireStorage---------------//
   /**
@@ -77,4 +85,40 @@ export class FrontLogsService {
   }
 
   //------------ FireStorage---------------//
+
+  /**
+   * Metodo comun para procesar la informacion de los catch
+   *
+   * @param {*} error
+   * @param {{ title: string; text: string; icon: SweetAlertIcon }} alertData
+   * @param {string} log
+   * @memberof FrontLogsService
+   */
+  public catchProcessError(
+    error: any,
+    alertData: { title: string; text: string; icon: SweetAlertIcon },
+    log: string
+  ): void {
+    console.error('Error: ', error);
+    alerts.basicAlert(alertData.title, alertData.text, alertData.icon);
+
+    let data: IFrontLogs = {
+      date: new Date(),
+      userId: this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.USER_ID
+      ),
+      log,
+    };
+
+    this.postDataFS(data)
+      .then((res) => {})
+      .catch((err) => {
+        alerts.basicAlert('Error', 'Error', 'error');
+        throw err;
+      });
+
+    functions.bloquearPantalla(false);
+
+    throw error;
+  }
 }

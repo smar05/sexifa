@@ -33,12 +33,14 @@
             <!--chatId-->
             <label for="chatId"><strong>Id de Telegram</strong></label>
             <p>{{ this.user.chatId }}</p>
-            <button
+            <app-button
               (click)="probarConexionBot()"
-              class="btn btn-primary btn-block bg-principal mb-2"
-            >
-              Probar conexion con el bot
-            </button>
+              [properties]="{
+                class: 'btn btn-primary btn-block bg-principal mb-2',
+                disabled: !this.user?.chatId,
+                text: 'Probar conexion con el bot'
+              }"
+            />
             <div class="alert alert-info" role="alert">
               <small
                 >Se le enviara el link de acceso al grupo a este id de
@@ -50,7 +52,7 @@
       </div>
     </div>
 
-    <div class="col-lg-6">
+    <div class="col-lg-6" *ngIf="!this.hiddenPayMethods()">
       <div class="card">
         <div class="card-body">
           <h2 class="text-center mb-3">
@@ -71,7 +73,7 @@
                     <td>
                       <a
                         [routerLink]="[
-                          '/grupo/' + this.getUrlModel(cartItem.model!)
+                          '/group/' + this.getUrlModel(cartItem.model!)
                         ]"
                         >{{ cartItem.model?.name }}</a
                       >
@@ -160,12 +162,13 @@
                 </div>
 
                 <div class="row" [hidden]="payMethod != 'payu'">
-                  <button
-                    class="btn btn-primary btn-block bg-payu mb-2"
+                  <app-button
+                    [properties]="{
+                      class: 'btn btn-primary btn-block bg-payu mb-2',
+                      text: 'Pagar con PayU'
+                    }"
                     (click)="pagarPayU()"
-                  >
-                    Pagar con PayU
-                  </button>
+                  />
                 </div>
               </ng-container>
 
@@ -190,23 +193,14 @@
                   </div>
                 </div>
 
-                <div class="row" [hidden]="payMethod != 'epayco'">
-                  <button
-                    style="
-                      padding: 0;
-                      background: none;
-                      border: none;
-                      cursor: pointer;
-                    "
-                    id="epayco-btn"
-                    class="epayco-button-render btn btn-block"
+                <div
+                  class="row justify-content-center"
+                  [hidden]="payMethod != 'epayco'"
+                >
+                  <app-button
+                    [properties]="this.epaycoProperties"
                     (click)="this.payEpayco()"
-                  >
-                    <img
-                      src="https://multimedia.epayco.co/dashboard/btns/btn2.png"
-                      alt=""
-                    />
-                  </button>
+                  />
                 </div>
               </ng-container>
             </form>

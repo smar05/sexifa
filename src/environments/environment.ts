@@ -24,7 +24,7 @@ const firebaseConfig: any = {
 
 export const environment = {
   production: false,
-  urlFirebase: `https://sexifa-269bf-default-rtdb.firebaseio.com/`,
+  urlFirebase: `https://sexifa-269bf.web.app`,
   urlLogin: `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
   urlGetUser: `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
   urlLocation: `https://api.countrystatecity.in/v1/`,
@@ -32,7 +32,6 @@ export const environment = {
   urlProd,
   urlServidorLocal,
   urlBot: 'https://t.me/OnlyGramGroup_BOT',
-  urlBotGetId: 'https://t.me/username_to_id_bot',
   urlCollections: {
     categories: 'categories',
     models: 'models',
@@ -45,6 +44,7 @@ export const environment = {
     saldos: 'saldos',
     metodos_de_pago: 'metodos_de_pago',
     epayco_trans: 'epayco_trans',
+    alerts: 'alerts',
   },
   urlsServidor: {
     urlTelegramApi: 'telegram',
