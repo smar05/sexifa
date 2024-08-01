@@ -264,7 +264,6 @@ export class PageSellerComponent {
     private userService: UserService,
     private route: Router,
     private frontLogsService: FrontLogsService,
-    private modelsService: ModelsService,
     private telegramService: TelegramLocalService,
     private alertsPagesService: AlertsPagesService,
     private bussinesService: BusinessParamsService,
@@ -450,7 +449,7 @@ export class PageSellerComponent {
     let qf: QueryFn = (ref) => ref.where('idUser', '==', this.userId);
     this.modelEnDb = await new Promise((resolve) => {
       this.modelService
-        .getDataFS(qf)
+        .getDataFS(qf, false)
         .toPromise()
         .then(
           (res: IFireStoreRes[]) => {
@@ -585,7 +584,8 @@ export class PageSellerComponent {
       try {
         this.imgTemp = await this.modelService.getImage(
           `${this.modelEnDb.id}/${ImgModelEnum.MAIN}`,
-          this.modelEnDb.url
+          this.modelEnDb.url,
+          false
         );
       } catch (error) {
         this.frontLogsService.catchProcessError(
@@ -608,7 +608,8 @@ export class PageSellerComponent {
             try {
               urlImage = await this.modelService.getImage(
                 `${this.modelEnDb.id}/${ImgModelEnum.GALLERY}/${galleryItem}`,
-                this.modelEnDb.url
+                this.modelEnDb.url,
+                false
               );
             } catch (error) {
               this.frontLogsService.catchProcessError(
@@ -759,10 +760,6 @@ export class PageSellerComponent {
     if (this.modelEnDb && this.modelEnDb.id) {
       this.modelService.patchDataFS(this.modelEnDb.id, dataModel).then(
         (res: any) => {
-          console.log(
-            '🚀 ~ file: page-seller.component.ts:321 ~ PageSellerComponent ~ saveModel ~ res:',
-            res
-          );
           this.save(this.modelEnDb.id, dataModel, 'update');
         },
         (err: any) => {
@@ -1394,7 +1391,7 @@ export class PageSellerComponent {
 
     try {
       this.preciosCalculados = (
-        await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
+        await this.modelService.calcularPrecioSubscripcion(params).toPromise()
       ).preciosCalculados;
     } catch (error) {
       this.frontLogsService.catchProcessError(
@@ -1443,7 +1440,7 @@ export class PageSellerComponent {
     let precioCalculado: number[] = [];
     try {
       precioCalculado = (
-        await this.modelsService.calcularPrecioSubscripcion(params).toPromise()
+        await this.modelService.calcularPrecioSubscripcion(params).toPromise()
       ).preciosCalculados;
     } catch (error) {
       this.frontLogsService.catchProcessError(

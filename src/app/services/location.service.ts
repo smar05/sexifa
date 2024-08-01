@@ -21,27 +21,33 @@ export class LocationService {
    * @return {*}  {Promise<string>}
    * @memberof LocationService
    */
-  public getAllContries(): Promise<string> {
+  public async getAllContries(): Promise<string> {
     let requestOptions: any = {
       method: 'GET',
       headers: this.headers,
       redirect: 'follow',
     };
-    return fetch(`${this.urlLocation}countries`, requestOptions)
-      .then((response: any) => response.text())
-      .catch((err: any) => {
-        this.frontLogsService.catchProcessError(
-          err,
-          {
-            title: 'Error',
-            text: 'Ha ocurrido un error en la consulta de paises',
-            icon: 'error',
-          },
-          `file: location.service.ts: ~ LocationService ~ getAllContries ~ JSON.stringify(error): ${JSON.stringify(
-            err
-          )}`
-        );
-      });
+    try {
+      const response = await fetch(
+        `${this.urlLocation}countries`,
+        requestOptions
+      );
+      return response.text();
+    } catch (err) {
+      this.frontLogsService.catchProcessError(
+        err,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de paises',
+          icon: 'error',
+        },
+        `file: location.service.ts: ~ LocationService ~ getAllContries ~ JSON.stringify(error): ${JSON.stringify(
+          err
+        )}`
+      );
+
+      return null;
+    }
   }
 
   /**
@@ -51,27 +57,32 @@ export class LocationService {
    * @return {*}  {Promise<string>}
    * @memberof LocationService
    */
-  public getAllStatesByCountry(iso: string): Promise<string> {
+  public async getAllStatesByCountry(iso: string): Promise<string> {
     let requestOptions: any = {
       method: 'GET',
       headers: this.headers,
       redirect: 'follow',
     };
-    return fetch(`${this.urlLocation}countries/${iso}/states`, requestOptions)
-      .then((response: any) => response.text())
-      .catch((err: any) => {
-        this.frontLogsService.catchProcessError(
-          err,
-          {
-            title: 'Error',
-            text: 'Ha ocurrido un error en la consulta de estados',
-            icon: 'error',
-          },
-          `file: location.service.ts: ~ LocationService ~ getAllStatesByCountry ~ JSON.stringify(error): ${JSON.stringify(
-            err
-          )}`
-        );
-      });
+    try {
+      const response = await fetch(
+        `${this.urlLocation}countries/${iso}/states`,
+        requestOptions
+      );
+      return response.text();
+    } catch (err) {
+      this.frontLogsService.catchProcessError(
+        err,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de estados',
+          icon: 'error',
+        },
+        `file: location.service.ts: ~ LocationService ~ getAllStatesByCountry ~ JSON.stringify(error): ${JSON.stringify(
+          err
+        )}`
+      );
+      return null;
+    }
   }
 
   /**
@@ -82,7 +93,7 @@ export class LocationService {
    * @return {*}  {Promise<string>}
    * @memberof LocationService
    */
-  public getAllCitiesByCountryAndState(
+  public async getAllCitiesByCountryAndState(
     isoCountry: string,
     isoState: string
   ): Promise<string> {
@@ -91,23 +102,26 @@ export class LocationService {
       headers: this.headers,
       redirect: 'follow',
     };
-    return fetch(
-      `${this.urlLocation}countries/${isoCountry}/states/${isoState}/cities`,
-      requestOptions
-    )
-      .then((response: any) => response.text())
-      .catch((err: any) => {
-        this.frontLogsService.catchProcessError(
-          err,
-          {
-            title: 'Error',
-            text: 'Ha ocurrido un error en la consulta de ciudades',
-            icon: 'error',
-          },
-          `file: location.service.ts: ~ LocationService ~ JSON.stringify(error): ${JSON.stringify(
-            err
-          )}`
-        );
-      });
+    try {
+      const response = await fetch(
+        `${this.urlLocation}countries/${isoCountry}/states/${isoState}/cities`,
+        requestOptions
+      );
+      return response.text();
+    } catch (err) {
+      this.frontLogsService.catchProcessError(
+        err,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error en la consulta de ciudades',
+          icon: 'error',
+        },
+        `file: location.service.ts: ~ LocationService ~ JSON.stringify(error): ${JSON.stringify(
+          err
+        )}`
+      );
+
+      return null;
+    }
   }
 }

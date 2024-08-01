@@ -705,7 +705,7 @@ export class CheckoutComponent implements OnInit {
           let cartItem: ICart = {};
           let model: Imodels = await new Promise((resolve) => {
             this.modelsService
-              .getItemFS(cartLocalItem.idModel)
+              .getItemFS(cartLocalItem.idModel, null, false)
               .toPromise()
               .then(
                 (res: IFireStoreRes) => {

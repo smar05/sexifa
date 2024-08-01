@@ -39,16 +39,24 @@ export class ModelsService {
    * Se toma la informacion de la coleccion de modelos en Firebase
    *
    * @param {QueryFn} [qf=null]
+   * @param {boolean} [useCache=true]
    * @return {*}  {Observable<IFireStoreRes[]>}
    * @memberof ModelsService
    */
-  public getDataFS(qf: QueryFn = null): Observable<IFireStoreRes[]> {
-    let cacheData: IFireStoreRes[] =
-      (this.cacheService.getCacheData(this.urlModels, qf) as IFireStoreRes[]) ||
-      null;
+  public getDataFS(
+    qf: QueryFn = null,
+    useCache: boolean = true
+  ): Observable<IFireStoreRes[]> {
+    if (useCache) {
+      let cacheData: IFireStoreRes[] =
+        (this.cacheService.getCacheData(
+          this.urlModels,
+          qf
+        ) as IFireStoreRes[]) || null;
 
-    if (cacheData) {
-      return of(cacheData);
+      if (cacheData) {
+        return of(cacheData);
+      }
     }
 
     return this.fireStorageService.getData(this.urlModels, qf).pipe(
@@ -64,16 +72,23 @@ export class ModelsService {
    *
    * @param {string} doc
    * @param {QueryFn} [qf=null]
+   * @param {boolean} [useCache=true]
    * @return {*}  {Observable<IFireStoreRes>}
    * @memberof ModelsService
    */
-  public getItemFS(doc: string, qf: QueryFn = null): Observable<IFireStoreRes> {
+  public getItemFS(
+    doc: string,
+    qf: QueryFn = null,
+    useCache: boolean = true
+  ): Observable<IFireStoreRes> {
     let key: string = `${this.urlModels}/${doc}`;
-    let cacheData: IFireStoreRes =
-      (this.cacheService.getCacheData(key, qf) as IFireStoreRes) || null;
+    if (useCache) {
+      let cacheData: IFireStoreRes =
+        (this.cacheService.getCacheData(key, qf) as IFireStoreRes) || null;
 
-    if (cacheData) {
-      return of(cacheData);
+      if (cacheData) {
+        return of(cacheData);
+      }
     }
 
     return this.fireStorageService.getItem(this.urlModels, doc, qf).pipe(
@@ -151,14 +166,21 @@ export class ModelsService {
    *
    *
    * @param {string} url
+   * @param {string} modelUrl
+   * @param {boolean} [useCache=true]
    * @return {*}  {Promise<string>}
    * @memberof ModelsService
    */
-  public async getImage(url: string, modelUrl: string): Promise<string> {
+  public async getImage(
+    url: string,
+    modelUrl: string,
+    useCache: boolean = true
+  ): Promise<string> {
     let image: StorageReference = null;
     const key: string = `${this.urlImage}/${url}`;
-    const urlImg: string =
-      (this.cacheService.getCacheImg(key) as string) || null;
+    const urlImg: string = useCache
+      ? (this.cacheService.getCacheImg(key) as string) || null
+      : null;
 
     if (urlImg) {
       return new Promise((resolve) => {
@@ -210,7 +232,7 @@ export class ModelsService {
    *
    * @param {string} url
    * @return {*}  {Promise<string[]>}
-   * @memberof ProductsService
+   * @memberof ModelsService
    */
   public async getImages(url: string): Promise<string[]> {
     let images: any[] = null;
@@ -446,17 +468,8 @@ export class ModelsService {
    * @memberof ModelsService
    */
   public calcularPrecioSubscripcion(params: any): Observable<any> {
-    console.log(
-      '🚀 ~ ModelsService ~ calcularPrecioSubscripcion ~ params:',
-      params
-    );
     let paramsEncrypted: object =
       this.encryptionService.encryptDataJson(params);
-
-    console.log(
-      '🚀 ~ ModelsService ~ calcularPrecioSubscripcion ~ paramsEncrypted:',
-      paramsEncrypted
-    );
 
     return this.http.get(
       `${this.urlModelsApi}/${EnumEndpointsBack.MODELS.OBTENER_PRECIOS}`,
