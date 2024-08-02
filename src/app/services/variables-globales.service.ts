@@ -46,4 +46,15 @@ export class VariablesGlobalesService {
   public getCurrentValue(key: EnumVariablesGlobales): any {
     return this.variables.get(key)?.getValue();
   }
+
+  /**
+   * Borrar un dato
+   *
+   * @param {EnumVariablesGlobales} key
+   * @return {*}  {boolean}
+   * @memberof VariablesGlobalesService
+   */
+  public clearByKey(key: EnumVariablesGlobales): boolean {
+    return this.variables.delete(key);
+  }
 }

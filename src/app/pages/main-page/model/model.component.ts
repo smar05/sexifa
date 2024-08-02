@@ -534,13 +534,10 @@ export class ModelComponent implements OnInit {
         return;
       }
 
-      let infoModelSubscription: IInfoModelSubscription = localStorage.getItem(
-        LocalStorageEnum.INFO_MODEL_SUBSCRIPTION
-      )
-        ? JSON.parse(
-            localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION) || ''
-          )
-        : {};
+      let infoModelSubscription: IInfoModelSubscription =
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
+        ) || {};
 
       infoModelSubscription = {
         idModel: this.model.id,
@@ -549,16 +546,15 @@ export class ModelComponent implements OnInit {
         ).time,
       };
 
-      localStorage.setItem(
-        LocalStorageEnum.INFO_MODEL_SUBSCRIPTION,
-        JSON.stringify(infoModelSubscription)
+      this.variablesGlobalesService.set(
+        EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION,
+        infoModelSubscription
       );
 
-      let cart: IInfoModelSubscription[] = localStorage.getItem(
-        LocalStorageEnum.CART
-      )
-        ? JSON.parse(localStorage.getItem(LocalStorageEnum.CART) || '')
-        : [];
+      let cart: IInfoModelSubscription[] =
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.CART
+        ) || [];
 
       // Miramos si ya existe en el carrito
       let modelInfoSubscriptionIndex: number = cart.findIndex(
@@ -573,7 +569,7 @@ export class ModelComponent implements OnInit {
         cart.push(infoModelSubscription);
       }
 
-      localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(cart));
+      this.variablesGlobalesService.set(EnumVariablesGlobales.CART, cart);
 
       functions.bloquearPantalla(false);
       this.load = false;
@@ -635,19 +631,18 @@ export class ModelComponent implements OnInit {
   }
 
   public async setViewsModelData(): Promise<void> {
-    let viewsLocal: string[] = localStorage.getItem(
-      LocalStorageEnum.VIEWS_MODEL
-    )
-      ? JSON.parse(localStorage.getItem(LocalStorageEnum.VIEWS_MODEL))
-      : [];
+    let viewsLocal: string[] =
+      this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.VIEWS_MODEL
+      ) || [];
 
     // Si no esta guardado en local, lo añadimos y guardamos en la bd
     if (!viewsLocal.find((v: string) => v == this.model.id)) {
       // Se añade a local
       viewsLocal.push(this.model.id);
-      localStorage.setItem(
-        LocalStorageEnum.VIEWS_MODEL,
-        JSON.stringify(viewsLocal)
+      this.variablesGlobalesService.set(
+        EnumVariablesGlobales.VIEWS_MODEL,
+        viewsLocal
       );
 
       // Guardamos la nueva vista en la bd

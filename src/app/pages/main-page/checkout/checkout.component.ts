@@ -365,8 +365,10 @@ export class CheckoutComponent implements OnInit {
           );
         }
 
-        localStorage.removeItem(LocalStorageEnum.CART);
-        localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
+        this.variablesGlobalesService.clearByKey(EnumVariablesGlobales.CART);
+        this.variablesGlobalesService.clearByKey(
+          EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
+        );
 
         try {
           await this.telegramLocalService
@@ -555,8 +557,12 @@ export class CheckoutComponent implements OnInit {
               );
             }
 
-            localStorage.removeItem(LocalStorageEnum.CART);
-            localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
+            this.variablesGlobalesService.clearByKey(
+              EnumVariablesGlobales.CART
+            );
+            this.variablesGlobalesService.clearByKey(
+              EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
+            );
 
             let res: any = null;
 
@@ -691,17 +697,16 @@ export class CheckoutComponent implements OnInit {
     functions.bloquearPantalla(true);
     this.load = true;
 
-    let aux: string = localStorage.getItem(LocalStorageEnum.CART);
-    if (!aux || !JSON.parse(aux) || JSON.parse(aux).length === 0) {
+    this.cartLocal =
+      this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.CART
+      ) || null;
+
+    if (!this.cartLocal) {
       this.cart = [];
-      functions.bloquearPantalla(false);
-      this.load = false;
       return;
     }
 
-    this.cartLocal = JSON.parse(
-      localStorage.getItem(LocalStorageEnum.CART) || ''
-    );
     this.cart = [];
     this.total = 0;
 
@@ -713,9 +718,9 @@ export class CheckoutComponent implements OnInit {
         if (!cartLocalItem.idModel) {
           if (i >= 0) this.cartLocal = this.cartLocal.splice(i, 1);
 
-          localStorage.setItem(
-            LocalStorageEnum.CART,
-            JSON.stringify(this.cartLocal)
+          this.variablesGlobalesService.set(
+            EnumVariablesGlobales.CART,
+            this.cartLocal
           );
 
           alerts.basicAlert(
@@ -804,9 +809,9 @@ export class CheckoutComponent implements OnInit {
           } else {
             if (i >= 0) this.cartLocal = this.cartLocal.splice(i, 1);
 
-            localStorage.setItem(
-              LocalStorageEnum.CART,
-              JSON.stringify(this.cartLocal)
+            this.variablesGlobalesService.set(
+              EnumVariablesGlobales.CART,
+              this.cartLocal
             );
 
             alerts.basicAlert(
@@ -895,7 +900,10 @@ export class CheckoutComponent implements OnInit {
 
     this.cartLocal.splice(index, 1);
 
-    localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(this.cartLocal));
+    this.variablesGlobalesService.set(
+      EnumVariablesGlobales.CART,
+      this.cartLocal
+    );
 
     this.getCartData();
   }
