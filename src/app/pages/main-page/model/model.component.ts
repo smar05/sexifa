@@ -631,19 +631,18 @@ export class ModelComponent implements OnInit {
   }
 
   public async setViewsModelData(): Promise<void> {
-    let viewsLocal: string[] = localStorage.getItem(
-      LocalStorageEnum.VIEWS_MODEL
-    )
-      ? JSON.parse(localStorage.getItem(LocalStorageEnum.VIEWS_MODEL))
-      : [];
+    let viewsLocal: string[] =
+      this.variablesGlobalesService.getCurrentValue(
+        EnumVariablesGlobales.VIEWS_MODEL
+      ) || [];
 
     // Si no esta guardado en local, lo añadimos y guardamos en la bd
     if (!viewsLocal.find((v: string) => v == this.model.id)) {
       // Se añade a local
       viewsLocal.push(this.model.id);
-      localStorage.setItem(
-        LocalStorageEnum.VIEWS_MODEL,
-        JSON.stringify(viewsLocal)
+      this.variablesGlobalesService.set(
+        EnumVariablesGlobales.VIEWS_MODEL,
+        viewsLocal
       );
 
       // Guardamos la nueva vista en la bd

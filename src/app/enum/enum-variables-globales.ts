@@ -5,4 +5,5 @@ export enum EnumVariablesGlobales {
   MODEL_ID = 'model_id',
   INFO_MODEL_SUBSCRIPTION = 'infoModelSubscription',
   CART = 'cart',
+  VIEWS_MODEL = 'viewsModel',
 }

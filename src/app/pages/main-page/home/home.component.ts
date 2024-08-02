@@ -157,7 +157,7 @@ export class HomeComponent implements OnInit {
     this.variablesGlobalesService.clearByKey(
       EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
     );
-    localStorage.removeItem(LocalStorageEnum.VIEWS_MODEL);
+    this.variablesGlobalesService.clearByKey(EnumVariablesGlobales.VIEWS_MODEL);
 
     if (idsProblem?.length > 0) {
       alerts.basicAlert(
