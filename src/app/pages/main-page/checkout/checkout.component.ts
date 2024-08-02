@@ -45,6 +45,7 @@ import { IButtonComponent } from 'src/app/shared/button/button.component';
 import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
 import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
 import { BackService } from 'src/app/services/back.service';
+import { EncryptionService } from 'src/app/services/encryption.service';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -96,7 +97,8 @@ export class CheckoutComponent implements OnInit {
     private tokenService: TokenService,
     private alertsPagesService: AlertsPagesService,
     private variablesGlobalesService: VariablesGlobalesService,
-    private backService: BackService
+    private backService: BackService,
+    private encryptionService: EncryptionService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -1014,6 +1016,18 @@ export class CheckoutComponent implements OnInit {
     });
     const date: Date = new Date();
     let dateNumber: number = date.getTime();
+    const extra3: string = JSON.stringify(
+      this.cart.map((c: ICart) => {
+        // Se envia todo menos Imodel
+        let encryptData = this.encryptionService.encryptDataJson({
+          infoModelSubscription: JSON.stringify(c.infoModelSubscription),
+          price: String(c.price),
+        });
+
+        return encryptData;
+      })
+    );
+
     const dataEpayco: object = {
       name: 'OnlyGram',
       description: 'Pago de subscripciones de OnlyGram',
@@ -1049,15 +1063,7 @@ export class CheckoutComponent implements OnInit {
       // Date
       extra2: date,
       // Carrito
-      extra3: JSON.stringify(
-        this.cart.map((c: ICart) => {
-          // Se envia todo menos Imodel
-          return {
-            infoModelSubscription: c.infoModelSubscription,
-            price: c.price,
-          } as ICart;
-        })
-      ),
+      extra3,
       confirmation: `${environment.urlServidorLocal}/api/epayco-trans/${EnumEndpointsBack.EPAYCO.CONFIRMACION}`,
       response: `${environment.urlProd}/#/${UrlPagesEnum.HOME}`,
       //Atributos cliente
