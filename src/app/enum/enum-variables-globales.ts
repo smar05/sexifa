@@ -3,4 +3,5 @@ export enum EnumVariablesGlobales {
   USER_TYPE = 'user_type',
   SEARCH_ORDER = 'search_order',
   MODEL_ID = 'model_id',
+  INFO_MODEL_SUBSCRIPTION = 'infoModelSubscription',
 }

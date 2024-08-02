@@ -366,7 +366,9 @@ export class CheckoutComponent implements OnInit {
         }
 
         localStorage.removeItem(LocalStorageEnum.CART);
-        localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
+        this.variablesGlobalesService.clearByKey(
+          EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
+        );
 
         try {
           await this.telegramLocalService
@@ -556,7 +558,9 @@ export class CheckoutComponent implements OnInit {
             }
 
             localStorage.removeItem(LocalStorageEnum.CART);
-            localStorage.removeItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION);
+            this.variablesGlobalesService.clearByKey(
+              EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
+            );
 
             let res: any = null;
 

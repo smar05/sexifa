@@ -534,13 +534,10 @@ export class ModelComponent implements OnInit {
         return;
       }
 
-      let infoModelSubscription: IInfoModelSubscription = localStorage.getItem(
-        LocalStorageEnum.INFO_MODEL_SUBSCRIPTION
-      )
-        ? JSON.parse(
-            localStorage.getItem(LocalStorageEnum.INFO_MODEL_SUBSCRIPTION) || ''
-          )
-        : {};
+      let infoModelSubscription: IInfoModelSubscription =
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
+        ) || {};
 
       infoModelSubscription = {
         idModel: this.model.id,
@@ -549,9 +546,9 @@ export class ModelComponent implements OnInit {
         ).time,
       };
 
-      localStorage.setItem(
-        LocalStorageEnum.INFO_MODEL_SUBSCRIPTION,
-        JSON.stringify(infoModelSubscription)
+      this.variablesGlobalesService.set(
+        EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION,
+        infoModelSubscription
       );
 
       let cart: IInfoModelSubscription[] = localStorage.getItem(
