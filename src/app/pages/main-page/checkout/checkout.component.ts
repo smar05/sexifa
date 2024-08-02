@@ -31,7 +31,10 @@ import { CurrencyConverterService } from 'src/app/services/currency-converter.se
 import { ModelStatusEnum } from 'src/app/enum/modelStatusEnum';
 import { CurrencyEnum } from 'src/app/enum/currencyEnum';
 import { FrontLogsService } from 'src/app/services/front-logs.service';
-import { BusinessParamsService } from 'src/app/services/business-params.service';
+import {
+  BusinessParamsService,
+  EnumBusinessParamsKeys,
+} from 'src/app/services/business-params.service';
 import { MetodosDePagoService } from 'src/app/services/metodos-de-pago.service';
 import {
   EnumMetodosDePagoStatus,
@@ -220,7 +223,7 @@ export class CheckoutComponent implements OnInit {
 
     try {
       data = await this.businessParamsService
-        .getItemFS('commission')
+        .getItemFS(EnumBusinessParamsKeys.COMMISSION)
         .toPromise();
     } catch (err) {
       this.frontLogsService.catchProcessError(

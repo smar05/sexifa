@@ -77,6 +77,7 @@ export const environment = {
     app_id: '1462767',
     url_dashboard: 'https://dashboard.epayco.com/',
   },
+  version: '1.0.0',
 };
 
 /*

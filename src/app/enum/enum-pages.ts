@@ -11,4 +11,5 @@ export enum EnumPages {
   PAGE_SELLER = 'page_seller',
   USER = 'user',
   USER_SELLER = 'user_seller',
+  FRONT_VERSION = 'front_version',
 }

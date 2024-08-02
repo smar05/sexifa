@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 export enum EnumBusinessParamsKeys {
   PUBLIC_KEY = 'public_key',
   COMMISSION = 'commission',
+  FRONT_DATA = 'front_data',
 }
 
 @Injectable({
@@ -35,12 +36,15 @@ export class BusinessParamsService {
   /**
    * Tomar un documento
    *
-   * @param {string} doc
+   * @param {EnumBusinessParamsKeys} doc
    * @param {QueryFn} [qf=null]
    * @return {*}  {Observable<any>}
    * @memberof BusinessParamsService
    */
-  public getItemFS(doc: string, qf: QueryFn = null): Observable<any> {
+  public getItemFS(
+    doc: EnumBusinessParamsKeys,
+    qf: QueryFn = null
+  ): Observable<any> {
     return this.fireStorageService
       .getItem(this.urlBusinessParams, doc, qf)
       .pipe(this.fireStorageService.mapForPipe('one'));
