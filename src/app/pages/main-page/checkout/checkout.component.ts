@@ -44,6 +44,7 @@ import { EnumPages } from 'src/app/enum/enum-pages';
 import { IButtonComponent } from 'src/app/shared/button/button.component';
 import { VariablesGlobalesService } from 'src/app/services/variables-globales.service';
 import { EnumVariablesGlobales } from 'src/app/enum/enum-variables-globales';
+import { BackService } from 'src/app/services/back.service';
 
 declare var paypal: any;
 declare const ePayco: any;
@@ -94,11 +95,32 @@ export class CheckoutComponent implements OnInit {
     private metodosDePagoService: MetodosDePagoService,
     private tokenService: TokenService,
     private alertsPagesService: AlertsPagesService,
-    private variablesGlobalesService: VariablesGlobalesService
+    private variablesGlobalesService: VariablesGlobalesService,
+    private backService: BackService
   ) {}
 
   async ngOnInit(): Promise<void> {
     functions.bloquearPantalla(true);
+
+    try {
+      let res = await this.backService.sendPing().toPromise();
+
+      if (!res.connection) this.router.navigate([`/${EnumPages.HOME}`]);
+    } catch (error) {
+      this.frontLogsService.catchProcessError(
+        error,
+        {
+          title: 'Error',
+          text: 'Ha ocurrido un error',
+          icon: 'error',
+        },
+        `file: checkout.component.ts: ~ CheckoutComponent ~ ngOnInit ~ JSON.stringify(error): ${JSON.stringify(
+          error
+        )}`
+      );
+
+      this.router.navigate([`/${EnumPages.HOME}`]);
+    }
 
     this.alertPage();
 
