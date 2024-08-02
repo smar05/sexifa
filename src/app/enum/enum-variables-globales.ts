@@ -4,4 +4,5 @@ export enum EnumVariablesGlobales {
   SEARCH_ORDER = 'search_order',
   MODEL_ID = 'model_id',
   INFO_MODEL_SUBSCRIPTION = 'infoModelSubscription',
+  CART = 'cart',
 }

@@ -551,11 +551,10 @@ export class ModelComponent implements OnInit {
         infoModelSubscription
       );
 
-      let cart: IInfoModelSubscription[] = localStorage.getItem(
-        LocalStorageEnum.CART
-      )
-        ? JSON.parse(localStorage.getItem(LocalStorageEnum.CART) || '')
-        : [];
+      let cart: IInfoModelSubscription[] =
+        this.variablesGlobalesService.getCurrentValue(
+          EnumVariablesGlobales.CART
+        ) || [];
 
       // Miramos si ya existe en el carrito
       let modelInfoSubscriptionIndex: number = cart.findIndex(
@@ -570,7 +569,7 @@ export class ModelComponent implements OnInit {
         cart.push(infoModelSubscription);
       }
 
-      localStorage.setItem(LocalStorageEnum.CART, JSON.stringify(cart));
+      this.variablesGlobalesService.set(EnumVariablesGlobales.CART, cart);
 
       functions.bloquearPantalla(false);
       this.load = false;

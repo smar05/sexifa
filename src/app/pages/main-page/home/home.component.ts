@@ -153,7 +153,7 @@ export class HomeComponent implements OnInit {
     }
 
     // Limpiar el localStorage
-    localStorage.removeItem(LocalStorageEnum.CART);
+    this.variablesGlobalesService.clearByKey(EnumVariablesGlobales.CART);
     this.variablesGlobalesService.clearByKey(
       EnumVariablesGlobales.INFO_MODEL_SUBSCRIPTION
     );
